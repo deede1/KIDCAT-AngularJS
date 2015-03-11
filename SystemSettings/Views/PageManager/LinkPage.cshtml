@@ -1,0 +1,144 @@
+﻿
+<div class="content edit-options" id="LinkPageFields" style="display:block">
+    <div class="fields">
+
+                 <!-- row 1 -->
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Page Name</label>
+                </p>
+                <p class="cell w-12-4">
+                    <input type="Text" maxlength="16" data-bind="value: PageTitleName"/>
+                         <div style="color: red">(Maximum characters: 16)</div>
+                </p>
+            </div>
+            
+               <div class="row">
+                <p class="cell w-12-2">
+                    <label>URL to link from the page</label>
+                </p>
+                <p class="cell w-12-4">
+                    <input type="text" data-bind="value: PageURL"/>
+                </p>
+            </div>
+        <!-- row 4 -->
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Enable for:</label>
+                </p>
+                <p class="cell w-12-4">
+                    <input name="patrons" type="checkbox" data-bind="checked: EnableGuests" />
+                    <label for="">Guest</label>
+                    <input name="patrons" type="checkbox" data-bind="checked: EnablePatrons" />
+                    <label for="">Patrons</label>
+                    <input name="staff" type="checkbox" data-bind="checked: EnableStaff" />
+                    <label for="">Staff</label>
+                </p>
+            </div>
+            
+         
+
+                  
+    </div>       
+</div>
+
+
+<script type="text/javascript">
+    uxAdmin.PageManager.LinkPage = (function () {
+
+        var _view = $('#LinkPageFields');
+        var LPvm;
+
+        var LinkPageVm = function () {
+            var self = this;
+            self.PageId = ko.observable();
+            self.PageTypeId = ko.observable();
+            self.PageType = ko.observable();
+            self.PageTitleName = ko.observable();
+            self.PageURL = ko.observable();
+            self.EnableGuests = ko.observable();
+            self.EnablePatrons = ko.observable();
+            self.EnableStaff = ko.observable();
+            self.PageTypeEnable = ko.observable();
+
+            self.showGlobal = ko.observable();
+            self.showLocal = ko.observable();
+            self.IsLocalPage = ko.observable(true);
+            self.IsGlobalPage = ko.observable(false);
+            self.ForceLibraryToUseGlobal = ko.observable(false);
+            self.SelectedLibrary = ko.observable();
+            self.ApplyToListLibrary = [];
+            self.DefaultPageType = ko.observable("Local");
+            self.WidgetLocation = [];
+            self.WidgetLocationGlobal = [];
+            self.PageTypeEnable = ko.observable(false);
+
+        };
+        //init
+        var init = function (pageTypeId, pageType) {
+
+            LPvm = new LinkPageVm();
+            LPvm.PageTypeId(pageTypeId);
+            LPvm.PageType(pageType);
+
+            LPvm.EnableGuests(false);
+            LPvm.EnablePatrons(false);
+            LPvm.EnableStaff(false);
+
+            ko.applyBindings(LPvm, _view.get(0));
+            //console.log("Link Page Loaded");
+
+        };
+        var showGlobalView = function (show) {
+            // LinkPageVm.showGlobal(show);
+        };
+        var showLocalView = function (show) {
+            // LinkPageVm.showLocal(show);
+        };
+        var showLibraryInfoView = function (show) {
+
+        };
+        var customerSuperUser = function (pageId, forceToUseLibrary, selectLibraryList) {
+            var self = this;
+            self.PageId = pageId;
+            self.ForuceToUse = forceToUseLibrary;
+            self.ApplyToLibraryList = ko.toJSON(selectLibraryList);
+        };
+        var collectApplyLibraryData = function () {
+
+            return new customerSuperUser(LPvm.PageId, LPvm.ForceLibraryToUseGlobal(), LPvm.SelectedLibrary());
+        };
+        var collectPageData = function () {
+        
+            return ko.mapping.toJS(LPvm);
+        };
+        var loadDefault = function () {
+        };
+        var loadData = function (index) {
+            uxAdmin.utilities.ajaxPostJson("SystemSettings/PageManager/GetPageData/", index, function (data) {                
+                var pageData = $.parseJSON(data.PageCollector.JsonData);
+                LPvm.PageId("-1|"+data.PageCollector.PageId);
+                LPvm.PageTypeId(pageData.PageTypeId);
+                LPvm.PageType(pageData.PageType);
+                LPvm.PageTitleName(pageData.PageTitleName);
+                LPvm.PageURL(pageData.PageUrl);
+                LPvm.EnableGuests(pageData.EnableGuests);
+                LPvm.EnablePatrons(pageData.EnablePatrons);
+                LPvm.EnableStaff(pageData.EnableStaff);
+                LPvm.PageTypeEnable(pageData.PageTypeId != -1);
+            });
+        };
+
+        return {
+            Init: init,
+            loadData: loadData,
+            loadDefault: loadDefault,
+            showGlobalView: showGlobalView,
+            showLocalView: showLocalView,
+            showLibraryInfoView: showLibraryInfoView,
+            collectPageData: collectPageData,
+            collectApplyLibraryData: collectApplyLibraryData
+        };
+
+    })();
+</script>

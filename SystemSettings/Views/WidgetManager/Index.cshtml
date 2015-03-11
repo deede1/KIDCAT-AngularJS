@@ -1,0 +1,827 @@
+﻿@*<!DOCTYPE html>*@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <meta charset="utf-8" />
+    <meta http-equiv="Cache-control" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+    <title>Widget Manager</title>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Styles/style.css")" />    
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")" />
+    <style type="text/css">
+        body { position:relative;}
+    
+        /* iframe form styles */
+        body > form {display:block; width:inherit; margin:0px;}
+        body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+        body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+        body > form .title .actions {width:auto; float:right;}
+        body > form .content > .fields .row > div.cell.w-12-10 {width:100%;}
+        body > form .list3.widgets3 {width:inherit; padding:0px;}
+        body > form .tabberlive {width:inherit;}
+        body > form .widgets.list, .widgets.list  {padding:0px;}
+        .fields .cell > span.cke, 
+        .cke_browser_ie.cke_browser_quirks {display:block;}
+        .cke_browser_iequirks.cke_browser_ie .cke_top,
+        .cke_browser_iequirks.cke_browser_ie .cke_bottom,
+        .cke_browser_ie.cke_browser_quirks .cke_top,
+        .cke_browser_ie.cke_browser_quirks .cke_bottom {width:auto;} 
+    </style>
+    <script type="text/javascript">
+            var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+            //console.log('Loading Page. You are in ' + (document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks') + ' mode.');
+    </script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+    
+    
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jQuery-ui-tab-utils.js")" ></script>
+    
+    @*
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-sortable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/ckeditor/ckeditor.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/ckeditor/config.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/ckeditor/plugins/iframe/dialogs/iframe.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jQuery.FileInput/jquery.fileinput.js")" ></script>    *@
+</head>
+<body>
+    <form id="WidgetManagerForm" method="post" action="">
+
+        <div class="title full-width">
+            <h3>Widget Manager</h3>
+            <div class="actions">
+                <input type="button" class="button primary" value="Create New Widget" data-bind="click: $root.CreateNewWidget"/>                                
+                <input type="button" class="button" value="Help" />
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="fields">
+
+                <!-- row 1 -->
+                <div class="row">
+                    <p class="cell w-12-2">
+                        <!--    <label>Edit or Delete the Widgets</label> -->
+                        <label style="font-weight: bold ; font-size: 15px">Widget List</label>
+                    </p>
+                    <div class="cell w-12-10">
+                        
+                    <div class="row">            
+                        <div id="PageTemplateTabs" style="width: 98.8%; float: left;">
+                            <ul>
+                                <li><a href="#LocalWidget">Local Widget</a></li>
+                                <li><a href="#GlobalWidget">Global Widget</a></li>            
+                            </ul>
+                            <div id="LocalWidget">
+                                <div class="row">                       
+                                    
+                                    <ul class="list widgets" >    
+                                    <li>
+                                        <div style="width: 19px;" data-bind="text: ' '"></div>   
+                                        <div style="width: 19px;" data-bind="text: ' '"></div>  
+                                         @*click: SortingTestFunction.bind(WidgetTypesList, 'Name')*@
+                                        <span class="widget-name" data-bind="click: sortLocalItems, text: 'Widget Name'" style="font-weight:bold;width: 80px;"></span><span class="name sort-icon" data-bind="click: sortLocalItems"></span> 
+                                        <span class="widget-name" data-bind="click: sortLocalType, text: 'Type'" style="font-weight:bold;width: 70px;"></span><span class="type sort-icon" data-bind="click: sortLocalType"></span>                            
+                                        <span class="widget-name dimensions" data-bind="text: 'Size (Column x Rows)'" style="font-weight:bold;"></span>
+                                        <span class="widget-name" data-bind="click: sortLocalInUse, text: 'In Use'" style="font-weight:bold;width: 45px;"></span><span class="type sort-icon" data-bind="click: sortLocalInUse"></span>
+                                    </li>
+                                    </ul>
+
+                                    <ul id="local_widgets" class="list widgets" data-bind="foreach: WidgetTypesList">
+                                    <li>
+                                        <a class="icon delete" title="Delete" data-bind="click: $root.deleteLocalWidget"></a>  
+                                        <a class="icon edit" title="Edit" data-bind="click: $root.editLocalWidget"></a>	                      
+                                        <div class="widget-name list-item" data-bind="text: Name,click: $root.editWidget,sortable: {foreach:Name}"></div>
+                                        <span class="widget-type" data-bind="text: WType"></span>
+                                        <span class="widget-type dimensions" data-bind="text: SizeMsg"></span>
+                                        <span class="widget-type dimensions last"><span data-bind="css:{ widgetInUseHightLight : $data.UsageInfo.UsingPages.length > 0 }, text: UsageInfo.UseMsg, event: { mouseover: $root.enablepop, mouseout: $root.disablepop }"></span></span>
+                                    </li>
+                                    </ul>   
+
+                                </div>
+                            </div>
+                            <div id="GlobalWidget">
+                                <div class="row">                       
+                              <ul class="list3 widgets3" >    
+                                    <li>
+                                        <div style="width: 19px;" data-bind="text: ' '"></div>   
+                                        <div style="width: 19px;" data-bind="text: ' '"></div>   
+                                        <span class="widget-name" data-bind="click: sortGlobalItems,text: 'Widget Name'" style="font-weight:bold;width: 80px;"></span><span class="name sort-icon" data-bind="click: sortGlobalItems"></span> 
+                                        <span class="widget-name" data-bind="click: sortGlobalType,text: 'Type'" style="font-weight:bold;width: 70px;"></span><span class="type sort-icon" data-bind="click: sortGlobalType"></span>                           
+                                        <span class="widget-name dimensions" data-bind="text: 'Size (Column x Rows)'" style="font-weight:bold;"></span>
+                                        <span class="widget-name" data-bind="click: sortGlobalInUse, text: 'In Use'" style="font-weight:bold;width: 45px;"></span><span class="type sort-icon" data-bind="click: sortGlobalInUse"></span>     
+                                    </li>
+                                </ul>
+                                    <ul id="global_widgets" class="list3 widgets3" data-bind="foreach: WidgetTypesListGlobal">                    
+                                        <li>
+                                            <a class="icon delete" title="Delete" data-bind="click: $root.deleteGlobalWidget"></a>
+                                            <a class="icon edit" title="Edit" data-bind="click: $root.editGlobalWidget"></a>	                      
+                                            <div class="widget-name" data-bind="text: Name,click: $root.editWidget"></div>
+                                            <span class="widget-type" data-bind="text: WType"></span>     
+                                            <span class="widget-type dimensions" data-bind="text: SizeMsg"></span>
+                                        
+                                            <span class="widget-type dimensions last"><span data-bind="css:{ widgetInUseHightLight : $data.UsageInfo.UsingPages.length > 0 }, text: UsageInfo.UseMsg, event: { mouseover: $root.enablepop, mouseout: $root.disablepop }"></span></span>                                           
+                                        </li>
+                                    </ul>
+
+                                </div>                      
+                            </div>
+                        </div>            
+                    </div> 
+
+
+
+                    </div>          
+                </div>
+
+                <!-- row 2 -->
+                <div class="row"></div>
+
+            </div>
+        </div>
+    
+@*        <div class="ModifyWidgetAction" style="display: none">
+            <div class="title full-width">
+                <h3>Modify Widget</h3>
+                <div class="actions">
+                    <input type="button" class="button primary" value="Preview"  />       
+                    <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" /> 
+                    <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                    <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                </div>
+            </div>
+        </div>
+
+        <div id="wgt"></div>
+        <div class="ModifyWidgetAction botButtons" style="display: none">
+            <div class="title full-width" style="border:none;">
+                <div class="actions">
+                    <input type="button" class="button primary" value="Preview"  />       
+                    <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" /> 
+                    <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                    <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                </div>
+            </div>
+        </div>*@
+    </form>
+
+    <script type="text/javascript">
+
+        uxAdmin.WidgetManager = (function () {
+            // vars
+            var _view = $('#WidgetManagerForm');
+            var _body = $('#wgt');
+            var _formButtons = {};
+            var _VM;
+            var module;
+
+            function SortingModule(obj, SortByColumnName, AcsDec) {
+                var abc = String(SortByColumnName);
+                obj.sort(function (a, b) {
+                    var tempA = eval("a." + abc);
+                    var tempB = eval("b." + abc);
+                    //console.log(tempA);
+                    var nameA = tempA.toLowerCase(), nameB = tempB.toLowerCase()
+                    if (nameA < nameB) //sort string ascending
+                        return -1
+                    if (nameA > nameB)
+                        return 1
+                    return 0 //default return value (no sorting)
+                })
+                if (AcsDec) {
+                    return obj;
+                } else {
+                    return obj.reverse();
+                }
+            }
+
+
+            // methods
+            var widgetManagerWidgetVm = function () {
+                var self = this;
+                self.WidgetTypesList = ko.observableArray([]);
+                self.WidgetTypesListGlobal = ko.observableArray([]);
+                self.isSort = ko.observable(true);
+                self.isSortType = ko.observable(true);
+                self.isGlobalSort = ko.observable(true);
+                self.isGlobalTypeSort = ko.observable(true);
+                self.selectedType = ko.observable();
+                self.IsCustomerSuperUser = ko.observable();
+                self.widgetSizeMsg = function (data) {
+                    return "Size: ";
+                };
+                self.ShowLocalWidget = function (data) {
+                    var x = ko.utils.parseJson(data);
+                    return x.WidgetForLocal;
+                };
+                self.ShowGlobalWidget = function (data) {
+                    var x = ko.utils.parseJson(data);
+                    return x.WidgetForGlobal;
+                };
+
+                self.deleteGlobalWidget = function (widget) {
+                    deleteDialogbox(widget, "Global");
+                };
+                self.deleteLocalWidget = function (widget) {
+                    deleteDialogbox(widget, "Local");
+                };
+                self.editLocalWidget = function (widget) {
+                    //console.log(widget);
+                    window.parent.ModifiyManagerIframeUrl("Widget", widget.Index, false);
+                };
+                self.editGlobalWidget = function (widget) {
+                    window.parent.ModifiyManagerIframeUrl("Widget", widget.Index, true);
+                };
+
+                var deleteDialogbox = function (widget, deleteType) {
+                    var useageMsg1 = '<div id="dialog-confirm" title="Delete this widget?"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;height: 12px;"></span>Are you sure you want to delete this widget?<br /><span style="color:red;"><strong>Note:</strong> There is no Undo.</span></p></div>';
+                    var useageMsg2 = '<div id="dialog-confirm" title="Delete this widget?"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 65px 0;height: 12px;"></span>Deleting this widget will delete it from all pages it is on.<br />Press "DELETE WIDGET" to continue.<br /><span style="color:red;"> <strong>Note:</strong> There is no Undo.</span><br /><span>Press CANCEL to delete this widget by going to individual pages.</span></p></div>';
+                    (widget.UsageInfo.UsingPages.length == 0) ? $('body').append(useageMsg1) : $('body').append(useageMsg2);
+                    $("#dialog-confirm").dialog({
+                        resizable: false,
+                        height: 180,
+                        width: 350,
+                        modal: false,
+                        buttons: {
+                            "Delete Widget": function () {
+                                $(this).dialog("close");
+                                deleteType == "Local" ? self.WidgetTypesList.remove(widget) : self.WidgetTypesListGlobal.remove(widget);
+                                uxAdmin.utilities.ajaxPostJson("WidgetManager/DeleteWidget", widget, function (data) { });
+                                //uxAdmin.utilities.ajaxPostJson("WidgetManager/Delete" + deleteType + "Widget", widget, function (data) { });
+                                _view.find('.actions .button[value="Create Widget"]').show();
+                                $('#dialog-confirm').remove();
+                                //
+                            },
+                            Cancel: function () {
+                                $(this).dialog("close"); $('#dialog-confirm').remove();
+                            }
+                        },
+                        create: function () {
+                            $(this).closest(".ui-dialog").addClass("customLay");
+                        }
+                    });
+                };
+                self.CreateNewWidget = function (data, event) {
+                    //window.location.href = '@Url.Action("CreateWidget", "WidgetManager", new { Area = "SystemSettings" , id = "", typeId= "",typeName= "",isGlobal= "", isLocal=""})';
+                    window.location.href = '../Systemsettings/WidgetManager/CreateWidget';
+                };
+                self.sortLocalItems = function (data, event) {
+                    //console.log($(event.target).text());
+                    var $modules = self.WidgetTypesList();
+                    //console.log($modules);
+                    if (_VM.isSort()) {
+                        _VM.isSort(false);
+                        _VM.WidgetTypesList(SortingModule($modules, "Name", false));
+                        $('.list.widgets li .sort-icon.name').removeClass('up');
+                        //_VM.WidgetTypesList($modules);
+                    } else {
+                        _VM.isSort(true);
+                        _VM.WidgetTypesList(SortingModule($modules, "Name", true));
+                        $('.list.widgets li .sort-icon.name').addClass('up');
+                    }
+                };
+                self.sortGlobalItems = function (data, event) {
+                    var $modules = self.WidgetTypesListGlobal();
+                    //console.log($modules);
+                    if (_VM.isGlobalSort()) {
+                        _VM.isGlobalSort(false);
+                        _VM.WidgetTypesListGlobal(SortingModule($modules, "Name", false));
+                        $('.list3.widgets3 li .sort-icon.name').removeClass('up');
+                    } else {
+                        _VM.isGlobalSort(true);
+                        _VM.WidgetTypesListGlobal(SortingModule($modules, "Name", true));
+                        $('.list3.widgets3 li .sort-icon.name').addClass('up');
+                    }
+                };
+                self.sortLocalType = function (data, event) {
+                    //console.log($(event.target).text());
+                    var $modules = self.WidgetTypesList();
+                    //console.log($modules);
+                    if (_VM.isSortType()) {
+                        _VM.isSortType(false);
+                        _VM.WidgetTypesList(SortingModule($modules, "WType", false));
+                        $('.list.widgets li .sort-icon.type').removeClass('up');
+                        //_VM.WidgetTypesList($modules);
+                    } else {
+                        _VM.isSortType(true);
+                        _VM.WidgetTypesList(SortingModule($modules, "WType", true));
+                        $('.list.widgets li .sort-icon.type').addClass('up');
+                    }
+                };
+                self.sortGlobalType = function (data, event) {
+                    var $modules = self.WidgetTypesListGlobal();
+                    //console.log($modules);
+                    if (_VM.isGlobalTypeSort()) {
+                        _VM.isGlobalTypeSort(false);
+                        _VM.WidgetTypesListGlobal(SortingModule($modules, "WType", false));
+                        $('.list3.widgets3 li .sort-icon.type').removeClass('up');
+                    } else {
+                        _VM.isGlobalTypeSort(true);
+                        _VM.WidgetTypesListGlobal(SortingModule($modules, "WType", true));
+                        $('.list3.widgets3 li .sort-icon.type').addClass('up');
+                    }
+                };
+                self.sortLocalInUse = function (data, event) {
+                    //console.log($(event.target).text());
+                    var $modules = self.WidgetTypesList();
+                    //console.log($modules);
+                    if (_VM.isSortType()) {
+                        _VM.isSortType(false);
+                        _VM.WidgetTypesList(SortingModule($modules, "UsageDetailMsg", false));
+                        $('.list.widgets li .sort-icon.type').removeClass('up');
+                        //_VM.WidgetTypesList($modules);
+                    } else {
+                        _VM.isSortType(true);
+                        _VM.WidgetTypesList(SortingModule($modules, "UsageDetailMsg", true));
+                        $('.list.widgets li .sort-icon.type').addClass('up');
+                    }
+                };
+                self.sortGlobalInUse = function (data, event) {
+                    var $modules = self.WidgetTypesListGlobal();
+                    //console.log($modules);
+                    if (_VM.isGlobalTypeSort()) {
+                        _VM.isGlobalTypeSort(false);
+                        _VM.WidgetTypesListGlobal(SortingModule($modules, "UsageDetailMsg", false));
+                        $('.list3.widgets3 li .sort-icon.type').removeClass('up');
+                    } else {
+                        _VM.isGlobalTypeSort(true);
+                        _VM.WidgetTypesListGlobal(SortingModule($modules, "UsageDetailMsg", true));
+                        $('.list3.widgets3 li .sort-icon.type').addClass('up');
+                    }
+                };
+                self.enablepop = function (widget, event) {
+                    if (widget.UsageInfo.UsingPages.length > 1) {
+                        var a = $(event.target).offset();
+                        var arr = [];
+                        for (i = 0; i < widget.UsageInfo.UsingPages.length; i++) {
+                            arr.push('<li class="val">' + widget.UsageInfo.UsingPages[i] + '</li>');
+                        }
+                        $(event.target).parent().parent().append('<span class="tip-arrow" style="left:' + (a.left + $(event.target).width() - 15) + 'px"/><ul class="tip" style="left:' + ((a.left + $(event.target).width()) - 8) + 'px">' + arr.join('') + '</ul>');
+                    }
+                    ;
+                };
+                self.disablepop = function () {
+                    $('.tip, .tip-arrow').remove();
+                };
+
+                //                self.saveWidget = function (widget) {
+                //                    //console.log("SAVE");
+                //                    var data = module.CollectWidgetData();
+
+                //                    if ((typeof data.WidgetTitleName === "undefined") || (data.WidgetTitleName === "")) {
+                //                        alert("Widget Name is required.");
+                //                    } else {
+
+                //                        //insert fill color tag
+                //                        if (data.WidgetType == "ContentWidget") {
+
+                //                            var editor = CKEDITOR.instances['contentWidget_te'];
+                //                            var initialColor = window.parent.__cke.getInitial();
+                //                            var editorColor;
+
+                //                            var existing = editor.document.getById('cke-background-fill');
+                //                            console.log("Existing input: ");
+                //                            console.log(existing);
+
+                //                            if (existing == null || existing == undefined || existing === "undefined") {
+                //                                //insert new tag based on validation result over _cke 'background' value
+                //                                //initialColor = window.parent.__cke.getInitial(); //.getBackground();
+                //                                editorColor = "undefined";
+                //                                console.log("editor color: " + editorColor);
+
+                //                                switch (initialColor) {
+                //                                    case "undefined":
+                //                                        console.log("---------------------------- (no tag,1)");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //no tag, no valid initial color onload, current applied color/no current applied color
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == "undefined" || applied == "transparent" ? "transparent" : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        /*var elem = new CKEDITOR.dom.element('input');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'");
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;*/
+
+                //                                        var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                        var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                        var html = content + elem;
+                //                                        CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                        editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                        console.log("content: " + content);
+                //                                        console.log("elem: " + elem);
+                //                                        console.log("html: " + html);
+                //                                        console.log(html);
+                //                                        console.log("----------------------------");
+                //                                        break;
+
+                //                                    case "transparent":
+                //                                    default:
+                //                                        console.log("---------------------------- (no tag,1)");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //no tag, valid initial color onload, current applied color
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == initialColor ? initialColor : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        /**/var elem = new CKEDITOR.dom.element('input');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;
+
+                //                                    /*var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                    var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                    var html = content + elem;
+                //                                    CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                    editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                    console.log("content: " + content);
+                //                                    console.log("elem: " + elem);
+                //                                    console.log("html: " + html);
+                //                                    console.log(html);
+                //                                    console.log("----------------------------");
+                //                                    break;*/ 
+                //                                };
+                //                            } else {
+                //                                editorColor = existing.getAttribute('data-color');
+                //                                console.log("editor color: ");
+                //                                console.log(editorColor);
+
+                //                                //tempColor = window.parent.__cke.getBackground();
+                //                                console.log("temp color: ");
+                //                                console.log(initialColor);
+
+                //                                switch (initialColor) {
+                //                                    case "undefined":
+                //                                        console.log("---------------------------- (tag,0)");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //tag with value, no initial color, current applied color 
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == "undefined" || applied == "transparent" ? "transparent" : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        var tag = editor.document.getById('cke-background-fill');
+                //                                        console.log("tag: " + tag);
+                //                                        if (tag) tag.remove();
+
+                //                                        console.log("tag: " + tag);
+
+
+                //                                        /**/var elem = new CKEDITOR.dom.element('input');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;
+
+                //                                    /*var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                    var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                    var html = content + elem;
+                //                                    CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                    editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                    console.log("content: " + content);
+                //                                    console.log("elem: " + elem);
+                //                                    console.log("html: " + html);
+                //                                    console.log(html);
+                //                                    console.log("----------------------------");
+                //                                    break;*/ 
+
+                //                                    case "transparent":
+                //                                    default:
+                //                                        console.log("---------------------------- (tag,1)");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //tag with value, valid initial color onload, current applied color
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == initialColor ? initialColor : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        var tag = editor.document.getById('cke-background-fill');
+                //                                        console.log("tag: " + tag);
+                //                                        if (tag) tag.remove();
+
+                //                                        console.log("tag: " + tag);
+
+                //                                        /**/var elem = new CKEDITOR.dom.element('p');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;
+
+                //                                    /*var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                    var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                    var html = content + elem;
+                //                                    CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                    editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                    console.log("content: " + content);
+                //                                    console.log("elem: " + elem);
+                //                                    console.log("html: " + html);
+                //                                    console.log("----------------------------");
+                //                                    break;*/ 
+                //                                };
+                //                            };
+                //                            data = module.CollectWidgetData();
+                //                            console.log("data to store:");
+                //                            console.log(data);
+                //                        };
+                //                        //return; //-
+
+                //                        var myCollectionData = new widgetJsonCollector(data.WidgetId, ko.toJSON(data));
+                //                        uxAdmin.utilities.ajaxPostJson("WidgetManager/UpdateWidget", myCollectionData, function (result) {
+                //                            if (data.WidgetType == "ContentWidget" && result == "Your Widget has been updated") {
+                //                                window.parent.__cke.reset();
+                //                                window.parent.__cke.onLoad(CKEDITOR.instances['contentWidget_te']);
+                //                            };
+                //                            alert(result);
+                //                        });
+                //                    };
+                //                };
+                //                self.saveCloseWidget = function (widget) {
+                //                    console.log("SAVE AND CLOSE");
+                //                    var data = module.CollectWidgetData();
+
+                //                    if ((typeof data.WidgetTitleName === "undefined") || (data.WidgetTitleName === "")) {
+                //                        alert("Widget Name is required.");
+                //                    } else {
+
+                //                        //insert fill color tag
+                //                        if (data.WidgetType == "ContentWidget") {
+
+                //                            var editor = CKEDITOR.instances['contentWidget_te'];
+                //                            var initialColor = window.parent.__cke.getInitial();
+                //                            var editorColor;
+
+                //                            var existing = editor.document.getById('cke-background-fill');
+                //                            console.log("Existing input: ");
+                //                            console.log(existing);
+
+                //                            if (existing == null || existing == undefined || existing === undefined) {
+                //                                //insert new tag based on validation result over _cke 'background' value
+                //                                //initialColor = window.parent.__cke.getInitial(); //.getBackground();
+                //                                editorColor = "undefined";
+                //                                console.log("editor color: " + editorColor);
+
+                //                                switch (initialColor) {
+                //                                    case "undefined":
+                //                                        console.log("----------------------------");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //no tag, no valid initial color onload, current applied color/no current applied color
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == "undefined" || applied == "transparent" ? "transparent" : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        /*var elem = new CKEDITOR.dom.element('input');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'");
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;*/
+
+                //                                        var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                        var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                        var html = content + elem;
+                //                                        CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                        editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                        console.log("content: " + content);
+                //                                        console.log("elem: " + elem);
+                //                                        console.log("html: " + html);
+                //                                        console.log(html);
+                //                                        console.log("----------------------------");
+                //                                        break;
+
+                //                                    case "transparent":
+                //                                    default:
+                //                                        console.log("----------------------------");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //no tag, valid initial color onload, current applied color
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == initialColor ? initialColor : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        /*var elem = new CKEDITOR.dom.element('input');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;*/
+
+                //                                        var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                        var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                        var html = content + elem;
+                //                                        CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                        editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                        console.log("content: " + content);
+                //                                        console.log("elem: " + elem);
+                //                                        console.log("html: " + html);
+                //                                        console.log(html);
+                //                                        console.log("----------------------------");
+                //                                        break;
+                //                                };
+                //                            } else {
+                //                                editorColor = existing.getAttribute('data-color');
+                //                                console.log("editor color: ");
+                //                                console.log(editorColor);
+
+                //                                //tempColor = window.parent.__cke.getBackground();
+                //                                console.log("temp color: ");
+                //                                console.log(initialColor);
+
+                //                                switch (initialColor) {
+                //                                    case "undefined":
+                //                                        console.log("----------------------------");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //tag with value, no initial color, current applied color 
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == "undefined" || applied == "transparent" ? "transparent" : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        var tag = editor.document.getById('cke-background-fill');
+                //                                        console.log("tag: " + tag);
+                //                                        if (tag) tag.remove();
+
+                //                                        console.log("tag: " + tag);
+
+
+                //                                        /*var elem = new CKEDITOR.dom.element('input');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;*/
+
+                //                                        var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                        var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                        var html = content + elem;
+                //                                        CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                        editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                        console.log("content: " + content);
+                //                                        console.log("elem: " + elem);
+                //                                        console.log("html: " + html);
+                //                                        console.log(html);
+                //                                        console.log("----------------------------");
+                //                                        break;
+
+                //                                    case "transparent":
+                //                                    default:
+                //                                        console.log("----------------------------");
+                //                                        console.log("switch case: " + initialColor);
+
+                //                                        //tag with value, valid initial color onload, current applied color
+                //                                        var applied = window.parent.__cke.getBackground();
+                //                                        var val = applied == initialColor ? initialColor : applied;
+                //                                        console.log("applied color: " + val);
+
+                //                                        var tag = editor.document.getById('cke-background-fill');
+                //                                        console.log("tag: " + tag);
+                //                                        if (tag) tag.remove();
+
+                //                                        console.log("tag: " + tag);
+
+                //                                        /*var elem = new CKEDITOR.dom.element('input');
+                //                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                //                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                //                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                //                                        editor.insertElement(elem); console.log("element inserted into editor");
+                //                                        console.log("----------------------------");
+                //                                        break;*/
+
+                //                                        var content = CKEDITOR.instances['contentWidget_te'].getData();
+                //                                        var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                //                                        var html = content + elem;
+                //                                        CKEDITOR.instances['contentWidget_te'].setData(html);
+                //                                        editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                //                                        console.log("content: " + content);
+                //                                        console.log("elem: " + elem);
+                //                                        console.log("html: " + html);
+                //                                        console.log(html);
+                //                                        console.log("----------------------------");
+                //                                        break;
+                //                                };
+                //                            };
+                //                            data = module.CollectWidgetData();
+                //                        };
+                //                        //return; //-
+
+                //                        var myCollectionData = new widgetJsonCollector(data.WidgetId, ko.toJSON(data));
+                //                        uxAdmin.utilities.ajaxPostJson("WidgetManager/UpdateWidget", myCollectionData, function (result) {
+                //                            if (result == "Your Widget has been updated") {
+                //                                window.parent.__cke.reset();
+                //                            };
+                //                            alert(result);
+                //                            window.location.href = '../Systemsettings/WidgetManager/CreateWidget';
+                //                        });
+                //                    };
+
+                //                };
+                //                self.cancelWidget = function (widget) {
+                //                    window.parent.__cke.reset();
+                //                    window.location.href = '../Systemsettings/WidgetManager/CreateWidget';
+                //                };
+            };
+            var createWidget = function () {
+                window.location.href = '../Systemsettings/WidgetManager/CreateWidget';
+            };
+
+            //            var widgetJsonCollector = function (widgetId, jsonData) {
+            //                var self = this;
+            //                self.JsonData = jsonData;
+            //                self.WidgetId = widgetId;
+            //            };
+            //          
+            //            var saveWidget = function () { };
+            //            var saveCloseWidget = function () { };
+            //            var cancelWidget = function () { };
+            //            var preview = function (data, event) {
+            //                //alert('preview');
+            //                module.Preview(data, event);
+            //            };
+            var help = function () {
+                //launch help          
+                alert("help");
+            };
+            var getFormButtonsReferences = function () {
+                _formButtons = {
+                    Create: _view.find('.actions .button[value="Create Widget"]'),
+                    //Save: _view.find('.actions .button[value="Save"]'),
+                    //SaveClose: _view.find('.actions .button[value="Save & Close"]'),
+                    //Preview: _view.find('.actions .button[value="Preview"]'),
+                    //Cancel: _view.find('.actions .button[value="Cancel"]'),
+                    Help: _view.find('.actions .button[value="Help"]')
+                };
+            };
+            var initFormButtonsBindings = function () {
+                _formButtons.Create.bind('click', createWidget);
+                //            _formButtons.Save.bind('click', saveWidget);
+                //              _formButtons.Preview.bind('click', preview);
+                //            _formButtons.SaveClose.bind('click', saveCloseWidget);
+                //            _formButtons.Cancel.bind('click', cancelWidget);
+                _formButtons.Help.bind('click', help);
+            };
+            var init = function () {
+                //                _view.find('.actions .button[value="Save"]').hide();
+                //                _view.find('.actions .button[value="Cancel"]').hide();
+                //                _view.find('.actions .button[value="SaveClose"]').hide();
+                $("#PageTemplateTabs").tabs({
+                    show: function (event, ui) {
+                        var lastOpenedPanel = $(this).data("lastOpenedPanel");
+                        if (!$(this).data("topPositionTab")) { $(this).data("topPositionTab", $(ui.panel).position().top); };
+                        $(ui.panel).hide().fadeIn();
+                        if (lastOpenedPanel) { lastOpenedPanel.toggleClass("ui-tabs-hide").css("position", "absolute").css("top", $(this).data("topPositionTab") + "px").fadeOut(500, function () { $(this).css("position", ""); }); }
+                        $(this).data("lastOpenedPanel", $(ui.panel));
+                    }
+                });
+                _VM = new widgetManagerWidgetVm();
+                uxAdmin.utilities.ajaxGetJson('WidgetManager/GetWidgetList/', null, function (data) {
+                    var jsondata = ko.toJS(data);
+                    _VM.WidgetTypesList(jsondata.WidgetList);
+                    _VM.WidgetTypesListGlobal(jsondata.WidgetListGlobal);
+                    _VM.IsCustomerSuperUser(jsondata.IsCustomerSuperUser);
+                    if (!jsondata.IsCustomerSuperUser) { $("#PageTemplateTabs").disableTab(1, true); }                    
+                });
+
+                ko.applyBindings(_VM);
+                getFormButtonsReferences();
+                initFormButtonsBindings();
+            };
+
+            return {
+                Init: init,
+                createWidget: createWidget,
+                widgetManagerWidgetVm: widgetManagerWidgetVm
+            };
+        })();
+
+        uxAdmin.WidgetManager.Init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+﻿<script type="text/javascript">
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+</script>
+
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Styles/style.css")" >
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Styles/jquery.sortable.style.css")" >
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/libs/Gridster/jquery.gridster.css")" >
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")" >
+
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-sortable.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jQuery.FileInput/jquery.fileinput.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/ckeditor/ckeditor.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/ckeditor/config.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/Gridster/jquery.gridster.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/jquery.ui.touch-punch.min.js")" ></script>
+
+<style type="text/css">
+    html {padding:0px; margin:0px;}
+    body {padding:0px; margin:0px; position:relative;}
+    
+    /* iframe form styles */
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title .actions {width:auto; float:right;}
+    
+   
+  
+.applyLibraryButton {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );	
+	background-color:#ededed;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	color:#777777;
+	font-family:arial;
+	font-size:11px;
+	font-weight:bold;
+	padding:3px 44px;
+	text-decoration:none;
+    text-align: center;
+    width: 85px;
+}.applyLibraryButton:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+	background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );	
+	background-color:#dfdfdf;
+}.applyLibraryButton:active {
+	position:relative;
+	top:1px;
+}
+
+</style>
+
+
+<form id="PageManagerForm" method="post" action="" style="display:block;">
+
+    <div class="title full-width">
+        <h3>Page Manager</h3>
+        <div class="actions">
+            <a href="#" id="backToPageList" style="text-decoration: underline;color: blue">Back to Page List </a>
+           @* <input type="button" class="button primary" value="Page List"  />            
+            <input type="button" class="button primary" value="Save" />
+            <input type="button" class="button" value="Help" /> *@
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="fields">
+
+@*            <!-- row 1 -->
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Page Title:</label>
+                </p>
+                <p class="cell w-12-4">
+                          <input type="text"  data-bind="value: PageTitleName" />
+                </p>
+            </div>*@
+                  
+            <div class="row" data-bind="if :IsCustomerSuperUser">
+                <p class="cell w-12-3">
+                    <label>This Page is for:</label>
+                </p>
+                <p class="cell w-12-4">
+                    @*   <input type="checkbox" data-bind="checked: PageForLocal, event:{ change: ShowPageLocal}" /> Local Page<br/>
+                    <input type="checkbox" data-bind="checked: PageForGlobal, event:{ change: ShowPageGlobal }"/> Global Page*@
+                       <input type="checkbox" data-bind="checked: PageForLocal" /> Local Page<br/>
+                    <input type="checkbox" data-bind="checked: PageForGlobal, enable: $root.EnablePageGlobal"/> Global Page
+                </p>
+            </div>
+            
+    
+            
+                <div id="PageForGlobal" data-bind="if:PageForGlobal">    
+                    <div class="row">
+                        <p class="cell w-12-3">
+                            <label>Force Library to use Global:</label>
+                        </p>
+                        <p class="cell w-12-4">            
+                            <input name="ForceLibraryToUseGlobal" type="checkbox" data-bind="checked: $root.ForceLibraryToUseGlobal" />           
+                        </p>
+                    </div>
+        
+                    <div class="row">
+                        <p class="cell w-12-3">
+                            <label>Apply to Library</label>
+                        </p>  
+                     
+                       
+                            <ul id="ApplytoLibrary" data-bind="foreach: WidgetLibraryList" class="cell w-12-4">
+                                <li>  <input type="checkbox" data-bind="attr: { value: Value }, checked: $root.SelectedLibrary, enable: Value != $root.DefaultLibrary() "><span data-bind="text: Name"></span></li>
+                            </ul>                                  
+                        <div class="cell w-12-2" >
+                            <input type="button" class="button primary" data-bind="click:$root.applyToLibrariesSelectedAll" style="width: 120px" value="Select All" /><br/><br/>
+                            <input type="button" class="button primary" data-bind="click:$root.applyToLibrariesClearAll" style="width: 120px" value="Clear All" /><br/><br/>                           
+                        </div>    
+                        
+                        <p class="cell w-12-5">
+                            
+
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                <p class="cell w-12-3">
+                    <label>Page Type:</label>
+                </p>
+                <p class="cell w-12-4">
+                    <select data-bind="options: PageTypesList, optionsText: 'Name', value: selectedType, optionsCaption: 'Select...', event:{ change: PageTypeSelected }">     </select>  
+                    @*  <select data-bind="value: selectedType, optionsCaption: 'Select...', foreach:PageTypesList, event:{ change: PageTypeSelected }">                               
+                            <option>- Please Select Page Type -</option>
+                        <!-- ko if: Index != '-1' -->        
+                            <option data-bind="value : Key, text : Name "></option>
+                           <!-- /ko -->
+                     </select>*@
+                </p>
+            </div>
+                <!-- row 2 -->
+            <div class="row">
+                <hr />
+            </div>
+          @*  <!-- row 3 -->
+            <div class="row hidden" id="linkPageUrlField">
+                <p class="cell w-12-2"></p>
+                <p class="cell w-12-4">
+                    <label>Enter the URL to link from the page</label>
+                    <input type="text" value="http://"/>
+                </p>
+            </div>        
+
+            <!-- row 4 -->
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Enable for:</label>
+                </p>
+                <p class="cell w-12-4">
+                    <input name="patrons" type="checkbox" />
+                    <label for="">Patrons</label>
+                    <input name="staff" type="checkbox" />
+                    <label for="">Staff</label>
+                </p>
+            </div>
+            
+                                          
+            <!-- row 2 -->
+            <div class="row">
+                <hr />
+            </div>
+              
+            <div class="row">
+                
+                 <div class="fields">
+                    <div class="gridster">
+                        <ul>
+                            <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">Content</li>
+                            <li data-row="2" data-col="1" data-sizex="2" data-sizey="1">Images</li>
+                            <li data-row="3" data-col="1" data-sizex="3" data-sizey="1">Text</li> 
+                            <li data-row="1" data-col="2" data-sizex="3" data-sizey="1">Calander</li>
+                            <li data-row="2" data-col="2" data-sizex="3" data-sizey="1">5</li>
+                            <li data-row="3" data-col="2" data-sizex="3" data-sizey="1">6</li>
+                        </ul>
+                    </div>
+                 </div>    
+
+            </div>*@
+        </>
+    </div>
+    </div>
+    
+        <div id="CreatePageAction" style="display: none">
+        <div class="title full-width">
+            <h3>Create Page</h3>
+            <div class="actions">            
+                <input type="button" class="button primary" value="Save"  /> 
+                <input type="button" class="button" value="Cancel"  />                 
+            </div>
+        </div>
+    </div>
+    <div id="wgt"></div>
+
+</form>
+ 
+<script type="text/javascript">
+
+    uxAdmin.PageManager = (function () {
+
+        // vars
+        var _view = $('#PageManagerForm');
+        var _body = $('#wgt');
+        var _formButtons = {};
+        var _VM;
+        var gridster;
+        var module;
+        // methods
+
+        var pageManagerPageVm = function () {
+            var self = this;
+            self.PageTypesList = ko.observableArray([]);
+            self.WidgetLibraryList = ko.observableArray([]);
+            self.selectedType = ko.observable();
+            self.PageForLocal = ko.observable();
+            self.PageForGlobal = ko.observable();
+            self.IsCustomerSuperUser = ko.observable();
+            self.ForceLibraryToUseGlobal = ko.observable();
+            self.SelectedLibrary = ko.observableArray();
+            self.DefaultLibrary = ko.observable();
+            self.EnablePageGlobal = ko.observable(true);
+            self.applyToLibrariesSelectedAll = function () {
+                var x = [];
+                ko.utils.arrayForEach(self.WidgetLibraryList(), function (item) {
+                    x.push(item.Value);
+                });
+                self.SelectedLibrary(x);
+            };
+            self.applyToLibrariesClearAll = function () {
+                var x = [];
+                self.SelectedLibrary(x);
+                self.SelectedLibrary([self.DefaultLibrary()]);
+            };
+
+            self.ShowPageGlobal = function () {
+                if (self.PageForGlobal() || self.PageForLocal()) {
+                    if (module) {
+                        module.showGlobalView(self.PageForGlobal());
+                        module.showDefaultPageView((self.PageForGlobal() && self.PageForLocal()));
+                    }
+                } else {
+                    alert("Please select either Local Page or Global Page");
+                    self.PageForGlobal(true);
+                }
+            };
+            self.ShowPageLocal = function () {
+                if (self.PageForGlobal() || self.PageForLocal()) {
+                    if (module) {
+                        module.showLocalView(self.PageForLocal());
+                        module.showDefaultPageView((self.PageForGlobal() && self.PageForLocal()));
+                    }
+
+                } else {
+                    alert("Please select either Local Page and/or Global Page");
+                    self.PageForLocal(true);
+                }
+            };
+            self.PageTypeSelected = function () {
+                _body.find('>div.edit-options').remove();
+                var PageType;
+                var PageTypeId;
+                try {
+
+                    PageType = self.selectedType().Key;
+                    PageTypeId = self.selectedType().Index;
+                    if ((!self.IsCustomerSuperUser())) {
+                        self.PageForGlobal(false);
+                        self.PageForLocal(true);
+                    }
+                    if (self.PageForGlobal() || self.PageForLocal()) {
+                        uxAdmin.utilities.ajaxGetHtml("SystemSettings/PageManager/GetPagePartialView/" + PageType, function (data) {
+                            $("#CreatePageAction").show();
+                            _body.html(data);
+                            _body.find('>div.edit-options').show();
+                            _view.find('.actions .button.blue').show();
+                            if (PageType == "LinkPage") {
+                                self.EnablePageGlobal(false);
+                                self.PageForGlobal(false);
+                            } else {
+                                self.EnablePageGlobal(true);
+                            }
+
+                            module = eval("uxAdmin.PageManager." + PageType);
+
+                            module.Init(PageTypeId, PageType, self.PageForLocal(), self.PageForGlobal(), false);
+                            //                            module.showGlobalView(self.PageForGlobal());
+                            //                            module.showLocalView(self.PageForLocal());
+                            //                            module.showDefaultPageView((self.PageForGlobal() && self.PageForLocal()));
+                            //                            module.showLibraryInfoView(false);
+                        });
+                    } else {
+                        alert("Please select either Local Page or Global Page");
+                    }
+
+                }
+                catch (e) { }
+            };
+
+
+        };
+        var pageJsonCollector = function (jsonData, libraryData, forceLibraryToUseGlobalData, isLocalData, isGlobalData) {
+            var self = this;
+            self.ForceLibraryToUseGlobal = forceLibraryToUseGlobalData;
+            self.ApplyToListLibrary = libraryData;
+            self.IsLocalPage = isLocalData;
+            self.IsGlobalPage = isGlobalData;
+            self.JsonData = jsonData;
+
+        };
+        var modifyPage = function () {
+            //var url = '@Url.Action("Index", "PageManager", new { Area = "SystemSettings" , id = "", typeId= "",typeName= "",isGlobal= "", isLocal=""})';
+            var url = '@Url.Content("~/SystemSettings/PageManager/Index")';
+            console.log(url);
+            window.location.href = url;
+
+        };
+        var savePage = function () {
+            //save data functionality
+
+            var mySelectedPageType = ko.mapping.toJS(_VM.selectedType());
+            var myCreatePageData = module.collectPageData(mySelectedPageType.Index.toString(), mySelectedPageType.Key);
+            var myApplyLibraryList = _VM.SelectedLibrary();
+            var myCollectionData = new pageJsonCollector(ko.toJSON(myCreatePageData), ko.toJSON(myApplyLibraryList), _VM.ForceLibraryToUseGlobal(), _VM.PageForLocal(), _VM.PageForGlobal());
+            uxAdmin.utilities.ajaxPostJson("PageManager/InsertPage", myCollectionData, function (result) {
+                //var url = '@Url.Action("Index", "PageManager", new { Area = "SystemSettings" , id = "", typeId= "",typeName= "",isGlobal= "", isLocal=""})';
+                var url = '@Url.Content("~/SystemSettings/PageManager/Index")';
+                window.location.href = url;
+            });
+
+
+        };
+
+        var help = function () {
+            //launch help
+            module.loadData();
+            alert("help");
+        };
+        var getFormButtonsReferences = function () {
+            _formButtons = {
+                Modify: $("#backToPageList"), //_view.find('.actions .button[value="Modify Page"]'),
+                Save: _view.find('.actions .button[value="Save"]'),
+                Help: _view.find('.actions .button[value="Help"]'),
+                Cancel: _view.find('.actions .button[value="Cancel"]')
+            };
+        };
+        var initFormButtonsBindings = function () {
+            _formButtons.Modify.bind('click', modifyPage);
+            _formButtons.Save.bind('click', savePage);
+            _formButtons.Help.bind('click', help);
+            _formButtons.Cancel.bind('click', modifyPage);
+        };
+        var init = function () {
+            $("#PageTemplateTabs").tabs();
+            _VM = new pageManagerPageVm();
+
+            uxAdmin.utilities.ajaxGetJson('PageManager/GetPageTypeList/', null, function (data) {
+
+                var jsondata = ko.toJS(data);
+                var xjsondata = $.grep(jsondata.PageTypesList, function (o, i) {
+                    return o.Index < 0;
+                }, true);
+
+                _VM.PageTypesList(xjsondata);
+                _VM.WidgetLibraryList(jsondata.Librarys);
+                _VM.IsCustomerSuperUser(jsondata.IsCustomerSuperUser);
+                var x = new Object();
+                x.Value = jsondata.currentLID;
+                _VM.SelectedLibrary([jsondata.currentLID]);
+                _VM.DefaultLibrary(jsondata.currentLID);
+            });
+
+
+
+            ko.applyBindings(_VM, _view.get(0));
+
+            getFormButtonsReferences();
+            initFormButtonsBindings();
+
+            gridster = $(".gridster ul").gridster({ Page_margins: [5, 5], Page_base_dimensions: [100, 100] }).data('gridster');
+
+        };
+
+        return {
+            Init: init
+        };
+    })();
+
+    uxAdmin.PageManager.Init();
+</script>

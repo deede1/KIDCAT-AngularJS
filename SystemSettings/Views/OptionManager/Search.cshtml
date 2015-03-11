@@ -1,0 +1,530 @@
+﻿<script type="text/javascript">
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+</script>
+
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+
+@Html.LocalResourceJavascripts("~/public/javascript/overrides.js", "~/public/javascript/json2.js")
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery.maxlength.js")" ></script>
+
+<style type="text/css">
+    html {padding:0px; margin:0px;}
+    body {padding:0px; margin:0px; position:relative;}
+    
+    /* iframe form styles */
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:20px;  margin:4px 0 0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title h3 a {padding:6px 10px;float: left; background:#f1f1f1; color:#333; cursor:pointer;}
+    body > form .title h3 a:hover {text-decoration:none;}
+    body > form .title h3 a.active{position: relative;bottom: -1px;background: #FFF;}
+    body > form .title .actions {width:auto; float:right;}
+</style>
+
+<script type="text/javascript">
+    
+    (function (uxAdmin) {
+        uxAdmin.searchOptions = (function () {
+            var view = $('#search_options');
+            var vm;
+            var searchOptionsVm = function () {
+                this.SearchOptionId = ko.observable();
+                // Simple Search
+                this.DisplayIndexSelectionForPatronsGuests = ko.observable();
+                this.DisplayIndexSelectionForStaff = ko.observable();
+                this.DisplayResourceSelectionPatronsGuests = ko.observable();
+                this.DisplayResourceSelectionForStaff = ko.observable();
+                this.UseIconButtonsPatronsGuests = ko.observable();
+                this.UseIconButtonsStaff = ko.observable();
+                this.ChooseResourcesLabel = ko.observable();
+
+                this.SearchHideShowBarOption = ko.observableArray([]);
+                this.ShowSearchingArea = ko.observable();
+
+
+                //                ChooseResourcesLabel = searchOptionResult.ChooseResourcesLabel,
+                this.SimpleSearchDefaultIndex = ko.observable();
+                this.QuickSearchLablePatronsGuests = ko.observable();
+                this.QuickSearchLableStaff = ko.observable();
+
+
+                //Advance Search
+                this.SelectedDisplayType = ko.observable();
+                this.FiltersTabLabel = ko.observable();
+                this.ResourcesTabLabel = ko.observable();
+                this.SearchByOptions = ko.observable();
+                this.DefaultIndex1 = ko.observable();
+                this.DefaultIndex2 = ko.observable();
+                this.DefaultIndex3 = ko.observable();
+
+                //Browse Search
+                this.IsVertual = ko.observable();
+                this.DisplayBrowseSearchOptionForPatronsGuests = ko.observable();
+                this.DisplayBrowseSearchOptionForStaff = ko.observable();
+                this.DisplayBrowseResource = ko.observable();
+                this.BrowseSearchDefaultIndex = ko.observable();
+
+                //Search History
+                //this.NumberSaveSearches = ko.observable();
+
+
+                // Predefine Dropdown Option DefaultIndexOptions
+                //this.AdvancedSearchDisplayTypeOptions = [{ Name: "Single Screen", id: 1 }, { Name: "Tab Display", id: 2}];
+                //this.SearchBoxDisplayOptions = [{ Name: "Expanded", id: 1 }, { Name: "Collapsed", id: 2}];
+                this.AdvancedSearchDisplayTypeOptions = ko.observable();
+                this.SearchBoxDisplayOptions = ko.observable();
+                this.DefaultIndexOptions = ko.observable();
+                this.DefaultBrowseIndexOptions = ko.observable();
+                this.DisplayBrowseResourceOptions = ko.observableArray([]);
+                this.NumberOfSaveSearchOptions = [{ Name: 0, Id: 0 }, { Name: 10, Id: 10 }, { Name: 20, Id: 20 }, { Name: 30, Id: 30 }, { Name: 40, Id: 40 }, { Name: 50, Id: 50}];
+
+                this.savePage = function () {
+
+                    var validation = true;
+                    var validationMsg = "";
+                    if (vm.IsVertual()) {
+                        vm.DisplayBrowseSearchOptionForPatronsGuests("");
+                        vm.DisplayBrowseSearchOptionForStaff("");
+                        //vm.DisplayBrowseResource("");
+                        vm.DisplayBrowseResourceOptions("");
+                        //vm.BrowseSearchDefaultIndex("");
+                    }
+                    var data = ko.mapping.toJS(vm);
+                    //                console.log(data.ShowSearchingArea);
+                    //                console.log(data.UseIconButtonsPatronsGuests);
+                    //                console.log(data.UseIconButtonsStaff);
+
+                    if (data.ShowSearchingArea.Id == "1") {
+                        data.ShowSearchingArea = true;
+                    } else {
+                        data.ShowSearchingArea = false;
+                    }
+                    if (data.FiltersTabLabel == "") {
+                        validation = false;
+                        validationMsg += "Advanced Search - Filters Tab Label is requried \n";
+                    }
+                    if (data.ResourcesTabLabel == "") {
+                        validation = false;
+                        validationMsg += "Advanced Search - Resources Tab Label is requried \n";
+                    }
+
+                    if (data.ChooseResourcesLabel == "") {
+                        if (!((data.UseIconButtonsPatronsGuests) && (data.UseIconButtonsStaff))) {
+                            alert("Default Choose Resources Label is required");
+                        } else {
+                            if (validation) {
+                                uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveSearchOption", data, function (datax) {
+                                    alert(datax);
+                                });
+                            } else {
+                                alert(validationMsg);
+                            }
+                        }
+                    } else {
+                        if (validation) {
+                            uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveSearchOption", data, function (datax) {
+                                alert(datax);
+                            });
+                        } else {
+                            alert(validationMsg);
+                        }
+                    }
+
+
+
+                };
+            };
+            var init = function () {
+                //console.log("Search Option Initialized!");
+                $("#filtersLabel").maxlength({ maxCharacters: 20, status: true, statusClass: "status", statusText: "character left", notificationClass: "notification", showAlert: true, alertText: "The text you are inserting exceeds the 20 character limit", slider: true });
+                $("#resourceLabel").maxlength({ maxCharacters: 20, status: true, statusClass: "status", statusText: "character left", notificationClass: "notification", showAlert: true, alertText: "The text you are inserting exceeds the 20 character limit", slider: true });
+                $("#SRLabel").maxlength({ maxCharacters: 20, status: true, statusClass: "status", statusText: "character left", notificationClass: "notification", showAlert: true, alertText: "The text you are inserting exceeds the 20 character limit", slider: true });
+                vm = new searchOptionsVm();
+                ko.applyBindings(vm, view.get(0));
+               // initFormButtonsBindings();
+            };
+            var loadData = function () {
+
+                uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/GetSearchOption", "", function (data) {
+                    //console.log(data);
+                    vm.SearchOptionId(data.SearchOptionId);
+                    vm.DisplayIndexSelectionForPatronsGuests(data.DisplayIndexSelectionForPatronsGuests);
+                    vm.DisplayIndexSelectionForStaff(data.DisplayIndexSelectionForStaff);
+                    vm.DisplayResourceSelectionPatronsGuests(data.DisplayResourceSelectionPatronsGuests);
+                    vm.DisplayResourceSelectionForStaff(data.DisplayResourceSelectionForStaff);
+                    vm.UseIconButtonsPatronsGuests(data.UseIconButtonsPatronsGuests);
+                    vm.UseIconButtonsStaff(data.UseIconButtonsStaff);
+                    vm.ChooseResourcesLabel(data.ChooseResourcesLabel);
+                    vm.SimpleSearchDefaultIndex(data.SimpleSearchDefaultIndex);
+                    vm.QuickSearchLablePatronsGuests(data.QuickSearchLablePatronsGuests);
+                    vm.QuickSearchLableStaff(data.QuickSearchLableStaff);
+                    vm.SearchHideShowBarOption(data.SearchAreaDisplayTypeOptions);
+                    vm.ShowSearchingArea(data.ShowSearchingArea ? data.SearchAreaDisplayTypeOptions[1] : data.SearchAreaDisplayTypeOptions[0]);
+                    //Advance Search
+                    vm.SelectedDisplayType(data.SelectedDisplayType);
+                    vm.FiltersTabLabel(data.FiltersTabLabel);
+                    vm.ResourcesTabLabel(data.ResourcesTabLabel);
+                    vm.SearchByOptions(data.SearchByOptions);
+                    vm.DefaultIndex1(data.DefaultIndex1);
+                    vm.DefaultIndex2(data.DefaultIndex2);
+                    vm.DefaultIndex3(data.DefaultIndex3);
+
+                    //Browse Search
+                    vm.IsVertual(data.IsVertual);
+                    vm.DisplayBrowseSearchOptionForPatronsGuests(data.DisplayBrowseSearchOptionForPatronsGuests);
+                    vm.DisplayBrowseSearchOptionForStaff(data.DisplayBrowseSearchOptionForStaff);
+                    vm.DisplayBrowseResource(data.DisplayBrowseResource);
+                    vm.DisplayBrowseResourceOptions(data.DisplayBrowseResourceOptions);
+                    vm.BrowseSearchDefaultIndex(data.BrowseSearchDefaultIndex);
+
+                    //Search History
+                    // vm.NumberSaveSearches(data.NumberSaveSearches);
+
+                    vm.AdvancedSearchDisplayTypeOptions(data.AdvancedSearchDisplayTypeOptions);
+                    vm.SearchBoxDisplayOptions(data.SearchBoxDisplayOptions);
+                    vm.DefaultIndexOptions(data.DefaultIndexOptions);
+                    vm.DefaultBrowseIndexOptions(data.DefaultBrowseIndexOptions);
+                });
+
+            };
+            return {
+                init: init,
+                loadData: loadData
+            };
+        })();
+
+    })(window.uxAdmin = window.uxAdmin || {});
+
+
+    $(function () {
+        uxAdmin.searchOptions.init();
+        uxAdmin.searchOptions.loadData();
+//        $('#simpleS, #advancedS, #browseS').hide(); $('#simpleS').show();
+//        $('.title h3').click(function () {
+//            $('.title h3 a').removeClass("active"); $(this).find('a').addClass("active");
+//            $('#simpleS, #advancedS, #browseS').hide(); var indexer = $(this).index();
+//            if (indexer == 0) { $('#simpleS').fadeIn(); } else if (indexer == 1) { $('#advancedS').fadeIn(); }
+//            else { $('#browseS').fadeIn(); }
+//        });
+        $("#SearchTabs").tabs();
+    });
+</script>
+<style>
+    #SearchTabs {
+        border: none;
+        margin: 0 5px;
+    }   
+    .topSearchOptionBtnFix {
+        z-index: 1;
+        position: relative;
+        float: right;        
+    }
+    .row {
+        padding: 5px 0 !important;
+    }
+</style>
+<form id="search_options" method="post" action="" style="display:block">
+    <br/>    
+    <div class="actions">        
+        @*<input type="button" class="button primary topSearchOptionBtnFix" value="Save"  />*@
+        <button class="button primary topSearchOptionBtnFix" data-bind="click: $root.savePage">Save</button>
+        @*<input type="button" class="button" value="Help" />*@
+    </div>
+    <div id="SearchTabs">
+        <ul>
+            <li><a href="#SimpleSearch">Simple</a></li>
+            <li><a href="#AdvancedSearch">Advanced</a></li>
+            <li><a href="#BrowseSearch">Browse</a></li>
+        </ul>
+    
+        <div id="SimpleSearch">
+            <div class="fields">
+                <!-- row 1 
+                    <div class="row">
+                        <font size="2"><b>Simple Search</b></font>
+                    </div>-->
+                <!-- row 2 -->
+                <div class="row">
+                    <p class="cell w-12-4">
+                        <label>Display Index Selection:</label>
+                    </p>
+                    <div class="cell w-12-5">
+                        <ul class="inline-list ">
+                            <li>
+                                <input name="patrons" type="checkbox" data-bind="checked: DisplayIndexSelectionForPatronsGuests"/>
+                                <label for="">Patrons/Guests</label>
+                            </li>
+                            <li>
+                                <input name="staff" type="checkbox" data-bind="checked: DisplayIndexSelectionForStaff" />
+                                <label for="">Staff</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- row 3 -->
+                <div class="row">
+                    <p class="cell w-12-4">
+                        <label>Display Resource Selection:</label>
+                    </p>
+                    <div class="cell w-12-5">
+                        <ul class="inline-list">
+                            <li>
+                                <input name="patrons" type="checkbox" data-bind="checked: DisplayResourceSelectionPatronsGuests"/>
+                                <label for="">Patrons/Guests</label>
+                            </li>
+                            <li>
+                                <input name="staff" type="checkbox" data-bind="checked: DisplayResourceSelectionForStaff" />
+                                <label for="">Staff</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- row 4 -->
+                <div class="row">
+                    <p class="cell w-12-4">
+                        <label>Use Icon Buttons:</label>
+                    </p>
+                    <div class="cell w-12-5">
+                        <ul class="inline-list">
+                            <li>
+                                <input name="patrons" type="checkbox" data-bind="checked: UseIconButtonsPatronsGuests" />
+                                <label for="">Patrons/Guests</label>
+                            </li>
+                            <li>
+                                <input name="staff" type="checkbox" data-bind="checked: UseIconButtonsStaff" />
+                                <label for="">Staff</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <p class="cell w-12-4">
+                        <label>Search Box Default Index:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <select data-bind="options: DefaultIndexOptions, optionsText: 'Name', optionsValue: 'Id', value:SimpleSearchDefaultIndex">
+                        </select>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="cell w-12-4">
+                        <label>Default Choose Resources Label:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <input id="SRLabel" type="text" data-bind="value: ChooseResourcesLabel"  maxlength="20"/>
+                    </p>
+                    <p class="cell w-12-3" style="color:red">
+                        20 characters max
+                    </p>
+                </div>
+                <!-- row 5 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        Quick Search Label:
+                    </p>
+                    <br/>
+                </div>
+                <div class="row">
+                    <p class="cell w-12-4 align-r">
+                        <label>Patrons/Guests</label>
+                    </p>
+                    <p class="cell w-12-3 ">
+                        <input type="text" placeholder="Enter yout search term here" data-bind="value: QuickSearchLablePatronsGuests"  />
+                    </p>
+                    <br/>
+                </div>
+                <!-- row 6 -->
+                <div class="row">
+                    <p class="cell w-12-4 align-r">
+                        <label>Staff</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <input type="text" placeholder="Enter yout search term here" data-bind="value: QuickSearchLableStaff" />
+                    </p>
+                    <p class="cell w-12-3">
+                    </p>
+                </div>
+             
+                <div class="row">
+                    <p class="cell w-12-4">Default position for Hide/Show Search Area</p>
+                    <p class="cell w-12-3"><select data-bind="options: SearchHideShowBarOption, optionsText: 'Name', optionValue:'Id', value: ShowSearchingArea "></select></p>
+                </div>
+
+                <!-- row 7 
+                    <div class="row">
+                        <hr />
+                    </div>-->
+            </div>
+        </div>
+        <div id="AdvancedSearch">
+            <div class="fields">
+                <!-- row 8 
+                    <div class="row">
+                        <font size="2"><b>Advanced Search</b></font>
+                    </div>-->
+                <!-- row 9 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Advanced Search Display Type:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <select data-bind="options: AdvancedSearchDisplayTypeOptions, optionsText: 'Name', optionsValue: 'Id', value: SelectedDisplayType">
+                        </select>
+                    </p>
+                </div>
+                <!-- row 10 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Filters Tab Label:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <input id="filtersLabel" type="text" data-bind="value: FiltersTabLabel"  maxlength="20"/>
+                    </p>
+                    <p class="cell w-12-3" style="color:red">
+                        20 characters max
+                    </p>
+                </div>
+                <!-- row 11 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Resources Tab Label:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <input id="resourceLabel" type="text" data-bind="value: ResourcesTabLabel" maxlength="20" />
+                    </p>
+                    <p class="cell w-12-3" style="color:red">
+                        20 characters max
+                    </p>
+                </div>
+                <!-- row 12 -->
+                <div class="row">
+                </div>
+                <!-- row 13 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Search Box Display Options:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <select data-bind="options: SearchBoxDisplayOptions, optionsText: 'Name', optionsValue: 'Id', value: SearchByOptions">
+                        </select>
+                    </p>
+                </div>
+                <!-- row 14 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Search Box One Default Index:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <select data-bind="options: DefaultIndexOptions, optionsText: 'Name', optionsValue: 'Id', value: DefaultIndex1">
+                        </select>
+                    </p>
+                </div>
+                <!-- row 15 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Search Box Two Default Index:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <select data-bind="options: DefaultIndexOptions, optionsText: 'Name', optionsValue: 'Id', value: DefaultIndex2">
+                        </select>
+                    </p>
+                </div>
+                <!-- row 16 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Search Box Three Default Index:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <select data-bind="options: DefaultIndexOptions,optionsText: 'Name', optionsValue: 'Id', value: DefaultIndex3">
+                        </select>
+                    </p>
+                </div>
+                <!-- row 17 
+                    <div class="row">
+                        <hr />
+                    </div>-->       
+            </div>
+
+        </div>
+        <div id="BrowseSearch">
+            <div class="fields">
+                <!-- ko ifnot : IsVertual -->
+
+                <!-- row 18 
+                    <div class="row">
+                        <font size="2"><b>Browse Search</b></font>
+                    </div>-->
+                <!-- row 19 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Display Browse Search Option:</label>
+                    </p>
+                    <div class="cell w-12-5">
+                        <ul class="inline-list">
+                            <li>
+                                <input name="patrons" type="checkbox" data-bind="checked: DisplayBrowseSearchOptionForPatronsGuests"/>
+                                <label for="">Patrons/Guests</label>
+                            </li>
+                            <li>
+                                <input name="staff" type="checkbox" data-bind="checked: DisplayBrowseSearchOptionForStaff" />
+                                <label for="">Staff</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- row 20 -->
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Default Browse Resource:</label>
+                    </p>
+                    <div class="cell w-12-8">
+                        <ul class="inline-list" data-bind="foreach: DisplayBrowseResourceOptions">
+                            <li>
+                                <input name="resource" type="radio" data-bind="value: ID, checked: $root.DisplayBrowseResource"/>
+                                <label data-bind="text: $data.Name"></label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <p class="cell w-12-3">
+                        <label>Search Box Default Index:</label>
+                    </p>
+                    <p class="cell w-12-3">
+                        <select data-bind="options: DefaultBrowseIndexOptions, optionsText: 'Name', optionsValue: 'Id', value: BrowseSearchDefaultIndex">
+                        </select>
+                    </p>
+                </div>
+          
+   
+
+                @*<div class="row">
+              <hr />
+          </div>*@
+                <!-- /ko -->  
+
+                @*         <div class="row">
+            <h5>Search History</h5>
+         </div>
+         <div class="row">
+            <p class="cell w-12-3">
+               <label>Default Number of Saved Searches:</label>
+            </p>
+            <div class="cell w-12-3">
+               <select data-bind="options: NumberOfSaveSearchOptions, optionsText: 'Name', optionsValue: 'Id', value: NumberSaveSearches">
+               </select>
+            </div>
+         </div>*@
+            </div>
+
+        </div>
+    </div>
+
+
+</form>

@@ -1,0 +1,213 @@
+﻿@{ Layout = null; }
+@model VersoMVC.Areas.SystemSettings.Controllers.PageManagerModel
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+<script  type="text/javascript" >
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath'; ;
+    var uxAdmin = {};
+    uxAdmin.PageManager = (function () { return {}; })();
+</script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+
+<div class="content edit-options" id="LinkPageFields" style="display:block">
+    <div class="fields" >
+          <div class="row"><h4>Global Page Manager - Link Page</h4></div>             
+            <!-- row 1 -->
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Page Name</label>
+                </p>
+                <p class="cell w-12-4">
+                    <input type="Text" maxlength="16" data-bind="value: PageTitleName"/>
+                    <div style="color: red">(Maximum characters: 16)</div>
+                </p>
+                      <p class="cell w-12-2" ></p>
+            <p class="cell w-12-2" style="position:relative; top:5px;">Page Description/Tooltip:</p>
+            <p Class="cell w-12-6"> <textarea style="width: 63%;float: left;margin-right: 5px;" type="text"  maxlength="160" rows="4" cols="50" data-bind="value: $root.PageDescToolTip, disable: $root.PageTypeId() == '-1'"></textarea> <span style="color: red; position:relative; top: -3px;">(Maximum characters: 160)</span></p>
+
+
+            </div>
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>URL to link from the page </label>
+                </p>
+                <p class="cell w-12-5">
+                  <input type="text" data-bind="value: PageURL" placeholder="http://"/> ( <span style="color:red">Prefix of url must contain http:// or https:// </span>)
+                </p>
+            </div>
+        <!-- row 4 -->
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Enable for:</label>
+                </p>
+                <p class="cell w-12-4">
+                    <input name="patrons" type="checkbox" data-bind="checked: EnableGuests" />
+                    <label for="">Guest</label>
+                    <input name="patrons" type="checkbox" data-bind="checked: EnablePatrons" />
+                    <label for="">Patrons</label>
+                    <input name="staff" type="checkbox" data-bind="checked: EnableStaff" />
+                    <label for="">Staff</label>
+                </p>
+            </div>  
+       <div class="row">
+            <p class="cell w-12-10"><hr/></p>
+        </div>
+        <div class="row">
+            <p class="cell w-12-3"><label>Force Library to use Global: </label></p>
+            <p class="cell w-12-4"><input type="checkbox" data-bind="checked: $root.ForceLibraryToUseGlobal"/></p>
+        </div>
+        <div class="row">
+            <p class="cell w-12-3" style="float: left;"><label>Apply to Library: </label></p>
+            <p class="cell w-12-0">             
+                <ul style="float: left; width: 300px" id="ApplytoLibrary" data-bind="foreach: WidgetLibraryList">
+                    <li><input type="checkbox" data-bind="attr: { value: AGLibID }, checked: $root.SelectedLibrary, enable: IsEnabled"><span data-bind="text: LibraryName"></span></li>
+                </ul>
+            </p>
+            <div class="cell w-12-2" >
+                <input type="button" class="button primary" style="width: 120px" value="Select All" data-bind="click: $root.SelectAllLibrary" /><br/><br/>
+                <input type="button" class="button primary" style="width: 120px" value="Clear All" data-bind="click: $root.ClearAllLibrary"/><br/><br/>
+                <input type="button" class="button primary" style="width: 120px" value="Show Selected" data-bind="click: $root.ShowSelectedlLibrary"/> <br/>                                                                          
+            </div>   
+        </div>
+          
+        <div class="row customz fixFooter"  style="float: right">
+            <div class="title full-width" style="border:none;">
+                <div class="actions">                      
+                    <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                    <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                    <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                </div>
+            </div>
+        </div>
+           
+    </div>    
+                <div id="Preview" >
+        <center>
+            <b><font color="red"> Not all web sites permit a preview in this frame.</font></b>
+                <iframe id="preViewIframe" data-bind="attr:{ 'src' : $root.linkpageurl() }"  width="98%" height="200px"></iframe>
+        </center>
+    </div>      
+</div>
+<script type="text/javascript">
+ 
+    uxAdmin.PageManager.LocalPageWidget = (function () {        
+        var view = $('#LinkPageFields');
+        var widgetVm;        
+        var localTemplate = function (xPageId, xPageTitleName, xPageDescToolTip, xEnableGuests, xEnablePatrons, xEnableStaff,  xForceLibraryToUseGlobal , xApplyToListLibrary, xPageUrl) {
+            var local = this;             
+            local.PageId =  xPageId + "|-1";          
+            local.PageTitleName = xPageTitleName;
+            local.PageDescToolTip = xPageDescToolTip;
+            local.EnableGuests = xEnableGuests;
+            local.EnablePatrons = xEnablePatrons;
+            local.EnableStaff = xEnableStaff;
+            local.PageUrl = xPageUrl;
+            local.TemplateType = "Link Page";
+            //--------- [missing property] -----            
+            local.PageType = "LinkPage";
+            local.PageTypeId = 1;
+            local.PageTypeEnable = true;
+            local.IsLocalPage = false;
+            local.IsGlobalPage = true;
+            local.ForceLibraryToUseGlobal = xForceLibraryToUseGlobal;
+            local.SelectedLibrariesToForceUseGlobal = xApplyToListLibrary.join();
+            local.DefaultPage = "Global";
+            local.LocalTemplate = ko.toJSON([]);
+            local.GlobalTemplate = ko.toJSON([]);
+            local.PageUrl = xPageUrl;
+        };
+        var startswith = function(string, prefix) {
+          return string.indexOf(prefix) == 0;
+        };
+        var widgetPageVm = function () {
+            var self = this;
+          
+            self.WidgetList = ko.observableArray();
+            self.PageId = ko.observable();           
+            self.PageTypeId = ko.observable();
+            self.PageTitleName = ko.observable();
+            self.PageDescToolTip = ko.observable();
+            self.EnableGuests = ko.observable();
+            self.EnablePatrons = ko.observable();
+            self.EnableStaff = ko.observable();
+            self.PageURL = ko.observable("");       
+            self.ForceLibraryToUseGlobal = ko.observable();
+            self.ApplyToListLibrary =  ko.observableArray();
+            self.WidgetLibraryList = ko.observableArray();                        
+            self.SelectedLibrary =  ko.observableArray();
+            self.saveWidget = function() {
+                updatePage();
+            };
+            self.saveCloseWidget = function() { updatePage(); reload(); parent.$.fn.colorbox.close();};
+            self.cancelWidget = function() {reload(); parent.$.fn.colorbox.close();};
+            
+            self.linkpageurl = function() {             
+                if (!startswith(self.PageURL(), "http")) {                    
+                    var url = self.PageURL();
+                    self.PageURL("http://" + url);                    
+                };
+                return self.PageURL();
+            };
+            
+            function updatePage() {                
+                uxAdmin.utilities.ajaxPostJson("PageManager/UpdatePage", collectPageData(), function (result) { alert(result.Message);self.PageId(result.ResultId);  });
+            };
+            function reload(){ var iframe = parent.document.getElementById('myIFrame'); iframe.src = iframe.src;}   
+            self.SelectAllLibrary = function() {
+                console.log("SelectAllLibrary");
+                var x = [];
+                ko.utils.arrayForEach( self.WidgetLibraryList(), function(item) {
+                    if (item.IsEnabled) {
+                        x.push(item.AGLibID);
+                    }
+                });            
+                self.SelectedLibrary(x);             
+            };
+            self.ClearAllLibrary = function() {
+                console.log("ClearAllLibrary");                  
+                self.SelectedLibrary([]);             
+            };
+            self.ShowSelectedlLibrary = function() {
+                console.log("ShowSelectedlLibrary");
+                var x = [];                
+                $.each(self.SelectedLibrary(), function(i, v) {
+                    ko.utils.arrayForEach( self.WidgetLibraryList(), function(item) {
+                         if (v == item.AGLibID) { x.push(item.LibraryName);}
+                    });
+                });             
+                alert(x.join());                
+            };
+        };
+       
+        var init = function () {
+            widgetVm = new widgetPageVm();
+            ko.applyBindings(widgetVm, view.get(0));
+        };        
+        var loadData = function (index, fillData, isGlobal) {            
+                var x = [];
+                var pageCollector = @Html.Raw(Json.Encode(Model.PageCollector)); 
+                var pageInfo = $.parseJSON(pageCollector.GlobalTemplate); 
+                widgetVm.PageId(pageCollector.PageId);                
+                widgetVm.PageTitleName(pageInfo.PageTitleName);
+                widgetVm.EnableGuests(pageInfo.EnableGuests);
+                widgetVm.EnablePatrons(pageInfo.EnablePatrons);
+                widgetVm.EnableStaff(pageInfo.EnableStaff);  
+                widgetVm.ForceLibraryToUseGlobal(pageCollector.ForceLibraryToUseGlobal);
+                widgetVm.WidgetLibraryList(pageCollector.GlobalLibraryList);
+                widgetVm.PageDescToolTip(pageCollector.PageDescToolTip);
+                ko.utils.arrayForEach( widgetVm.WidgetLibraryList(), function (item) { if (item.IsChecked) { x.push(item.AGLibID);}});            
+                widgetVm.SelectedLibrary(x);  
+                widgetVm.PageURL(pageInfo.PageUrl);                   
+        };
+        var collectPageData = function () {                        
+            return new localTemplate(widgetVm.PageId(), widgetVm.PageTitleName(), widgetVm.PageDescToolTip(), widgetVm.EnableGuests(),widgetVm.EnablePatrons(), widgetVm.EnableStaff(),widgetVm.ForceLibraryToUseGlobal(),widgetVm.SelectedLibrary(),widgetVm.PageURL());            
+        };
+        return { Init: init, LoadData: loadData };
+    })();
+    uxAdmin.PageManager.LocalPageWidget.Init();
+    uxAdmin.PageManager.LocalPageWidget.LoadData();
+</script>

@@ -1,0 +1,173 @@
+﻿@{ Layout = null; }
+
+@model VersoMVC.Areas.SystemSettings.Controllers.PageManagerModel
+           
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/libs/Gridster/jquery.gridster.css")" >
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+<script  type="text/javascript" >
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath'; ;
+    var uxAdmin = {};
+    uxAdmin.PageManager = (function () { return {}; })();
+</script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/Gridster/jquery.gridster.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/SystemSettings/Scripts/GridsterHelper.js")" ></script>
+
+
+<div class="content" id="WidgetManagerFieldsx">
+<ul>
+    <li class="fields" >
+        <div class="row"><h4>Local Page Manager - Widget Page</h4></div>             
+        <div class="row">
+            <p class="cell w-12-3"><label>Page Name: </label></p>            
+            <p class="cell w-12-4"><input type="text"  maxlength="16" data-bind="value: $root.PageTitleName, disable: $root.PageTypeId() == '-1' " /> <span style="color: red; position:relative; top:5px;">(Maximum characters: 16)</span></p>
+            <p class="cell w-12-3" ></p>
+            <p class="cell w-12-2" style="position:relative; top:5px;" data-bind="visible: $root.PageTypeId() != '-1'">Page Description/Tooltip:</p>
+            <p Class="cell w-12-6" data-bind="visible: $root.PageTypeId() != '-1'"> <textarea style="width: 63%;float: left;margin-right: 5px;" type="text"  maxlength="160" rows="4" cols="50" data-bind="value: $root.PageDescToolTip, disable: $root.PageTypeId() == '-1'"></textarea> <span style="color: red; position:relative; top: -3px;">(Maximum characters: 160)</span></p>
+        </div>
+                
+        <div class="row">
+            <p class="cell w-12-3"><label>Show This Page For:</label></p>
+            <p class="cell w-12-4"><input type="checkbox" data-bind="checked: $root.EnableGuests, disable: $root.PageTypeId() == '-1'"/> Guests <input type="checkbox" data-bind="checked: $root.EnablePatrons, disable: $root.PageTypeId() == '-1'"/> Patrons <input type="checkbox" data-bind="checked: $root.EnableStaff, disable: $root.PageTypeId() == '-1'"/> Staff</p>
+        </div>
+        <div class="row">
+            <hr style="margin: 0;"/>
+        </div>
+        <div class="row">
+            <p class="cell w-12-3"><label>Design Your Page Layout:</label></p>
+            <p class="cell w-12-10" style="width: 750px ;"><label style="float: left; clear: none">Available Local Widgets :  &nbsp;</label> <select data-bind="options: WidgetList, optionsText: 'Name', value : SelectedWidget, optionsCaption: 'Select a Widget' " style="width: 490px;float:left; clear: none"></select> &nbsp; &nbsp;<button  style="float:right; clear: none" data-bind="click: $root.AddWidgetToPage">Add This Widget</button></p>
+        </div>
+        <div class="row" data-bind="attr:{'style': 'overflow: auto;height:385px;'}">           
+            <div class="gridster">
+            <b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>
+            <ul></ul></div>
+        </div>
+        <div class="row customz fixFooter"  style="float: right">
+            <div class="title full-width" style="border:none;">
+                <div class="actions">
+                    <input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview" />       
+                    <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                    <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                    <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                </div>
+            </div>
+        </div>
+
+    </li>
+    <li id="preview">
+        <div class="rowPreview">
+            <ul id="forPreviewPage" data-bind="html: $root.previewTemplate, attr:{'style': 'height:' + $root.pageHeight() + 'px;'}"></ul>
+        </div>
+        <div class="row customz fixFooter"  style="float: right">
+            <div class="title full-width" style="border:none;">
+                <div class="actions">
+                    <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />       
+                    <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                    <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                    <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                </div>
+            </div>
+        </div>
+    </li>
+    </ul>
+</div>
+
+
+<script type="text/javascript">
+ 
+    uxAdmin.PageManager.LocalPageWidget = (function () {        
+        var view = $('#WidgetManagerFieldsx');
+        var widgetVm;
+        var gridster;
+        var gristerHelper = uxAdmin.PageManager.GridsterHelper;
+        var localTemplate = function (xPageId,xPageTypeId, xPageTitleName, xPageDescToolTip , xEnableGuests, xEnablePatrons, xEnableStaff, xLocalTemplate) {
+            var local = this;
+            local.PageId = "-1|" + xPageId;
+            local.PageTitleName = xPageTitleName;
+            local.PageDescToolTip = xPageDescToolTip;
+            local.EnableGuests = xEnableGuests;
+            local.EnablePatrons = xEnablePatrons;
+            local.EnableStaff = xEnableStaff;
+            local.LocalTemplate = ko.toJSON(xLocalTemplate);
+            local.TemplateType = "Local";
+            //--------- [missing property] -----
+            local.PageTypeId = xPageTypeId;          
+            local.PageType = "WidgetPage";
+            local.PageTypeEnable = true;
+            local.IsLocalPage = true;
+            local.IsGlobalPage = false;
+            local.ForceLibraryToUseGlobal = false;
+            local.SelectedLibrariesToForceUseGlobal = "";
+            local.DefaultPage = "Local";
+            local.GlobalTemplate = ko.toJSON([]);
+            local.PageUrl = "";
+        };
+        var widgetPageVm = function () {
+            var self = this;
+            self.pageHeight = ko.observable(0);
+            self.previewTemplate = ko.observable("");
+            self.WidgetList = ko.observableArray();
+            self.PageId = ko.observable();
+            self.PageTypeId = ko.observable();
+            self.PageTitleName = ko.observable();
+            self.PageDescToolTip = ko.observable();
+            self.EnableGuests = ko.observable();
+            self.EnablePatrons = ko.observable();
+            self.EnableStaff = ko.observable();
+            self.SelectedWidget = ko.observable();
+            self.AddWidgetToPage = function () { gristerHelper.AddWidgetToPage( self.pageHeight, gridster, self.SelectedWidget().Index);};
+            self.DeleteWidgetOnPage = function (id) { gristerHelper.DeleteWidgetOnPage(gridster, id); };
+            self.Preview = function() {
+                self.previewTemplate("");
+                ko.utils.arrayForEach(gridster.serialize(), function(gItem) {
+                    gristerHelper.AddWidgetToPage( self.pageHeight, gridster, gItem.id, gItem.col, gItem.row, self.previewTemplate, true);
+                });
+                $('#WidgetManagerFieldsx > ul').stop().animate({left: "-1310"}, 500); 
+            };
+            self.goBack = function(){ $('#WidgetManagerFieldsx > ul').stop().animate({left: "0"}, 500); };
+            self.saveWidget = function() { updatePage(); };
+            self.saveCloseWidget = function() { updatePage(); reload(); parent.$.fn.colorbox.close();};
+            self.cancelWidget = function() {reload(); parent.$.fn.colorbox.close();};
+            function updatePage() { uxAdmin.utilities.ajaxPostJson("PageManager/UpdatePage", collectPageData(), function (result) { alert(result.Message);self.PageId(result.ResultId); });  };
+            function reload(){ var iframe = parent.document.getElementById('myIFrame'); iframe.src = iframe.src;}
+        };
+       
+        var init = function () {
+            widgetVm = new widgetPageVm();
+            ko.applyBindings(widgetVm, view.get(0));
+            uxAdmin.utilities.ajaxGetJson('WidgetManager/GetWidgetList/', null, function (data) {
+                widgetVm.WidgetList(ko.toJS(data).WidgetList);
+            });
+            gridster = gristerHelper.InitGridster();
+            $("body a.icon.delete.widgetDelete").live("click", function () { widgetVm.DeleteWidgetOnPage($(this).closest(".gs_w")); });         
+        };        
+        var loadData = function (index, fillData, isGlobal) {            
+                var pageCollector = @Html.Raw(Json.Encode(Model.PageCollector)); 
+                var pageInfo = $.parseJSON(pageCollector.LocalTemplate); 
+                var pageDetail = $.parseJSON(pageInfo.LocalTemplate);
+                widgetVm.PageId(pageCollector.PageId);
+                widgetVm.PageTypeId(pageCollector.PageTypeId);
+                widgetVm.PageTitleName(pageInfo.PageTitleName);
+                widgetVm.PageDescToolTip(pageInfo.PageDescToolTip);
+                widgetVm.EnableGuests(pageInfo.EnableGuests);
+                widgetVm.EnablePatrons(pageInfo.EnablePatrons);
+                widgetVm.EnableStaff(pageInfo.EnableStaff);
+            
+                if (pageDetail.length > 0) { ko.utils.arrayForEach(pageDetail, function (item) {gristerHelper.AddWidgetToPage( widgetVm.pageHeight,gridster, item.id, item.col, item.row);});}                
+        };
+        var collectPageData = function () {
+            
+            return new localTemplate(widgetVm.PageId(),widgetVm.PageTypeId(), widgetVm.PageTitleName(), widgetVm.PageDescToolTip(), widgetVm.EnableGuests(),widgetVm.EnablePatrons(), widgetVm.EnableStaff(), gridster.serialize());            
+        };
+        return {
+            Init: init,
+            LoadData: loadData            
+        };
+    })();
+    uxAdmin.PageManager.LocalPageWidget.Init();
+    uxAdmin.PageManager.LocalPageWidget.LoadData();
+</script>

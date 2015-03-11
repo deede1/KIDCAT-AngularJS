@@ -1,0 +1,194 @@
+﻿
+<style>
+
+  .CSSTableGenerator {
+	margin:0px;padding:0px;
+	width:100%;
+	border:1px solid #000000;
+	
+	-moz-border-radius-bottomleft:0px;
+	-webkit-border-bottom-left-radius:0px;
+	border-bottom-left-radius:0px;
+	
+	-moz-border-radius-bottomright:0px;
+	-webkit-border-bottom-right-radius:0px;
+	border-bottom-right-radius:0px;
+	
+	-moz-border-radius-topright:0px;
+	-webkit-border-top-right-radius:0px;
+	border-top-right-radius:0px;
+	
+	-moz-border-radius-topleft:0px;
+	-webkit-border-top-left-radius:0px;
+	border-top-left-radius:0px;
+}.CSSTableGenerator table{
+    border-collapse: collapse;
+        border-spacing: 0;
+	width:100%;
+	height:100%;
+	margin:0px;padding:0px;
+}.CSSTableGenerator tr:last-child td:last-child {
+	-moz-border-radius-bottomright:0px;
+	-webkit-border-bottom-right-radius:0px;
+	border-bottom-right-radius:0px;
+}
+.CSSTableGenerator table tr:first-child td:first-child {
+	-moz-border-radius-topleft:0px;
+	-webkit-border-top-left-radius:0px;
+	border-top-left-radius:0px;
+}
+.CSSTableGenerator table tr:first-child td:last-child {
+	-moz-border-radius-topright:0px;
+	-webkit-border-top-right-radius:0px;
+	border-top-right-radius:0px;
+}.CSSTableGenerator tr:last-child td:first-child{
+	-moz-border-radius-bottomleft:0px;
+	-webkit-border-bottom-left-radius:0px;
+	border-bottom-left-radius:0px;
+}.CSSTableGenerator tr:hover td{
+	
+}
+.CSSTableGenerator tr:nth-child(odd){ background-color:#e5e5e5; }
+.CSSTableGenerator tr:nth-child(even)    { background-color:#ffffff; }.CSSTableGenerator td{
+	vertical-align:middle;
+	
+	
+	border:1px solid #000000;
+	border-width:0px 1px 1px 0px;
+	text-align:left;
+	padding:7px;
+	font-size:12px;
+	font-family:Arial;
+	font-weight:normal;
+	color:#000000;
+}.CSSTableGenerator tr:last-child td{
+	border-width:0px 1px 0px 0px;
+}.CSSTableGenerator tr td:last-child{
+	border-width:0px 0px 1px 0px;
+}.CSSTableGenerator tr:last-child td:last-child{
+	border-width:0px 0px 0px 0px;
+}
+.CSSTableGenerator tr:first-child td{
+		background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
+	background:-moz-linear-gradient( center top, #cccccc 5%, #b2b2b2 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");	background: -o-linear-gradient(top,#cccccc,b2b2b2);
+
+	background-color:#cccccc;
+	border:0px solid #000000;
+	text-align:center;
+	border-width:0px 0px 1px 1px;
+	font-size:13px;
+	font-family:Arial;
+	font-weight:bold;
+	color:#000000;
+}
+.CSSTableGenerator tr:first-child:hover td{
+	background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
+	background:-moz-linear-gradient( center top, #cccccc 5%, #b2b2b2 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");	background: -o-linear-gradient(top,#cccccc,b2b2b2);
+
+	background-color:#cccccc;
+}
+.CSSTableGenerator tr:first-child td:first-child{
+	border-width:0px 0px 1px 0px;
+}
+.CSSTableGenerator tr:first-child td:last-child{
+	border-width:0px 0px 1px 1px;
+}
+#availability-indicator
+{
+        display: block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-left:34px;
+}
+</style>
+<nav-menux class="masthead" ></nav-menux>
+<hr/>
+<a href="javascript:window.history.back();" style="margin: 20px"><< Back to previous</a>    
+<div class="container">
+   <div class="container-fluid vertical-room">
+      <div class="row">
+         <div class="container-fluid">
+            <div style="margin: 10px;">
+               <ul class="list-group">
+                  <li class="list-group-item">
+                     <div class="row">
+                        <div class="item-cover col-xs-12">
+                            <div class="col-xs-5">
+                                <img ng-src="{{RecordResult.RecordDetail.JacketArtUrl}}" alt="" border="0" width="50px">
+                                <div class="chili_review" id="chili_0439295025_0">
+                                    <span>
+                                        <div class="chili_link" align="center">
+                                            <strong>User rating</strong>
+                                            <div style="font-size: 1px; background:url('http://chilifresh.com/ratingicons/red_star.gif') repeat-x; width: 46px; height: 10px;"></div>
+                                            <a class="chili_link" href="javascript:void(0);" onclick="open_review('0439295025','0',  '2590', 'reviews', 'a4bd8c283170b6d784dd2e391b083c48', document.getElementById('chili_0439295025_0').rel);">3 reviews</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-xs-7">
+                                <table style="float: left">
+                                    <tr><td style="float: left"><strong>Title</strong> :</td><td style="float: left"><span style="float: left;text-align:left;" ng-bind="RecordResult.RecordDetail.Title"></span></td></tr>
+                                    <tr><td style="float: left"><strong>Author</strong> :</td><td style="float: left"><span style="float: left;text-align:left;" ng-bind="RecordResult.RecordDetail.Author"></span></td></tr>
+                                </table>
+
+                            </div>
+                            <div class="col-xs-12">
+                                
+                                <div style="float: right">
+                                    <table>
+                                        <tr><td>
+                                                {{RecordResult.RecordDetail.Format.Description}}<br/>
+                                                <img ng-src="{{RecordResult.RecordDetail.Format.IconUrl}}" style="width: 40px"/> <br/>                      
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><placehold-button record="RecordResult"></placehold-button></td>
+                                        </tr>
+                                    </table>
+                                    
+                                </div>
+                                
+                                <!--  <button style="margin:4px;" type="button" class="btn btn-primary dropdown-toggle pull-right"><span class="glyphicon glyphicon-saved"></span> Placehold</button>-->
+                                
+                            </div>
+                        </div>
+                        <div class=" col-xs-12">
+                           <tabset>
+                                <tab heading="Detail Info">
+                                    <div style="margin: 10px">
+                                        <div  class="CSSTableGenerator">
+                                            <table style="width: 100%">
+                                                 <tr><td></td><td></td></tr>
+                                                <tr ng-repeat="record in RecordResult.RecordDetail.Fields" >
+                                                    <td> {{record.Label}}</td><td> {{record.Content}}</td>
+                                                </tr>
+                                            </table>        
+                                        </div>
+                                    </div>
+                                </tab>
+                                <tab heading="Where to find it">
+                                    <div style="margin: 5px;" class="CSSTableGenerator">
+                                        <table style="width: 100%">
+                                            <tr><td ng-repeat="col in Availabilities.ItemAvailabilities[0].Holdings[0].GridColumns"> {{ col}}</td></tr>
+                                            <tr ng-repeat="holding in Availabilities.ItemAvailabilities[0].Holdings" >
+                                                <td  ng-show="!$last" ng-repeat="col in holding.GridData">{{col}}</td>
+                                                <td  ng-show="$last" ng-repeat="col in holding.GridData"><span id="availability-indicator" style="background:{{col}}"></span></td>
+                                            </tr>
+                                        </table>        
+                                    </div>
+                                </tab>
+                           </tabset>
+                        </div>
+                        <div class="clear"></div>
+                     </div>
+                  </li>
+               </ul>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+

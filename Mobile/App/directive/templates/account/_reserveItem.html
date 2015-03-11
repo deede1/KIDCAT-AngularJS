@@ -1,0 +1,29 @@
+﻿ <table class="table table-striped table-bordered" ng-repeat="item in ReserveItems.ReservedItems.Reserves">
+        <tr>
+            <td>
+                <table style="width: 100%" >
+                    <tr class="tr-itemlisting-header">
+                        <td width="50%">Reserve Item</td>
+                        <td width="50%"></td>            
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: text-top">
+                            <p>
+                                <b>Title:</b> {{ item.Title }}<br/>
+                                <b>Author:</b>{{ item.Author }}<br/>                                
+                                <b>Volume:</b>{{ item.Volume}}<br/>
+                            </p>
+                        </td>
+
+                        <td style="vertical-align: text-top">
+                            <p>
+                                <b>Reserve Date:</b>{{ item.ReserveDateStr}}    <br/>
+                                <b>Pickup Location:</b> {{ item.PickupLocationName}}   <br/>
+                                <button class="btn btn-primary"  ng-show="item.CanDelete" ng-click="cancelReserveItem(item)" style="vertical-align: bottom; float: right">Cancel</button>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>

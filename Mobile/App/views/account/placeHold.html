@@ -1,0 +1,56 @@
+﻿ <style>
+         .animate-enter,
+    .animate-leave
+    {
+    -webkit-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    }
+     
+    .animate-enter {
+    left: 100%;
+    }
+    .animate-enter.animate-enter-active {
+    left: 0;
+    }
+     
+    .animate-leave {
+    left: 0;
+    }
+    .animate-leave.animate-leave-active{
+    left: -100%;
+    }
+    
+ </style>
+ <div class="modal-header">
+     <h3 class="modal-title">Place Hold</h3>
+     <div style="color: red; float: right; margin: -10px 0px;" ng-bind="credentials.msg"></div>
+ </div>
+<div class="modal-body">    
+  
+  
+    <div class="form-group" ng-if="!showMsg">
+        <label for="validate-text">Pickup Location</label>
+        <div class="input-group">                                                  
+            <div>                  
+                <select  class="form-control" name="validate-select" id="validate-select" placeholder="Validate Select" required="" ng-model="libraryList.currentActivity" data-ng-options="a.PickupLocationName for a in libraryList.activities"></select>
+            </div>
+            <span class="input-group-addon danger"><span class="glyphicon glyphicon-list-alt"></span></span>
+        </div>
+    </div>
+    
+    
+    <div class="form-group" ng-if="showMsg">
+        <label for="validate-text">Your request has been placed.</label>        
+    </div>
+    
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()" ng-if="!showMsg">Place Hold</button>
+    <button class="btn btn-warning" ng-click="cancel()" ng-if="!showMsg">Cancel</button>
+    <button class="btn btn-warning" ng-click="cancel()" ng-if="showMsg">Close</button>
+</div>

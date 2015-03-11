@@ -1,0 +1,60 @@
+﻿
+<div class="content edit-options" id="hoursWidgetFields" style="display:none">
+    <div class="fields">
+
+        <!-- row 1 -->
+        <div class="row">
+            <h5>Hours Widget</h5>
+        </div> 
+
+        <!-- row 2 -->
+        <div class="row">
+            <p class="cell w-12-2">
+                <label>Widget Name:</label>
+            </p>
+            <p class="cell w-12-5">
+                <input type="text" />
+            </p>
+        </div>
+
+        <!-- row 3 -->
+        <div class="row">
+            <p class="cell w-12-2">
+                <label>Headline:</label>
+            </p>
+            <p class="cell w-12-5">
+                <input type="text" />
+            </p>
+        </div>
+
+        <!-- row 4 -->
+        <div class="row">
+            <p class="cell w-12-2">
+                <label>Hours Text:</label>
+            </p>
+            <div class="cell w-12-5">
+                <textarea id="TextEditor" rows="2" cols="1"></textarea> 
+            </div>
+        </div>
+
+    </div>       
+</div>
+
+
+@*<script type="text/javascript" src="@Url.Content("~/Public/Javascript/ControlPanel/CreateWidget/Index.js")" ></script>*@
+<script type="text/javascript">
+    uxAdmin.WidgetManager.FormatSearchWidget = (function () {
+
+        var _view = $('#hoursWidgetFields');
+
+        //init
+        var init = function () {
+            //console.log("Format Search Widget Loaded");
+
+        };
+        return {
+            Init: init
+        };
+
+    })();
+</script>

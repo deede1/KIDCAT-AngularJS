@@ -1,0 +1,46 @@
+﻿<kidsheader></kidsheader>
+<div id="kidcatBody">
+<header></header>
+    <div id="search-result-innercontainer">
+        <a class="back-button" ng-click="goBack()"></a>
+        <h2 ng-bind="pageHeaderTitle">
+        </h2>
+        <h3 ng-show="TotalMergedRecords>0">
+            Look what we found:<span ng-bind="TotalMatchedRecords"></span> items
+        </h3>
+
+        <h3 ng-show="TotalMatchedRecords==0">
+            No Record Found.
+        </h3>
+        <h4 ng-show="TotalMergedRecords>0">
+            Page <span ng-bind="PageNum"></span> of <span ng-bind="TotalMatchedRecords"></span> results
+        </h4>
+        <div id="line-divider">
+        </div>
+        <div class="search-result-carousel-arrow left" ng-click="loadPrev()" ng-show="hasPrev()">
+        </div>
+        <div class="search-result-carousel-arrow right" ng-click="loadNext()" ng-show="hasNext()">
+        </div>
+        <div id="search-result-list-container">
+           <!-- <div class="loader" data-bind="visible: showSmallLoader()">
+                Loading ...
+                <br />
+                <img src="../../mvc/Public/Images/loading18.gif" />
+            </div>-->
+            <ul>
+                <li ng-repeat="cluster in clusters">
+                    <a ng-click="getFullRecord(cluster)" title="{{cluster.Groupings[0].Items[0].Title}}">
+                        <img ng-src="{{cluster.Groupings[0].Items[0].JacketArtUrl}}" />
+                    <div id="title">
+                        <span title="{{cluster.Groupings[0].Items[0].Title}}">{{cluster.Groupings[0].Items[0].Title}}</span>
+                    </div>
+                    <div id="by">
+                        by</div>
+                    <div id="author">
+                        <span title="{{cluster.Groupings[0].Items[0].Author}}">{{cluster.Groupings[0].Items[0].Author}}</span>
+                    </div>
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>

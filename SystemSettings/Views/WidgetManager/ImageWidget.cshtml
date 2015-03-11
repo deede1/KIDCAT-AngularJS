@@ -1,0 +1,281 @@
+﻿
+<div class="content edit-options" id="imageWidgetFields" style="display:none">
+    <div class="fields">
+
+        <!-- row 1 -->
+        <div class="row">
+            <h4>Image Widget</h4>
+        </div>    
+      
+
+        <div class="row">
+            <p class="cell w-12-2">
+                <label>Widget Size:</label>
+            </p>
+            <p class="cell w-12-1">
+                Column: <select data-bind="options: WidgetSizeList, optionsText: 'Name' , optionsValue: 'id', value: selectedColumnSize" ></select>
+            </p>
+            <p class="cell w-12-1">
+                Row: <select data-bind="options: WidgetSizeList, optionsText: 'Name', optionsValue: 'id', value: selectedRowSize"></select>
+            </p>
+        </div> 
+            
+        <!-- row 2 -->
+        <div class="row">
+            <p class="cell w-12-2">
+                 <label style="color: red">* Widget Name:</label>
+            </p>
+            <p class="cell w-12-8">
+                <input type="text"  data-bind="value: WidgetTitleName" />
+            </p>
+        </div>
+        
+
+      
+
+        <!-- row 3 -->
+        @using (Html.BeginForm("UploadImage", "WidgetManager", FormMethod.Post, new { Area = "SystemSetting", enctype = "multipart/form-data", id = "ImgForm", name = "ImgForm", target = "UploadTarget" }))
+        {	
+
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Upload Image:</label>
+                </p>
+                <p class="cell w-12-5">
+                    <input type="file" value="" size="37" id="imageFile" name="imageFile"/>	                        
+                    <input type="button" value="Upload" onclick="UploadImage()" />                    
+                </p>                
+            </div>            
+        }
+        
+          <div class="row">
+             <p class="cell w-12-2">
+                <label>Image Preview:</label>
+            </p>                
+            <p class="cell w-12-7">
+               
+                <img id="preloadImg" alt=""  data-bind="attr: { src: WidgetImageURL }" /> 
+                 <div id="preloadImg2" style="text-align: center"></div> 
+                              
+            </p>
+        </div>
+    </div>       
+</div>
+
+
+          
+
+        
+
+<script type="text/javascript">
+    var isFirstLoad = true;
+
+    function UploadImage() {
+        //$("#preloadImg").hide();
+        $("#ImgForm").submit();
+    }
+
+    function UploadImage_Complete() {
+       
+        //Check to see if this is the first load of the iFrame
+        if (isFirstLoad == true) {
+            isFirstLoad = false;
+            //$("#preloadImg").hide();
+            return;
+        }
+
+        //Reset the image form so the file won't get uploaded again
+        document.getElementById("ImgForm").reset();
+
+        //Grab the content of the textarea we named jsonResult .  This shold be loaded into 
+        //the hidden iFrame.
+        var newImg = $.parseJSON($("#UploadTarget").contents().find("#jsonResult")[0].innerHTML);
+
+        //If there was an error, display it to the user
+        if (newImg.IsValid == false) {
+            alert(newImg.Message);
+            return;
+        }
+        
+
+
+        //Create a new image and insert it into the Images div.  Just to be fancy, 
+        //we're going to use a "FadeIn" effect from jQuery
+        var imgDiv = document.getElementById("Images");
+        //imgDiv.removechild();
+
+        $('<img src="' + newImg.ImagePath + '">').load(function () {
+
+            $('#preloadImg2').empty();
+            $(this).appendTo('#preloadImg2');
+
+        });
+        
+       // $("#preloadImg").src = newImg.ImagePath;
+
+//        var img = new Image();
+//        img.src = newImg.ImagePath;
+//        
+//        //Hide the image before adding to the DOM
+//        $(img).hide();
+//        imgDiv.appendChild(img);
+//        //Now fade the image in
+//        $(img).fadeIn(500, null);
+//        imgDiv.removechild();
+
+    }
+   
+</script>
+   <iframe id="UploadTarget" name="UploadTarget" src="@Url.Content("../../dummy.cshtml")" onload="loadUploadImage()" style="position: absolute; left: -999em; top: -999em;"></iframe>
+<div id="Images"></div>
+
+
+
+
+@*
+           <div id ="progressbar" ></div>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery.progressbar.js")" ></script>
+
+<style>
+    
+          
+/* progress bar container */
+#progressbar{
+        border:1px solid black;
+        width:200px;
+        height:20px;
+        position:relative;
+        color:black; 
+}
+/* color bar */
+#progressbar div.progress{
+        position:absolute;
+        width:0;
+        height:100%;
+        overflow:hidden;
+        background-color:#369;
+}
+/* text on bar */
+#progressbar div.progress .text{
+        position:absolute;
+        text-align:center;
+        color:white;
+}
+/* text off bar */
+#progressbar div.text{
+        position:absolute;
+        width:100%;
+        height:100%;
+        text-align:center;
+}
+</style>*@
+
+<script type="text/javascript">
+    var temp_img;
+    var temp_img_name;
+    var fileName = null;
+    var fileToUpload = null;
+    function loadUploadImage() {
+        //alert("load Image");
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e, data) {
+                    temp_img = e.target.result
+                    $('#preloadImg').attr('src', temp_img);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        $("#imageFile").change(function () {
+            readURL(this);
+            temp_img_name = $('.customfile-feedback').text();
+            //uxAdmin.WidgetManager.ImageWidget.IWvm.WidgetFileName(temp_img_name);
+            //console.log(uxAdmin.WidgetManager.ImageWidget.IWvm);
+            $(".customfile").append("<div class='hide-title' style='display:none'> " + temp_img_name + "</div>")
+        });
+    }
+    uxAdmin.WidgetManager.ImageWidget = (function () {
+
+        var _view = $('#imageWidgetFields');
+        var iWvm;
+
+        var imageWidgetVm = function () {
+            this.WidgetId = ko.observable();
+            this.WidgetTypeId = ko.observable();
+            this.WidgetType = ko.observable();
+
+            this.WidgetTitleName = ko.observable();
+            this.WidgetImageURL = ko.observable();
+            this.WidgetSizeList = [{ Name: 1, id: 1 }, { Name: 2, id: 2 }, { Name: 3, id: 3 }, { Name: 4, id: 4 }, { Name: 5, id: 5 }, { Name: 6, id: 6 }, { Name: 7, id: 7 }, { Name: 8, id: 8 }, { Name: 9, id: 9 }, { Name: 10, id: 10 }, { Name: 11, id: 11 }, { Name: 12, id: 12}];
+            this.selectedColumnSize = ko.observable();
+            this.selectedRowSize = ko.observable();
+            this.orgFileName = ko.observable();
+
+        };
+        var collectWidgetData = function () {
+            try {
+                var newImg = $.parseJSON($("#UploadTarget").contents().find("#jsonResult")[0].innerHTML);
+                iWvm.WidgetImageURL(newImg.ImagePath);
+
+                iWvm.orgFileName($(".customfile-feedback").html());
+                //iWvm.WidgetSizeList([]);
+            } catch (e) {
+
+            };
+
+            return ko.mapping.toJS(iWvm);
+        };
+        var loadData = function (index) {
+            uxAdmin.utilities.ajaxPostJson("SystemSettings/WidgetManager/GetWidgetData/", index, function (data) {
+                var widgetData = $.parseJSON(data.JsonData);
+
+                iWvm.WidgetId(data.WidgetId);
+                iWvm.WidgetTypeId(widgetData.WidgetTypeId);
+                iWvm.WidgetType(widgetData.WidgetType);
+                iWvm.WidgetTitleName(widgetData.WidgetTitleName);
+                iWvm.WidgetImageURL(widgetData.WidgetImageURL);
+                iWvm.selectedColumnSize(widgetData.selectedColumnSize);
+                iWvm.selectedRowSize(widgetData.selectedRowSize);
+                iWvm.orgFileName(widgetData.orgFileName);
+                $(".customfile-feedback").html(widgetData.orgFileName);
+            });
+
+        };
+        var init = function (widgetProps, widgetTypeId, widgetType) {
+
+            // create new instance of View Model
+            iWvm = new imageWidgetVm();
+
+            // init file input
+            if (!customFileInit) {
+                var customFileInit = _view.find('input[type=file]').customFileInput();
+            }
+
+            // cache widget properties
+            var indexKeyPair = widgetProps;
+
+            // initialize existing/new widget
+            if (indexKeyPair != null) {
+                //edit: load data and create editor
+                loadData(indexKeyPair);
+            }
+            else {
+                //new: set creation properties into View Model
+                iWvm.WidgetTypeId(widgetTypeId);
+                iWvm.WidgetType(widgetType);
+            }
+
+            // apply ko bindings
+            ko.applyBindings(iWvm, _view.get(0));
+
+        };
+
+        return {
+            Init: init,
+            loadData: loadData,
+            CollectWidgetData: collectWidgetData
+        };
+    })();
+
+</script>

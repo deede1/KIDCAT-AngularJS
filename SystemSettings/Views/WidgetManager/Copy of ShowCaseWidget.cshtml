@@ -1,0 +1,973 @@
+﻿@model Verso.Common.UXAdmin.WidgetCollector
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")
+@*@Html.LocalResourceJavascript("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")*@
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/ckeditor.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/config.js")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+   <style type="text/css">
+                   /*  reset & .clear
+----------------------------*/
+
+                   * {
+                       margin: 0;
+                       padding: 0;
+                   }
+
+                   .clear:before,
+                   .clear:after {
+                       content: " ";
+                       display: table;
+                   }
+
+                   .clear:after { clear: both }
+
+                   .clear { *zoom: 1 }
+
+/*  MAIN
+----------------------------*/
+
+                   body {
+                       font: normal 12px/1.3 arial, sans-serif;
+                       /*    background-color: #eee;*/
+                   }
+
+                   li { list-style: none }
+
+                   a { text-decoration: none }
+
+                   .container {
+                       position: relative;
+                       width: 920px;
+                       /*margin: 15px auto;*/
+                   }
+
+                   .container #product {
+                       position: relative;
+                       z-index: 2;
+                       float: left;
+                       width: 670px;
+                   }
+
+                   .container #sidebar {
+                       position: relative;
+                       z-index: 1;
+                       float: right;
+                       width: 190px;
+                   }
+
+/*  PRODUCTS
+----------------------------*/
+
+                   #product ul { margin:30px 0 0 -9px; float: left;width: 955px;}
+                   #product ul li {
+                       position: relative;
+                       float: left;
+                       width: 75px;
+                       margin: 0 0 10px 10px;
+                       padding: 5px;
+                       background-color: #fff;
+                       border-radius: 4px;
+                       -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+                       box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+                       -webkit-transition: -webkit-transform .1s ease;
+                       -moz-transition: -webkit-transform .1s ease;
+                       -o-transition: -webkit-transform .1s ease;
+                       -ms-transition: -webkit-transform .1s ease;
+                       transition: transform .1s ease; z-index:5;
+                   }
+                   #product #sidebar ul li { width:160px;box-shadow: none;margin: 0;z-index: 0;background:transparent;padding: 0 0 0 10px; }
+                   #product #sidebar ul {width: 185px;margin: 0;overflow-x: hidden;}
+                   #product ul li:hover {
+                       background-color: #fff8c1;z-index: 10;
+                   }
+
+                   #product.active ul li {
+                       -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+                       filter: alpha(opacity = 40);
+                       opacity: .4;
+                   }
+
+                   #product.active ul li.active {
+                       z-index: 2;
+                       -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+                       filter: alpha(opacity = 100);
+                       opacity: 1;
+                       -webkit-transform-origin: 50% 50%;
+                       -moz-transform-origin: 50% 50%;
+                       -o-transform-origin: 50% 50%;
+                       -ms-transform-origin: 50% 50%;
+                       transform-origin: 50% 50%;
+                       -webkit-transform: scale(.6);
+                       -moz-transform: scale(.6);
+                       -o-transform: scale(.6);
+                       -ms-transform: scale(.6);
+                       transform: scale(.6);
+                   }
+
+                   #product ul li a {
+                       display: block;
+                       color: #000
+                   }
+
+                   #product ul li a h3 { margin:5px 0 0;}
+
+                   #product ul li a h3,
+                   #product ul li a p {
+                       white-space: nowrap;
+                       overflow: hidden;
+                       -o-text-overflow: ellipsis;
+                       -ms-text-overflow: ellipsis;
+                       text-overflow: ellipsis;
+                   }
+
+                   #product ul li a img { display: block;width: 75px;height: 65px;}
+
+/*  BASKET
+----------------------------*/
+
+                   .basket {
+                       position: relative;float: left;
+                   }
+
+                   .basket .basket_list {
+                       background-color: #fff;
+                       border: 2px dashed transparent;
+                       border-radius: 4px;
+                       min-height: 285px;
+                   }
+
+                   .basket.active .basket_list,
+                   .basket.hover .basket_list { border-color: #ffa0a3;float: left; }
+
+                   .basket .basket_list { background-color: #fff8c1;border-color: #EBE797; }
+
+                   .basket.hover .basket_list { background-color: #ffa0a3 }
+
+/* .head */
+
+                   .basket .head {
+                       overflow: hidden;
+                       margin: 0 10px;
+                       height: 26px;
+                       line-height: 26px;
+                       color: #666;
+                       border-bottom: 1px solid #ddd;
+                   }
+
+                   .basket .head .name { float: left; font-size: 13px;font-weight: bold;}
+                   .basket.hover .head .name { color:#fff;}
+                   .basket .head .count { float: right }
+
+/* .head */
+
+                   .basket ul { padding-bottom: 10px;max-height: 235px;overflow: auto; }
+
+                   .basket ul li {
+                       position: relative;
+                       clear: both;
+                       overflow: hidden;
+                       margin: 0 10px;
+                       height: 26px;
+                       line-height: 32px;
+                       border-bottom: 1px dashed #eee;
+                   }
+
+                   .basket ul li:hover { border-bottom-color: #ccc }
+
+
+                   .basket ul li span.name {
+                       display: block;
+                       float: left;
+                       width: 127px;
+                       font-weight: bold;
+                       white-space: nowrap;
+                       overflow: hidden;
+                       -o-text-overflow: ellipsis;
+                       -ms-text-overflow: ellipsis;
+                       text-overflow: ellipsis;
+                       -webkit-transition: width .2s ease;
+                       -moz-transition: width .2s ease;
+                       -o-transition: width .2s ease;
+                       -ms-transition: width .2s ease;
+                       transition: width .2s ease;
+                   }
+
+                   .basket ul li:hover span.name { width: 146px }
+
+                   .basket ul li input.count {
+                       float: right;
+                       margin: 3px 2px 0 0;
+                       width: 25px;
+                       line-height: 20px;
+                       text-align: center;
+                       border: 0;
+                       border-radius: 3px;
+                       background-color: #ddd;
+                   }
+
+                   .basket ul li button.delete {
+                       position: absolute;
+                       right: 0px;
+                       padding:0px;
+                       top: 3px;
+                       -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+                       filter: alpha(opacity = 0);
+                       opacity: 0;
+                       width: 20px;
+                       line-height: 20px;
+                       height: 20px;
+                       text-align: center;
+                       font-size: 11px;
+                       border: 0;
+                       color: #EE5757;
+                       background-color: #eee;
+                       border-radius: 3px;
+                       cursor: pointer;
+                       -webkit-transition: opacity .2s ease;
+                       -moz-transition: opacity .2s ease;
+                       -o-transition: opacity .2s ease;
+                       -ms-transition: opacity .2s ease;
+                       transition: opacity .2s ease;
+                   }
+
+                   .basket ul li:hover button.delete {
+                       -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+                       filter: alpha(opacity = 100);
+                       opacity: 1;
+                   }
+
+                   .basket ul li button.delete:hover {
+                       color: #000;
+                       background-color: #ffa0a3;
+                   }
+
+                   .basket ul li button.delete:active {
+                       color: #000;
+                       background-color: #EE5757;
+                   }
+                   .showcaseResultSetHeader { position:absolute; width: 940px;background: #F5F5F5;top: 0px;left: 0px;height: 25px;display: block;border-bottom: 1px solid #DFDFDF;line-height: 25px; }
+                   .showcaseResultSetHeader h3{ font-size:13px; float:left; padding-left:5px;}
+                   .showcaseResultSetHeader .showcaseResultPagination{ float:right; width:115px; }
+                   #product .showcaseResultSetHeader .showcaseResultPagination ul { margin:0;float: none;width: auto; }
+                   #product .showcaseResultSetHeader .showcaseResultPagination ul li{list-style: none;float: left;padding: 2px 3px;background: #FFF;width: auto;margin: 3px;line-height: normal;}
+                   .ui-tabs .ui-tabs-nav li {border-bottom: 1px solid #BBB!important;margin: 5px 0 0;left: -1px;top:0px;width: 102px;overflow: hidden; }
+                   .ui-tabs .ui-tabs-nav li.ui-tabs-selected {left: 0px;}
+                   .ui-tabs .ui-tabs-panel{padding: 6px;}
+                   .ui-tabs .ui-tabs-nav li a {padding: 20px 11px;}
+                   .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { background:#fff; }
+                   .mastToHide{overflow: hidden;height: 298px;position: relative;}
+                   .content-box { width: 780px; margin: 50px auto; position:relative;}
+                    #sliderSelfHelpBooks { width: 700px; padding-left: 0px; padding-right: 0px; overflow:hidden; margin:0 40px;}
+                    #sliderSelfHelpBooks ul{position: relative; width:10000px; left:0px; top:0px;float: left;z-index: 0;}
+                    #sliderSelfHelpBooks li{list-style:none; float:left; width: 100px;padding: 0 20px;}
+                    .slider-button { height:34px; width:34px; display:block; position:absolute; top:100px; z-index: 100;}
+                    .slider-button-left{background: url(../../../../Public/Images/arr_left.png) no-repeat; left:0px;}
+                    .slider-button-right{background: url(../../../../Public/Images/arr_right.png) no-repeat; right:0px;}
+                    .blinds { background: url(../../../../Public/Images/blinds.png) no-repeat; height:290px; width:81px; overflow:hidden; position:absolute; z-index:10; }
+                    .blinds.leftB { top:0px; left:28px; background-position:top left; }
+                    .blinds.rightB { top:0px; right:28px; background-position:top right; }
+               </style>
+
+<div class="content edit-options" id="TopicSearchWidgetFields">
+    <ul>
+        <li class="fields">
+            <!-- row 1 -->
+            <div class="row">
+                <h4 style="margin:0;">Showcase Widget</h4>
+            </div>
+            <div class="row">
+                <p class="cell w-12-2">
+                    <label>Widget Size:</label>
+                </p>
+                <p class="cell w-12-1">Column:
+                    <select data-bind="options: widgetSizeStyleOption, optionsText: 'Name' , optionsValue: 'id', value: selectedColumnSize"></select>
+                </p>
+                <p class="cell w-12-1">Row:
+                    <select data-bind="options: WidgetSizeList, optionsText: 'Name', optionsValue: 'id', value: selectedRowSize"></select>
+                </p>
+            </div>
+            <!-- row 2 -->
+            <div class="row customz">
+                <p class="cell w-12-2">
+                    <label style="color: red">* Widget Name:</label>
+                </p>
+                <p class="cell w-12-8">
+                    <input type="text" data-bind="value: WidgetTitleName" />
+                </p>
+            </div>
+            <!-- row 3 -->
+            <div class="row customz">
+                <p class="cell w-12-2">
+                    <label>Headline:</label>
+                </p>
+                <div class="cell w-12-8">
+                    <textarea rows="10" cols="10" id="contentWidget_HLte" data-bind="value: WidgetHeadline"></textarea>
+                </div>
+            </div>
+            <!-- row 4 -->
+            <div class="row customz" style="padding: 0;height: 20px;">
+                <p class="cell w-12-2">
+                    <label>Search Type:</label>
+                </p>
+                <div class="cell w-12-8" style="line-height: 24px;">
+                    <input type="radio" />&nbsp;RealTime Showcase&nbsp;&nbsp;&nbsp;<input type="radio" />&nbsp;List Showcase
+                </div>
+            </div>
+            <!-- row 5 -->
+            <div class="row customz" style="padding: 0;height: 20px;">
+                <p class="cell w-12-2">
+                    <label>Showcase Type:</label>
+                </p>
+                <div class="cell w-12-8" style="line-height: 24px;">
+                    <input type="radio" />&nbsp;One-Up Showcase&nbsp;&nbsp;<input type="radio" />&nbsp;Standard Showcase
+                </div>
+            </div>
+            <div class="row customz">
+                <p class="cell w-12-2">
+                    <label>Find New Items:</label>
+                </p>
+                <div class="cell w-12-8">
+
+                    <div id="fullRecordTabs" style="width: 99.95%; float: left;min-height: 298px;">
+                        <ul style="margin: -3px -1px;float: left;width:100px;position: absolute;top:31px;left: -104px;z-index: 0;overflow: hidden;border: none;">
+                            <li><a href="#tabs-1">Search Query</a>
+                            </li>
+                            <li><a href="#tabs-2">Search Result</a>
+                            </li>
+                        </ul>
+                        <div class="mastToHide">
+                            <div id="tabs-1">
+                            <ul>
+                                <li>
+                                    <label style="display:block;">Search Keyword:</label>
+                                    <input type="text" style="width: 300px;padding: 6px;float: left;height: auto;margin-right: 10px;" />
+                                    <button class="button primary" data-bind="click: $root.ShowcaseResultSet">Search</button>
+                                </li>
+                            </ul>
+
+                        </div>
+                            <div id="tabs-2">
+                            <div class="container">
+                                <section id="product" style="overflow: hidden ; height: 290px; width: 100%">
+                                    <div class='showcaseResultSetHeader'>
+                                        <h3>Showcase Result Set</h3>
+                                        <div class='showcaseResultPagination'>
+                                            <ul>
+                                                <li><a href="#">1</a></li>
+                                                <li><a href="#">2</a></li>
+                                                <li><a href="#">3</a></li>
+                                                <li><a href="#">4</a></li>
+                                                <li><a href="#">5</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <ul data-bind="showcaseDraggable:{revert:true}">
+                                        <li data-id="1">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/1/" alt="">
+                                                <h3>iPad 32gb retina screen</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="2">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/2/" alt="">
+                                                <h3>Turntable mixer</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="3">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/3/" alt="">
+                                                <h3>IBM 15" super-fast computer</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="4">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/4/" alt="">
+                                                <h3>Some crazy circuit</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="5">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/5/" alt="">
+                                                <h3>White earpieces</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="6">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/6/" alt="">
+                                                <h3>Headphones with free keyboard</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="7">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/7/" alt="">
+                                                <h3>iPhone 4S</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                        <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                          <li data-id="8">
+                                            <a href="#">
+                                                <img src="http://lorempixel.com/150/100/technics/8/" alt="">
+                                                <h3>Another crazy circuit or..</h3>
+                                                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <aside id="sidebar">
+                                    <div class="basket" data-bind="showcaseDroppable:{}">
+                                        <div class="basket_list">
+                                            <div class="head">
+                                                <span class="name">Drag to your Shelf</span>
+                                                <span class="count"></span>
+                                            </div>
+                                            <ul data-bind="foreach: TempShowcaseItems()">
+                                                <li><span class="name" data-bind="text: $data.Title"></span><button class="delete">&#10005;</button></li>
+                                                <!--li>
+                                                    <span class="name">Samsung S3 asd asdasdaf dfsdghgfg dgfg</span>
+                                                    <input class="count" value="1" type="text">
+                                                    <button class="delete">&#10005;</button>
+                                                    </li-->
+                                            </ul>
+                                        </div>
+                                    </div>
+
+
+                                </aside>
+                                </section>
+
+
+                                
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+            <!-- row 7 -->
+            <div class="row customz fixFooter" style="float: right">
+                <div class="title full-width" style="border:none;">
+                    <div class="actions">
+                        <input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview" />
+                        <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                        <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" />
+                        <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget" />
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li id="preview">
+            <div class="row">
+                <h4>Showcase Widget Preview (<span data-bind="text: 'Columns: '+selectedColumnSize() +' X Rows: '+selectedRowSize()"></span>)</h4> 
+            </div>
+
+            <div class="content-box">
+                <a class="slider-button slider-button-left" id="sliderSelfHelpBooks_bl"></a>
+                <span class="blinds leftB"></span><span class="blinds rightB"></span>
+                <a class="slider-button slider-button-right" id="sliderSelfHelpBooks_br"></a>
+                <div class="slider clearfix slider-init" id="sliderSelfHelpBooks" style="">
+                    <ul id="sliderSelf">
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/967260/grain-brain/perlmutter-david-loberg-kristin/">
+                                <img alt="Grain Brain" src="http://i0.ebkimg.com/previews/000/000967/000967260/000967260-sml-1.jpg" class="img-hover-action">
+                            </a>
+                            <span class="preview">Grain Brain</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Perlmutter%2c+David&amp;restrictBy=author">David Perlmutter</a>; <a href="/searchapp/searchresults.net?page=1&amp;term=+Loberg%2c+Kristin&amp;restrictBy=author">Kristin Loberg</a></span>
+                            <span class="price">US$ 12.99</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/680742/steve-jobs/isaacson-walter/">
+                                <img alt="Steve Jobs" src="http://i2.ebkimg.com/previews/000/000680/000680742/000680742-sml-1.jpg" class="img-hover-action">
+                            </a>
+                            <span class="preview">Steve Jobs</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Isaacson%2c+Walter&amp;restrictBy=author">Walter Isaacson</a></span>
+                            <span class="price">US$ 14.57</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/1114554/e-squared/grout-pam/">
+                                <img alt="E-Squared" src="http://i4.ebkimg.com/previews/001/001114/001114554/001114554-sml-1.jpg" class="img-hover-action">
+                            </a>
+                            <span class="preview">E-Squared</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Grout%2c+Pam&amp;restrictBy=author">Pam Grout</a></span>
+                            <span class="price">US$ 6.99</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/284872/no-more-mr-nice-guy/glover-robert-a/">
+                                <img alt="No More Mr Nice Guy" src="http://i2.ebkimg.com/previews/000/000284/000284872/000284872-sml-1.jpg" class="img-hover-action">
+                            </a>
+                            <span class="preview">No More Mr. Nice Guy!</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Glover%2c+Robert+A.&amp;restrictBy=author">Robert A. Glover</a></span>
+                            <span class="price">US$ 9.95</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/555932/how-to-win-friends-and-influence-people/carnegie-dale/">
+                                <img alt="How To Win Friends and Influence People" src="http://i2.ebkimg.com/previews/000/000555/000555932/000555932-sml-1.jpg" class="img-hover-action">
+                            </a>
+                            <span class="preview">How To Win Friends and Influence People</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Carnegie%2c+Dale&amp;restrictBy=author">Dale Carnegie</a></span>
+                            <span class="price">US$ 11.66</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/706889/the-paleo-diet/cordain-loren/">
+                                <img alt="The Paleo Diet" onload="return 'http://i4.ebkimg.com/previews/000/000706/000706889/000706889-sml-1.jpg'" class="img-hover-action img-lazy-load-i" src="http://i4.ebkimg.com/previews/000/000706/000706889/000706889-sml-1.jpg">
+                            </a>
+                            <span class="preview">The Paleo Diet</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Cordain%2c+Loren&amp;restrictBy=author">Loren Cordain</a></span>
+                            <span class="price">US$ 14.95</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/349869/the-holy-bible/unknown/">
+                                <img alt="The Holy Bible" onload="return 'http://i4.ebkimg.com/previews/000/000349/000349869/000349869-sml-1.jpg'" class="img-hover-action img-lazy-load-i" src="http://i4.ebkimg.com/previews/000/000349/000349869/000349869-sml-1.jpg">
+                            </a>
+                            <span class="preview">The Holy Bible</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Unknown&amp;restrictBy=author">Unknown </a></span>
+                            <span class="price">US$ 4.95</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/287410/how-to-motivate-every-employee/bruce-anne/">
+                                <img alt="How to Motivate Every Employee" onload="return 'http://i0.ebkimg.com/previews/000/000287/000287410/000287410-sml-1.jpg'" class="img-hover-action img-lazy-load-i" src="http://i0.ebkimg.com/previews/000/000287/000287410/000287410-sml-1.jpg">
+                            </a>
+                            <span class="preview">How to Motivate Every Employee</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Bruce%2c+Anne&amp;restrictBy=author">Anne Bruce</a></span>
+                            <span class="price">US$ 7.95</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/348007/outliers/gladwell-malcolm/">
+                                <img alt="Outliers" onload="return 'http://i2.ebkimg.com/previews/000/000348/000348007/000348007-sml-1.jpg'" class="img-hover-action img-lazy-load-i" src="http://i2.ebkimg.com/previews/000/000348/000348007/000348007-sml-1.jpg">
+                            </a>
+                            <span class="preview">Outliers</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Gladwell%2c+Malcolm&amp;restrictBy=author">Malcolm Gladwell</a></span>
+                            <span class="price">US$ 9.99</span>
+                        </li>
+    
+                        <li>
+                            <a class="slider-item book-picture-shadow" href="/889155/the-law-of-attraction/hicks-esther-hicks-jerry/">
+                                <img alt="The Law of Attraction" onload="return 'http://i0.ebkimg.com/previews/000/000889/000889155/000889155-sml-1.jpg'" class="img-hover-action img-lazy-load-i" src="http://i0.ebkimg.com/previews/000/000889/000889155/000889155-sml-1.jpg">
+                            </a>
+                            <span class="preview">The Law of Attraction</span>
+                            <span class="author"><a href="/searchapp/searchresults.net?page=1&amp;term=Hicks%2c+Esther&amp;restrictBy=author">Esther Hicks</a>; <a href="/searchapp/searchresults.net?page=1&amp;term=+Hicks%2c+Jerry&amp;restrictBy=author">Jerry Hicks</a></span>
+                            <span class="price">US$ 14.95</span>
+                        </li>     
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row customz fixFooter" style="float: right">
+                <div class="title full-width" style="border:none;">
+                    <div class="actions">
+                        <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />
+                        <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                        <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" />
+                        <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget" />
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<script type="text/javascript">
+    
+    
+     $("#fullRecordTabs").tabs();
+    var uxAdmin = {};
+    uxAdmin.WidgetManager = (function () {
+        return {};
+    })();
+      function addBasket(basket, move) {
+			basket.find("ul").append('<li data-id="' + move.attr("data-id") + '">'
+					+ '<span class="name">' + move.find("h3").html() + '</span>'
+					+ '<input class="count" value="1" type="text">'
+					+ '<button class="delete">&#10005;</button>');
+		}
+        $(".basket ul li button.delete").live("click", function () {
+			$(this).closest("li").remove();
+		});
+    
+        
+    ko.bindingHandlers.showcaseDroppable = {
+        init: function(element, valueAccessor, allBindingsAccessor,viewModel, bindingContext) {
+            $(element).droppable({				    
+			    activeClass:"active",	
+			    hoverClass:"hover",				    
+			    tolerance:"touch",
+			    drop:function (event, ui) {
+			        console.log(viewModel);
+			        console.log(bindingContext);
+			        console.log(ui.draggable);
+			        viewModel.TempShowcaseItems.push({ 'Title': ui.draggable.find("h3").html() });
+			        /*
+				    var basket = $(this),
+						move = ui.draggable,
+						itemId = basket.find("ul li[data-id='" + move.attr("data-id") + "']");	
+				    if (itemId.html() != null) {
+					    itemId.find("input").val(parseInt(itemId.find("input").val()) + 1);
+				    }
+				    else {
+					    // Add the dragged item to the basket
+					    addBasket(basket, move);
+		
+					    // Updating the quantity by +1" rather than adding it to the basket
+					    move.find("input").val(parseInt(move.find("input").val()) + 1);
+				    }*/
+			    }
+		    });
+            
+        },
+        update: function(element, valueAccessor, allBindingsAccessor) {
+        }
+    };
+    ko.bindingHandlers.showcaseDraggable = {
+        init: function(element, valueAccessor, allBindingsAccessor) {
+            var options = ko.utils.unwrapObservable(valueAccessor()) || {};                                
+            $(element).find("li").draggable(options,{                  	
+			    drag:function () {
+				    $(element).addClass("active");
+				    $(element).closest(element).addClass("active");
+			    },					    
+			    stop:function () {
+				    $(element).removeClass("active").closest(element).removeClass("active");
+			    }
+		    });
+        },
+        update: function (element, valueAccessor, allBindingsAccessor) {
+            
+        }
+    };
+//    ko.bindingHandlers.dialog = {
+//        init: function (element, valueAccessor, allBindingsAccessor) {
+//            var options = ko.utils.unwrapObservable(valueAccessor()) || {};
+//            setTimeout(function () {
+//                options.close = function () {
+//                    allBindingsAccessor().dialogVisible(false);
+//                };
+//                $(element).dialog(options);
+//            }, 0);
+//            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+//                $(element).dialog("destroy");
+//            });
+//        },
+//        update: function (element, valueAccessor, allBindingsAccessor) {
+//            var shouldBeOpen = ko.utils.unwrapObservable(allBindingsAccessor().dialogVisible);
+//            $(element).dialog(shouldBeOpen ? "open" : "close");
+//        }
+//    };
+
+    uxAdmin.WidgetManager.TopicSearchWidget = (function () {
+        var _view = $('#TopicSearchWidgetFields');
+        var tpWvm;
+        var _editor, _html = '', _editor2, _html2 = '';
+        var widgetSizeListOption = [{ Name: 1, id: 1 }, { Name: 2, id: 2 }, { Name: 3, id: 3 }, { Name: 4, id: 4 }, { Name: 5, id: 5 }, { Name: 6, id: 6 }, { Name: 7, id: 7 }, { Name: 8, id: 8 }, { Name: 9, id: 9 }, { Name: 10, id: 10 }, { Name: 11, id: 11 }, { Name: 12, id: 12}];
+        var widgetSizeStyleOption = [{ Name: 2, id: 2 }, { Name: 4, id: 4 }, { Name: 6, id: 6 }, { Name: 8, id: 8}];
+
+        //self.WidgetHeadlineContent = ko.observable();
+        var displayList = function(id,name) {
+            var dList = this;
+            dList.Id = id;
+            dList.Name = name;            
+        };
+        
+        var topicSearchWidgetVm = function () {
+            var self = this;
+            self.widgetIdTemp = ko.observable();
+            //SearchTopic Dialog
+            self.CreateOrConfig = ko.observable("Create");
+
+            self.WidgetId = ko.observable();
+            self.WidgetTypeId = ko.observable();
+            self.WidgetType = ko.observable();
+            self.WidgetTitleName = ko.observable();
+            self.WidgetSizeList = widgetSizeListOption;
+            self.widgetSizeStyleOption = widgetSizeStyleOption;
+            self.selectedColumnSize = ko.observable();
+            self.selectedRowSize = ko.observable();
+            self.WidgetHeadline = ko.observable();
+            
+            self.WidgetForLocal = ko.observable();
+            self.WidgetForGlobal= ko.observable();
+
+            self.TempShowcaseItems = ko.observableArray([]);
+
+            self.saveWidget = function () {
+                reload();               
+                saveWidgetInfo(false);
+            };
+            self.saveCloseWidget = function () {
+                reload();
+                saveWidgetInfo(true);
+            };
+            this.goBack = function(){
+                $('#TopicSearchWidgetFields > ul').stop().animate({left: "0"}, 500);
+            };
+            this.Preview = function() {
+                document.getElementById('contentWidget_HLte').innerHTML = _html = _editor.getData();                 
+                tpWvm.WidgetHeadline(_html);                
+                $('#TopicSearchWidgetFields > ul').stop().animate({left: "-1310"}, 500);              
+            };
+            this.ShowcaseResultSet = function() {
+                $('#tabs-1').css('position','absolute').stop().animate({top: "-285"}, 500 ,function(){$(this).removeAttr('style').addClass('ui-tabs-hide')}); 
+                $('.ui-state-active').removeClass('ui-tabs-selected ui-state-active').next().addClass('ui-tabs-selected ui-state-active');
+                $('#tabs-2').removeClass('ui-tabs-hide');     
+            };
+            self.cancelWidget = function () {
+                reload();
+                parent.$.fn.colorbox.close();
+            };
+            function reload(){
+                var iframe = parent.document.getElementById('myIFrame');
+                iframe.src = iframe.src;
+            }
+            // Dialog - Begin            
+            self.isOpen = ko.observable(false);
+
+        } .bind(this);
+
+        var collectWidgetData = function() {
+            var cWidgetData = this;
+            document.getElementById('contentWidget_HLte').innerHTML = _html = _editor.getData();
+            cWidgetData.widgetIdTemp = tpWvm.widgetIdTemp();            
+            cWidgetData.WidgetId = tpWvm.WidgetId();
+            cWidgetData.WidgetTypeId = tpWvm.WidgetTypeId();
+            cWidgetData.WidgetType = tpWvm.WidgetType();
+            cWidgetData.WidgetTitleName = tpWvm.WidgetTitleName();            
+            cWidgetData.selectedColumnSize = tpWvm.selectedColumnSize();
+            cWidgetData.selectedRowSize = tpWvm.selectedRowSize();
+            cWidgetData.WidgetHeadline = _html;     
+            cWidgetData.WidgetForLocal = tpWvm.WidgetForLocal;
+            cWidgetData.WidgetForGlobal = tpWvm.WidgetForGlobal;
+        };
+
+        var saveWidgetInfo = function(closePopup) {
+            var data = new collectWidgetData();            
+            var widgetJsonCollector = function (widgetId,widgetForLocal,widgetForGlobal, jsonData) {
+                var self = this;
+                self.WidgetForLocal = widgetForLocal;
+                self.WidgetForGlobal = widgetForGlobal;
+                self.JsonData = jsonData;
+                self.WidgetId = widgetId;
+            };                        
+            var widgetUrl = "";
+            var myWidgetDataCollection = "";
+            //console.log(data.widgetIdTemp);
+            if (data.widgetIdTemp == 0) {
+                myWidgetDataCollection = new widgetJsonCollector(data.WidgetId,data.WidgetForLocal,data.WidgetForGlobal, ko.toJSON(data));    
+                widgetUrl = "/mvc/SystemSettings/WidgetManager/InsertWidget";
+                $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                    success: function (result) {
+                        if (data.WidgetForLocal) { alert(result[0].Message);}
+                        if (data.WidgetForGlobal) { alert(result[1].Message);}                                                                        
+                        tpWvm.widgetIdTemp(result[0].ResultId + "|" + result[1].ResultId);                                                                        
+                        if (closePopup) { parent.$.fn.colorbox.close();}                                
+                    }
+                });
+            } else {                
+                widgetUrl ="/mvc/SystemSettings/WidgetManager/UpdateWidget";
+                var localId;
+                var globalId;
+                var updateWidgetId;
+                if (data.widgetIdTemp.toString().indexOf("|") == -1) {
+                    localId = data.widgetIdTemp.toString();
+                    globalId = data.widgetIdTemp.toString();
+                } else {
+                    updateWidgetId = data.widgetIdTemp.split('|');
+                    localId = updateWidgetId[0];
+                    globalId = updateWidgetId[1];
+                }
+                if (tpWvm.WidgetForLocal()) {                               
+                    tpWvm.WidgetId(localId);
+                    myWidgetDataCollection = new widgetJsonCollector(localId,true,false, ko.toJSON(data));    
+                    $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                        success: function (result) {/*console.log(result);*/ alert(result.Message); if (closePopup) { parent.$.fn.colorbox.close();} }
+                    });
+                }
+                if (tpWvm.WidgetForGlobal()) {                                
+                    tpWvm.WidgetId(globalId);
+                    myWidgetDataCollection = new widgetJsonCollector(globalId,false,true, ko.toJSON(data));    
+                    $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                        success: function (result) {console.log(result); alert(result.Message);if (closePopup) { parent.$.fn.colorbox.close();} }
+                    });
+                }                             
+            }                     
+        };
+        var loadData = function (data,widgetInfo) {
+            tpWvm.widgetIdTemp(widgetInfo.WidgetId);
+            tpWvm.WidgetId(widgetInfo.WidgetId);
+            tpWvm.WidgetTypeId(data.WidgetTypeId);
+            tpWvm.WidgetType(data.WidgetType);
+            tpWvm.WidgetTitleName(data.WidgetTitleName);
+            tpWvm.selectedColumnSize(data.selectedColumnSize);
+            tpWvm.selectedRowSize(data.selectedRowSize);
+            tpWvm.WidgetHeadline(data.WidgetHeadline);         
+            tpWvm.WidgetForLocal(widgetInfo.WidgetForLocal);
+            tpWvm.WidgetForGlobal(widgetInfo.WidgetForGlobal);            
+            removeEditor();
+            createEditor();
+        };
+        var createEditor = function () {
+            if (_editor)
+                return;
+            // Create a new editor by replacing textarea with id = contentWidget_te, setting its value to html
+            var config = { language: 'en', toolbar: 'Full', height: '45px' };            
+            _editor = CKEDITOR.replace('contentWidget_HLte', config, _html);            
+        };
+        var removeEditor = function () {
+            if (!_editor)
+                return;
+            // Destroy the editor.
+            _editor.destroy();
+            _editor = null;
+        };
+
+        //init
+        var init = function () {
+            var widgetData = $.parseJSON(@Html.Raw(Json.Encode(Model.JsonData)));
+            var widgetInfo = @Html.Raw(Json.Encode(Model));
+            //console.log(widgetData);
+            //console.log(widgetInfo);
+            tpWvm = new topicSearchWidgetVm();
+            if (widgetData) {
+                loadData( widgetData, widgetInfo);            
+            } else {                
+                tpWvm.widgetIdTemp(widgetData.WidgetId);
+                tpWvm.WidgetId(widgetData.WidgetId);
+                tpWvm.WidgetTypeId(widgetData.widgetTypeId);
+                tpWvm.WidgetType(widgetData.widgetType);            
+                tpWvm.WidgetForLocal(widgetInfo.WidgetForLocal);
+                tpWvm.WidgetForGlobal(widgetInfo.WidgetForGlobal);                
+                removeEditor();
+                createEditor();
+            }
+            ko.applyBindings(tpWvm, _view.get(0));            
+         
+        };
+        return {
+            Init: init,
+            CollectWidgetData: collectWidgetData
+        };
+    })();
+    uxAdmin.WidgetManager.TopicSearchWidget.Init();
+    $(function() { $('body').css('overflow', 'hidden');
+        var jsonObj = { templateType: 2, Title: 'My title 1' };
+            console.log(jsonObj);
+            var sliderWidth = 140;
+            var clickFlag = true;
+            var slider = $('#sliderSelf');
+            var sliderCount = $('li', slider).length;
+            slider.width(sliderCount * sliderWidth);
+            $('a#sliderSelfHelpBooks_bl').click(function () {
+                if (clickFlag && parseInt($('#sliderSelf').css('left')) < 0) {
+                    clickFlag = false; $('#sliderSelf').animate({ left: '+=' + sliderWidth }, 500, function () { clickFlag = true; });
+                }
+            });
+            $('a#sliderSelfHelpBooks_br').click(function () {
+                //console.log(parseInt($('#sliderSelf').css('left')));
+                if (clickFlag && parseInt($('#sliderSelf').css('left')) > -(sliderCount - 5) * 140) {
+                    clickFlag = false; $('#sliderSelf').animate({ left: '-=' + sliderWidth }, 500, function () { clickFlag = true; });
+                }
+            });
+     });
+</script>

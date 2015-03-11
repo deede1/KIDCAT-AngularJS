@@ -1,0 +1,290 @@
+﻿<script type="text/javascript">    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';</script>
+
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+@Html.LocalResourceJavascripts("~/public/javascript/overrides.js", "~/public/javascript/json2.js")
+
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery.maxlength.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/ckeditor/ckeditor.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/ckeditor/config.js")" ></script>
+<!-- JavaScript Includes -->
+<script type="text/javascript" src="@Url.Content("~/Areas/SystemSettings/Assets/KnockoutJSFileUpload/Jquery.form.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/SystemSettings/Assets/KnockoutJSFileUpload/ko.FileUpload.js")"></script>
+<style type="text/css">
+    html {padding:0px; margin:0px;}
+    body {padding:0px; margin:0px; position:relative;}
+    /* iframe form styles */
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:20px; margin:4px 0 0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title h3 a {padding:6px 10px;float: left; background:#f1f1f1; color:#333; cursor:pointer;}
+    body > form .title h3 a:hover {text-decoration:none;}
+    body > form .title h3 a.active{position: relative;bottom: -1px;background: #FFF;}
+    body > form .title .actions {width:auto; float:right;}
+</style>
+
+
+<script type="text/javascript">
+    (function (uxAdmin) {
+        uxAdmin.HeaderFooterOptions = (function () {
+            var view = $('#full_record_options');
+            var vm;
+            var _editorHeader = "";
+            var _editor = "";
+            var _html = "";
+            var _html2 = "";
+            var headerFooterOptionsVm = function () {
+                var self = this;
+                self.LibraryProfileKey = ko.observable();
+                self.BrandingForHeaderSpace = ko.observable();
+                self.LibraryDefinedLabel = ko.observable();
+                self.UploadImageFileName = ko.observable();
+                self.DisplaySelectedLanguageOption = ko.observable();
+                self.CustomizedFooterText = ko.observable();
+                self.filename = ko.observable("");
+                self.uploadImageBtn = function () {
+
+                };
+                self.savePage = function () {
+                    var data = ko.mapping.toJS(vm);
+                    var sHeaderFooterOption = new headerFooter(data);
+                    uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveHeaderFooterOption", sHeaderFooterOption, function (datax) {
+                        alert(datax);
+                    });
+                };
+            };
+            var init = function () {
+
+                $("#CustomizedFooterText").maxlength({ maxCharacters: 240, status: true, statusClass: "status", statusText: "character left", notificationClass: "notification", showAlert: true, alertText: "The text you are pasting exceeds the 240 character limit", slider: true });
+                if (_editor)
+                    return;
+
+                // Create a new editor by replacing textarea with id = contentWidget_te, setting its value to html
+                // var config = { language: 'en', toolbar: 'Full', height:'75px' };
+                var config2 = { language: 'en', toolbar: 'Full3' };
+                _editor = CKEDITOR.replace('contentWidget_te', config2, _html);
+                _editorHeader = CKEDITOR.replace('contentWidgetHeader_te', config2, _html2);
+
+                vm = new headerFooterOptionsVm();
+                ko.applyBindings(vm, view.get(0));
+                //initFormButtonsBindings();
+            };
+            var loadData = function () {
+
+                uxAdmin.utilities.ajaxGetJson("SystemSettings/OptionManager/GetHeaderFooterOption", "", function (data) {
+                    //console.log(data);
+                    vm.BrandingForHeaderSpace(data.HeaderBranding);
+                    vm.DisplaySelectedLanguageOption(data.DisplaySelectLanguage ? 1 : 0);
+                    vm.CustomizedFooterText(data.CustomFooterText);
+                    vm.LibraryProfileKey(data.LibraryProfileKey);
+
+                    switch (data.HeaderBranding) {
+                    case 2:
+                        vm.LibraryDefinedLabel("");
+                        vm.UploadImageFileName(data.HeaderBrandingDetail);
+
+                        var hidden = document.createElement("input");
+                        hidden.id = "UploadedImagePath";
+                        hidden.type = "hidden";
+                        hidden.value = data.HeaderBrandingDetail;
+                        document.getElementById("PreviewImage").appendChild(hidden);
+                        break;
+                    case 0:
+                        vm.LibraryDefinedLabel(data.HeaderBrandingDetail);
+                        vm.UploadImageFileName(null);
+                        break;
+                    default:
+                        vm.LibraryDefinedLabel(data.HeaderBrandingDetail);
+                        vm.UploadImageFileName(null);
+                        break;
+                    }
+                    //                    if (data.HeaderBranding == 0) {
+                    //                        vm.LibraryDefinedLabel(data.HeaderBrandingDetail);
+                    //                        vm.UploadImageFileName("");
+                    //                    } else {
+                    //                        vm.LibraryDefinedLabel("");
+                    //                        vm.UploadImageFileName(data.HeaderBrandingDetail);
+
+                    //                        var hidden = document.createElement("input");
+                    //                        hidden.id = "UploadedImagePath";
+                    //                        hidden.type = "hidden";
+                    //                        hidden.value = data.HeaderBrandingDetail;
+                    //                        document.getElementById("PreviewImage").appendChild(hidden);
+
+                    //                    }
+
+                });
+
+            };
+
+//            var initFormButtonsBindings = function () {
+//                $("#full_record_options").find("input[type=button][value='Save']").bind("click", savePage);
+//                $("#full_record_options").find("input[type=button][value='Help']").bind("click", help);
+//            };
+
+            var headerFooter = function (result) {
+                var self = this;
+
+                self.LibraryProfileKey = result.LibraryProfileKey;
+                self.HeaderBranding = result.BrandingForHeaderSpace;
+
+                document.getElementById('contentWidget_te').innerHTML = _html = _editor.getData();
+                document.getElementById('contentWidgetHeader_te').innerHTML = _html2 = _editorHeader.getData();
+                self.CustomFooterText = _html;
+                self.LibraryDefinedLabel = _html2;
+                switch (result.BrandingForHeaderSpace.toString()) {
+                case "0":
+
+                    //self.HeaderBrandingDetail = result.LibraryDefinedLabel;
+                    self.HeaderBrandingDetail = _html2;
+                    break;
+                case "1":
+
+                    self.HeaderBrandingDetail = "";
+                    break;
+                case "2":
+
+                    self.HeaderBrandingDetail = $("#UploadedImagePath").val() == "" ? result.UploadImageFileName : $("#UploadedImagePath").val();
+                    break;
+                }
+                self.DisplaySelectLanguage = result.DisplaySelectedLanguageOption == 1 ? true : false;
+                //self.CustomFooterText = result.CustomizedFooterText;
+
+            };
+
+         
+//            var help = function () {
+//                alert("Help");
+//            };
+            return {
+                init: init,
+                loadData: loadData
+            };
+        })();
+
+    })(window.uxAdmin = window.uxAdmin || {});
+
+
+    $(function () {
+        uxAdmin.HeaderFooterOptions.init();
+        uxAdmin.HeaderFooterOptions.loadData();
+//        $('#headerOptions, #footerOptions').hide(); $('#headerOptions').show();
+//        $('.title h3').click(function () {
+//            $('.title h3 a').removeClass("active"); $(this).find('a').addClass("active");
+//            $('#headerOptions, #footerOptions').hide(); var indexer = $(this).index();
+//            if (indexer == 0) { $('#headerOptions').fadeIn(); }
+//            else { $('#footerOptions').fadeIn(); }
+//        });
+        $("#HeaderFooterTabs").tabs();
+    });
+</script>
+<style>
+    #HeaderFooterTabs {
+        border: none;
+        margin: 0 5px;
+    }   
+    .topHeaderFooterOptionBtnFix {
+        z-index: 1;
+        position: relative;
+        float: right;        
+    }
+    .row {
+        padding: 5px 0 !important;
+    }
+</style>
+<form id="full_record_options" method="post" action="" style="display:block">
+    <br/>
+     <div class="actions">
+            <input type="button" class="button primary topHeaderFooterOptionBtnFix" value="Save" data-bind="click: $root.savePage" />
+        </div>
+    <div id="HeaderFooterTabs">
+        <ul>
+            <li><a href="#HeaderOptions">Header</a></li>
+            <li><a href="#FooterOptions">Footer</a></li>
+        </ul>
+        <div id="HeaderOptions">
+            <div class="content" id="headerOptions">
+                <div class="fields">
+                    <div class="row">
+                        <p class="cell w-12-3">
+                            <label class="subtitle">Display Select Language Option:</label>
+                        </p>
+                        <div class="cell w-12-4">
+                            <ul class="inline-list ">
+                                <li>
+                                    <input name="DisplaySelectLanguageOption" type="radio" value="1" data-bind="checked: DisplaySelectedLanguageOption"/>
+                                    <label for="">Yes</label>
+                                </li>
+                                <li>
+                                    <input name="DisplaySelectLanguageOption" type="radio" value="0" data-bind="checked: DisplaySelectedLanguageOption" />
+                                    <label for="">No</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="cell w-12-3">
+                            <label class="subtitle">Branding for Header Space:</label>
+                        </p>
+                        <div class="cell w-12-3">
+                            <input name="BrandingHeaderSpace" type="radio" value="1" data-bind="checked: BrandingForHeaderSpace"/>
+                            <label for="">Use My Library Profile Name</label>
+                        </div>
+                        <div class="cell w-12-4">                
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="cell w-12-3">
+                            <label class="subtitle"></label>
+                        </p>
+                        <div class="cell w-12-3">
+                            <input name="BrandingHeaderSpace" type="radio" value="2" data-bind="checked: BrandingForHeaderSpace"/>
+                            <label for="">Upload Image</label>
+                        </div>
+                        <div class="cell w-12-6">
+                            <input type="file"  name="file" id="selectedFile" style="display: none;" data-bind="fileUpload: { property: 'filename', url: '/mvc/SystemSettings/OptionManager/HeaderImageUpload/', imgDiv: 'PreviewImage' }" />  	&nbsp;
+                            <input type="button" value="Browse..." onclick="document.getElementById('selectedFile').click();" />                 
+                            <br/>
+                            <div style="color:red">Banner image size should not exceed 1200 pixels wide by 45 pixels high</div>
+                            <br/>                    
+                            <div id="PreviewImage"></div>
+                            <img  id="lastPreviewImage" data-bind="if: UploadImageFileName, attr: { 'src': UploadImageFileName }" alt="" />            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="cell w-12-3">
+                            <label class="subtitle"></label>
+                        </p>
+                        <div class="cell w-12-3">
+                            <input name="BrandingHeaderSpace" type="radio" value="0" data-bind="checked: BrandingForHeaderSpace"/>
+                            <label for="">Library Defined</label>
+                        </div>
+                        <div class="cell w-12-8">
+                            <textarea rows="10" cols="200" id="contentWidgetHeader_te" data-bind="value: LibraryDefinedLabel"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="FooterOptions">
+            <div class="content" id="footerOptions">
+                <div class="fields">
+                    <div class="row">
+                        <p class="cell w-12-3">
+                            <label class="subtitle">Customized Footer Text:</label>
+                        </p>
+                        <div class="cell w-12-8">
+                            <textarea rows="10" cols="200" id="contentWidget_te" data-bind="value: CustomizedFooterText"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

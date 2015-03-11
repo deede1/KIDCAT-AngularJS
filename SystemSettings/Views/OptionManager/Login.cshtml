@@ -1,0 +1,208 @@
+﻿<head>
+<script type="text/javascript">var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';</script>
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+@Html.LocalResourceJavascripts("~/public/javascript/overrides.js", "~/public/javascript/json2.js")
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery.maxlength.js")" ></script>
+<style type="text/css">
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title .actions {width:auto; float:right;}
+</style>
+<script type="text/javascript">    
+    (function (uxAdmin) {
+        uxAdmin.LoginOptions = (function () {                  
+            var view = $('#login_options');
+            var vm;            
+            var loginOptionsVm = function () {
+                this.LoginInstructionalText = ko.observable();
+                this.UserNameLabel = ko.observable();
+                this.PasswordLabel = ko.observable();
+                this.ShowLibraryLookupBox = ko.observable();
+                this.ShowPasswordPrompt = ko.observable();
+                this.RequireLoginBeforSearch = ko.observable();
+                this.RedirectToAdvancedSearch = ko.observable();
+                this.ShowForgotPasswordLink = ko.observable();
+                this.EmailText = ko.observable();
+                this.savePage = function () {
+                    var data = ko.mapping.toJS(vm);
+                    uxAdmin.utilities.ajaxPostJson('SystemSettings/OptionManager/SaveLoginOption/', data, function (datax) { alert(datax); });
+                };
+            };
+            var load = function () {
+                //console.log("Login Option Initialized!");
+                $("#loginInstrTxt").maxlength({maxCharacters: 240, status: true, statusClass: "status",  statusText: "character left",  notificationClass: "notification",  showAlert: true, alertText: "The text you are pasting exceeds the 240 character limit", slider: true });
+                $("#usernamePromptTxt").maxlength({maxCharacters: 20, status: true, statusClass: "status",  statusText: "character left",  notificationClass: "notification",  showAlert: true, alertText: "The text you are pasting exceeds the 20 character limit", slider: true });
+                $("#passwordPromptTxt").maxlength({maxCharacters: 20, status: true, statusClass: "status",  statusText: "character left",  notificationClass: "notification",  showAlert: true, alertText: "The text you are pasting exceeds the 20 character limit", slider: true });
+                vm = new loginOptionsVm();                
+                uxAdmin.utilities.ajaxGetJson('SystemSettings/OptionManager/GetLoginOptions/', null, function (data) {                
+                    var jsondata = ko.toJS(data);
+                    //console.log(jsondata);
+                    vm.LoginInstructionalText(jsondata.LoginInstructionalText);
+                    vm.UserNameLabel(jsondata.UserNameLabel);
+                    vm.PasswordLabel(jsondata.PasswordLabel);
+                    vm.ShowLibraryLookupBox(jsondata.ShowLibraryLookupBox);
+                    vm.ShowPasswordPrompt(jsondata.ShowPasswordPrompt);
+                    vm.RequireLoginBeforSearch(jsondata.RequireLoginBeforSearch);
+                    vm.RedirectToAdvancedSearch(jsondata.RedirectToAdvancedSearch);
+                    vm.ShowForgotPasswordLink(jsondata.ShowForgotPasswordLink);
+                    vm.EmailText(jsondata.EmailText);
+                    ko.applyBindings(vm, view.get(0));
+                });                
+             //   initFormButtonsBindings();
+            };         
+//            var initFormButtonsBindings = function () {                
+//                $("#login_options").find("input[type=button][value='Save']").bind("click", savePage);
+//                $("#login_options").find("input[type=button][value='Help']").bind("click", help);
+//            };            
+//         
+//            var help = function () { alert("Help");};
+            return { load: load };
+        })();
+
+    })(window.uxAdmin = window.uxAdmin || {});
+
+    $(function () {
+        uxAdmin.LoginOptions.load();
+        $("#LoginTabs").tabs();
+    });
+</script>
+<style>
+    #LoginTabs {
+        border: none;
+        margin: 0 5px;
+    }   
+    .topLoginOptionBtnFix {
+        z-index: 1;
+        position: relative;
+        float: right;        
+    }
+    .row {
+        padding: 5px 0 !important;
+    }
+</style>
+</head>
+
+
+<form id="login_options" method="post" action="" style="display:block">
+    <br/>
+    <div id="LoginTabs">
+        <div class="actions">                
+            <button class="button primary topLoginOptionBtnFix" data-bind="click: $root.savePage">Save</button>                      
+        </div>
+        <ul>
+            <li><a href="#LoginConfig">Login</a></li>
+        </ul>
+        <div id="LoginConfig">
+            <div class="content">
+                <div class="fields">
+                    <!-- row 1 -->
+                    <div class="row">
+                        <p class="cell w-12-2">
+                            <label>Login Instructional Text:</label>
+                        </p>
+                        <p class="cell w-12-5">
+                            <input id="loginInstrTxt" type="text" data-bind="value: LoginInstructionalText" maxlength="240" style="float: left"/> 
+                        </p>
+                        <p class="cell w-12-3" style="color: red">
+                            240 characters max
+                        </p>
+                    </div>
+                    <!-- row 2 -->
+                    <div class="row">
+                        <p class="cell w-12-2">
+                            <label>Username Prompt Label:</label>
+                        </p>
+                        <p class="cell w-12-5">
+                            <input id="usernamePromptTxt" type="text" data-bind="value: UserNameLabel" maxlength="20"/> 
+                        </p>
+                        <p class="cell w-12-3" style="color: red">
+                            20 characters max
+                        </p>
+                    </div>
+                    <!-- row 3 -->
+                    <div class="row">
+                        <p class="cell w-12-2">
+                            <label>Password Prompt Label:</label>
+                        </p>
+                        <p class="cell w-12-5">
+                            <input id="passwordPromptTxt" type="text" data-bind="value: PasswordLabel" maxlength="20"/>
+                        </p>
+                        <p class="cell w-12-3" style="color: red">
+                            20 characters max
+                        </p>
+                    </div>
+                    <!-- row 4 -->
+                    <div class="row">
+                        <hr />
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="fields">
+                    <!-- row 1 -->
+                    <div class="row">
+                        <p class="cell w-12-5">
+                            <input type="checkbox" data-bind="checked: ShowLibraryLookupBox" />
+                            <label>Display Library Lookup Box</label>
+                        </p>
+                    </div>
+                    <!-- row 2 -->
+                    @*         
+         <div class="row">
+            <p class="cell w-12-4">
+               <input type="checkbox" data-bind="checked: ShowPasswordPrompt" />
+               <label>Display Password Prompt</label>
+            </p>
+         </div>
+         *@
+                    <!-- row 3 -->
+                    <div class="row">
+                        <p class="cell w-12-5">
+                            <input type="checkbox"  data-bind="checked: RequireLoginBeforSearch"/>
+                            <label>You must login to the system before searching the catalog.</label>
+                        </p>
+                    </div>
+                    <!-- row 4 -->
+                    <div class="row">
+                        <p class="cell w-12-5">
+                            <input type="checkbox" data-bind="checked: RedirectToAdvancedSearch"/>
+                            <label>Direct to Advanced Search after Login</label>
+                        </p>
+                    </div>
+                    <!-- row 5 -->
+                    <div class="row">
+                        <p class="cell w-12-5">
+                            <input type="checkbox" data-bind="checked: ShowForgotPasswordLink"/>
+                            <label>Display Forgot Password Link</label>
+                        </p>
+                        @*                
+            <p class="cell w-12-5">
+               <label>Forgot Password Email Text:</label>
+               <textarea></textarea>
+            </p>
+            *@
+                    </div>
+                    <!-- row 6 -->
+                    <div class="row">
+                        <p class="cell w-12-2">
+                            @*<label>Forgot Password Email Text:</label>*@
+                        </p>
+                        <p class="cell w-12-5">
+                            <label>Forgot Password Email Text:</label>
+                            <textarea rows="10" cols="20"  data-bind="value: EmailText"></textarea>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+

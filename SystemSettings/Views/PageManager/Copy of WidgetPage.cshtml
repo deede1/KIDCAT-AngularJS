@@ -1,0 +1,607 @@
+﻿<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/libs/jQuery.Carousel/jquery.carousel-uxAdmin.css")" >    
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jQuery.Carousel/jquery.carousel.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jQuery-ui-tab-utils.js")" ></script>
+<style>        
+    #sd li {display: block;float: left;height: 100px;text-align: center;width: 100px;}
+    #sd li a {color: #8cabbf;display: block;font: 700 10px/10px Arial;text-decoration: none;}
+    #sd li a img {border: 1px solid #dfe9ee;}   
+   .accordion.vertical { padding: 10px; width: 84%;}
+   .accordion { font-family:Arial, Helvetica, sans-serif; margin:0 auto;font-size:14px;border:0px solid #542437;width: 75%;height: 80%;padding:10px;background:#fff;}
+   .accordion ul { list-style:none; margin:0; padding:0;}
+   .accordion li { margin:0; padding:0; }
+   .accordion [type=radio], .accordion [type=checkbox] {display:none; }
+   .accordion label { display:block; font-size:12px; line-height:7px; background:#F5ECCE; border:1px solid #542437;color:#542437; font-weight:700;cursor:pointer; -webkit-transition: all .2s ease-out; -moz-transition: all .2s ease-out;width: 70%;}
+   .accordion ul li label:hover, .accordion [type=radio]:checked ~ label, .accordion [type=checkbox]:checked ~ label { background:#F5ECCE;color:black;   width: 82%;}
+   .accordion .content { padding:0 10px; overflow:hidden; border:1px solid #fff; /* Make the border match the background so it fades in nicely */-webkit-transition: all .5s ease-out; -moz-transition: all .5s ease-out; width: 82%;height: 80%;}
+   .accordion p { color:#333; margin:0 0 10px; }
+   .accordion h3 { color:#542437; padding:0; margin:10px 0;}
+   .vertical ul li { overflow:hidden; margin:0 0 1px;}
+   .vertical ul li label { padding:10px; }
+   .vertical [type=radio]:checked ~ label, .vertical [type=checkbox]:checked ~ label { border-bottom:0; }
+   .vertical ul li label:hover { border:1px solid #542437; /* We don't want the border to disappear on hover */}
+   .vertical ul li .content { height:0px; border-top:0; }
+   .vertical [type=radio]:checked ~ label ~ .content, .vertical [type=checkbox]:checked ~ label ~ .content { height: 250px; border:1px solid #542437;overflow:auto;}
+</style>
+<div class="content" id="WidgetManagerFieldsx" style="display:block">
+    <div class="fields">        
+        <div class="row" data-bind="if : ShowLibraryInfo">
+            <p class="cell w-12-3"><label>Force Library to use Global:</label></p>
+            <p class="cell w-12-4"><input name="ForceLibraryToUseGlobal" type="checkbox" data-bind="checked: $root.ForceLibraryToUseGlobal, enable: $root.enableForceToUserGlobal, event: { change: $root.UpdateForceTouseGlobal() }" />         </p>
+        </div>
+
+        <div class="row" data-bind="if : ShowLibraryInfo">
+            <p class="cell w-12-3"><label>Apply to Library</label></p>
+            <div id="LoadingLibraryBar" class="cell w-12-4" style="overflow:auto; width: 350px; ">Loading the Library List...</div>
+                <ul id="ApplytoLibrary" data-bind="foreach: WidgetLibraryList" class="cell w-12-4">
+                <li>  <input type="checkbox" data-bind="attr: { value: Value },checked: $root.SelectedLibrary, enable: Value != $root.DefaultLibrary()"><span data-bind="text: Name"></span></li>
+            </ul>   
+            <div class="cell w-12-2" >
+                <input type="button" class="button primary" data-bind="click:$root.applyToLibrariesSelectedAll" style="width: 120px" value="Select All" /><br/><br/>
+                <input type="button" class="button primary" data-bind="click:$root.applyToLibrariesClearAll" style="width: 120px" value="Clear All" /><br/><br/>
+                <input type="button" class="button primary" data-bind="click:$root.applyToLibrariesShowSelected" style="width: 120px" value="Show Selected" /> <br/>                                                                           
+            </div>    
+       </div>
+        <hr data-bind="visible: ShowLibraryInfo" />
+        <!-- row 1 -->
+        <div class="row">
+            <p class="cell w-12-2"><label>Page Name</label></p>
+            <p class="cell w-12-4">
+                <input type="Text" maxlength="16" data-bind="value: PageTitleName , enable: PageTypeEnable"/>
+                <div style="color: red">(Maximum characters: 16)</div>
+            </p>
+        </div>
+        <!-- row 2 -->
+        <div class="row">
+            <p class="cell w-12-2"><label>Enable for:</label></p>
+            <p class="cell w-12-4">
+                <input name="patrons" type="checkbox" data-bind="checked: EnableGuests, enable: PageTypeEnable" /><label >Guests</label>
+                <input name="patrons" type="checkbox" data-bind="checked: EnablePatrons, enable: PageTypeEnable" /><label >Patrons</label>
+                <input name="staff" type="checkbox" data-bind="checked: EnableStaff, enable: PageTypeEnable" /><label >Staff</label>
+            </p>
+        </div>
+        <!-- row 3 -->
+        <div class="row">
+            <hr/>
+        </div>
+        <!-- row 4 -->
+        <div class="row">
+            <p class="cell w-12-2"><label>Default Page:</label></p>
+            <p class="cell w-12-8">
+                <input type="radio" name="DefaultPage"  value="Local" data-bind="checked: DefaultPageType,enable: DefaultPageLocal"  /><label>Local Template</label>
+                <input type="radio" name="DefaultPage"  value="Global" data-bind="checked: DefaultPageType,enable:showGlobal" /><label>Global Template</label>
+            </p>
+        </div>
+        <!-- row 5 -->
+        <div class="row">            
+                <div id="PageTemplateTabs" style="width: 98.8%; float: left;">
+                    <ul>
+                        <li><a href="#LocalTemplate">Local Template</a></li>
+                        <li><a href="#GlobalTemplate">Global Template</a></li>            
+                    </ul>
+                    <div id="LocalTemplate">
+                        <div class="row">
+                            <p class="cell w-12-2"><label>Available Local Widgets</label></p>
+                            <p class="cell w-12-4"><select data-bind="options: WidgetList, optionsText: 'Name', value : WidgetSelected, optionsCaption: 'Select a Widget'"></select></p>
+                            <p class="cell w-12-2"><button data-bind="click: AddWidgetClick">Add this widget</button></p>
+                        </div>
+                        <div class="row">
+                                <div class="gridster"><ul></ul></div></div>
+                        </div>
+                    <div id="GlobalTemplate">
+                       <div class="row">
+                            <p class="cell w-12-2"><label>Available Global Widgets</label></p>
+                            <p class="cell w-12-4"><select data-bind="options: WidgetListGlobal, optionsText: 'Name', value : WidgetGlobalSelected, optionsCaption: 'Select a Widget'"></select></p>
+                            <p class="cell w-12-2"><button data-bind="click: AddGlobalWidgetClick">Add this widget</button>                </p>
+                        </div>
+                        <div id="globalGridster" class="gridster"><ul></ul></div>
+                    </div>
+                </div>            
+        </div>   
+    </div>
+</div>
+
+<script type="text/javascript">    
+    uxAdmin.PageManager.WidgetPage = (function () {
+        var pageManagerView = $('#WidgetManagerFieldsx');
+        var gridster;
+        var globalGridster;
+        var widgetVm;
+        var showcaseWidgetCounter = 0;
+        var widgetPageVm = function () {
+            var self = this;
+            self.PageId = ko.observable();
+            self.PageTypeId = ko.observable();
+            self.PageType = ko.observable();
+            self.PageTypeEnable = ko.observable();
+            self.PageTitleName = ko.observable();
+            self.EnableGuests = ko.observable();
+            self.EnablePatrons = ko.observable();
+            self.EnableStaff = ko.observable();
+
+            self.showGlobal = ko.observable();
+            self.showLocal = ko.observable();
+            self.showDefaultPage = ko.observable();
+            self.ShowLibraryInfo = ko.observable();
+
+            self.WidgetList = ko.observable();
+            self.WidgetListGlobal = ko.observable();
+            self.WidgetLocation = ko.observable();
+
+            self.WidgetListGlobal = ko.observable();
+            self.WidgetLocationGlobal = ko.observable();
+
+            self.WidgetSelected = ko.observable();
+            self.WidgetGlobalSelected = ko.observable();
+            self.WidgetLibraryList = ko.observableArray([]);
+            self.SelectedLibrary = ko.observableArray([]);
+            self.ForceLibraryToUseGlobal = ko.observable();
+            self.DefaultPageType = ko.observable();
+            self.IsLocalPage = ko.observable();
+            self.IsGlobalPage = ko.observable();
+            self.DefaultLibrary = ko.observable();
+            self.DefaultPageLocal = ko.observable();
+            self.PageURL = ko.observable("");
+            self.UpdateForceTouseGlobal = function() {                
+            
+            
+//                if (self.ForceLibraryToUseGlobal()) {
+//                    self.DefaultPageType("Global");
+//                    self.DefaultPageLocal(false);                     
+//                    $("#PageTemplateTabs").tabs("option", "selected", 1 ); 
+//                    $( "#PageTemplateTabs" ).tabs( "option", "disabled", [ 0 ] );   
+//                } else {
+//                    self.DefaultPageLocal(true);   
+//                    $( "#PageTemplateTabs" ).tabs( "option", "disabled", [] );                    
+//                }
+               
+            };
+            self.enableForceToUserGlobal= ko.observable(true);
+            self.applyToLibrariesSelectedAll = function () {
+                var x = [];
+                ko.utils.arrayForEach(self.WidgetLibraryList(), function (item) {
+                    x.push(item.Value);
+                });
+                self.SelectedLibrary(x);
+            };
+            self.applyToLibrariesClearAll = function () {
+                var x = [];
+                self.SelectedLibrary(x);                
+                self.SelectedLibrary([self.DefaultLibrary()]);
+            };
+            self.applyToLibrariesShowSelected = function () {
+                var libraryCode = self.SelectedLibrary();                
+                var x = libraryCode.join().replace(/(.{45})/g, "$1\n");               
+                alert("The Following Library Code was Assign to Global Page \n" + x);
+            };
+
+            self.AddWidgetClick = function () {
+                addWidget("Local", self.WidgetSelected().Index);
+            };
+            self.AddGlobalWidgetClick = function () {
+                addWidget("Global", self.WidgetGlobalSelected().Index);
+            };
+
+        };
+        var customerSuperUser = function (pageId, forceToUseLibrary, selectLibraryList) {
+            var self = this;
+            self.PageId = pageId;
+            self.ForuceToUse = forceToUseLibrary;
+            self.ApplyToLibraryList = ko.toJSON(selectLibraryList);
+        };
+
+        var collectApplyLibraryData = function () {
+
+            return new customerSuperUser(widgetVm.PageId, widgetVm.ForceLibraryToUseGlobal(), widgetVm.SelectedLibrary());
+        };
+        var collectPageData = function () {
+            widgetVm.WidgetLocation(gridster.serialize());
+            widgetVm.WidgetLocationGlobal(globalGridster.serialize());
+            widgetVm.WidgetLibraryList(null);
+            widgetVm.WidgetList(null);
+            widgetVm.WidgetListGlobal(null);            
+            widgetVm.ForceLibraryToUseGlobal(widgetVm.ForceLibraryToUseGlobal() ? widgetVm.ForceLibraryToUseGlobal() : false);
+            //WidgetSelected(null);
+            //WidgetGlobalSelected(null);
+            return ko.mapping.toJS(widgetVm);
+        };
+        var showGlobalView = function (show) {
+            widgetVm.showGlobal(show);
+        };
+        var showLocalView = function (show) {
+            widgetVm.showLocal(show);
+        };
+        var showDefaultPageView = function (show) {
+            widgetVm.showDefaultPage(show);
+        };
+        var showLibraryInfoView = function (show) {
+            widgetVm.ShowLibraryInfo(show);
+        };
+        var setDefaultTab = function (localOrGlobal) {
+            console.log(localOrGlobal);
+
+            $(".tab_content").hide(); //Hide all content
+            $("ul.tabs li:nth-of-type(" + localOrGlobal + ")").addClass("active").show(); //Activate first tab
+            $(".tab_content:nth-of-type(" + localOrGlobal + ")").show(); //Show first tab content
+
+            //            if (localOrGlobal) {
+            //                $("ul.tabs li:nth-of-type(1)").addClass("active").show(); //Activate first tab
+            //                $(".tab_content:nth-of-type(1)").show(); //Show first tab content
+            //            } else {
+            //                $("ul.tabs li:nth-of-type(2)").addClass("active").show(); //Activate first tab
+            //                $(".tab_content:nth-of-type(2)").show(); //Show first tab content
+            //            }
+        };
+           var getShowCaseOptions = function (data, items) {
+                var i = "<li><a href='" + __contextRoot + "/PersistentLinkEngine/GetFullRecordForShowCase?guid=" + data.PersistentKey + "' ><img src='" + @Url.Content("~/")+ encodeURI(data.JacketArt) + "' width='60px' height='80px' /></a></li>",
+                    p = "0",
+                    o = "true",
+                    d = "0";
+
+                if (o == "false") o = false;
+                if (o == "true") o = true;
+
+                if (items) return [i, p, o, d];
+                else return [p, o, d];
+            };
+        
+        var init = function (pageTypeId, pageType, showLocalViewx, showGlobalViewx, showLibraryInfoViewx) {
+            //console.log(showLocalViewx);
+            //console.log(showGlobalViewx);
+            if (showLocalViewx) { $("#PageTemplateTabs").tabs({ selected: 0 , disabled: [1] });  }
+            if (showGlobalViewx) { $("#PageTemplateTabs").tabs({ selected: 0 , disabled: [] });  }
+                    
+            uxAdmin.utilities.ajaxGetJson('WidgetManager/GetWidgetList/', null, function (data) {
+                var jsondata = ko.toJS(data);
+                console.log(jsondata);
+                widgetVm.WidgetList(jsondata.WidgetList);
+                widgetVm.WidgetListGlobal(jsondata.WidgetListGlobal);
+            });
+            
+            gridster = $(".gridster ul").gridster({
+                widget_margins: [2.987, 2.987],
+                widget_base_dimensions: [73.9123, 73.9123],
+                max_size_x: 12,
+                max_size_y: 12,
+                serialize_params: function ($w, wgd) { return { id: wgd.el[0].id, col: wgd.col,row: wgd.row}; }
+            }).data('gridster');
+
+            globalGridster = $("#globalGridster ul").gridster({
+                widget_margins: [2.987, 2.987],
+                widget_base_dimensions: [73.9123, 73.9123],
+                max_size_x: 12,
+                max_size_y: 12,
+                serialize_params: function ($w, wgd) { return { id: wgd.el[0].id, col: wgd.col, row: wgd.row};}
+            }).data('gridster');
+
+            
+            widgetVm = new widgetPageVm();
+            widgetVm.PageTypeId(pageTypeId);
+            widgetVm.PageType(pageType);
+
+            widgetVm.EnableGuests(false);
+            widgetVm.EnablePatrons(false);
+            widgetVm.EnableStaff(false);
+            widgetVm.PageTypeEnable(true);
+            ko.applyBindings(widgetVm, pageManagerView.get(0));
+            
+            this.showLocalView(showLocalViewx);
+            this.showGlobalView(showGlobalViewx);
+            this.showDefaultPageView((showLocalViewx && showGlobalViewx));
+            this.showLibraryInfoView(showLibraryInfoViewx);
+            if (showLocalViewx) { widgetVm.DefaultPageType("Local");}
+            if (showGlobalViewx) { widgetVm.DefaultPageLocal(true); }
+            /*
+            $(".tab_content").hide(); //Hide all content
+            $("ul.tabs li:nth-of-type(1)").addClass("active").show(); //Activate first tab
+            $(".tab_content:nth-of-type(1)").show(); //Show first tab content
+            */
+            //On Click Event
+            $("ul.tabs li").click(function () {
+                $("ul.tabs li").removeClass("active"); //Remove any "active" class
+                $(this).addClass("active"); //Add "active" class to selected tab
+                $(".tab_content").hide(); //Hide all tab content
+                var activeTab = $(this).find("a").attr("href"); //Find the rel attribute value to identify the active tab + content
+                $(activeTab).fadeIn(); //Fade in the active content
+                return false;
+            });
+
+            $("body a.icon.delete.widgetDelete").die();
+            $("body a.icon.delete.widgetDeleteGlobal").die();
+            $("body a.icon.delete.widgetDelete").live("click", function () { deleteWidget($(this).parents("li").parents("li")); });
+            $("body a.icon.delete.widgetDeleteGlobal").live("click", function () { deleteGlobalWidget($(this).parents("li").parents("li")); });
+            $("body a.icon.edit.widgetEdit").die();
+            $("body a.icon.edit.widgetEdit").live("click", function () { console.log(e); });
+            
+        };
+
+        var widgetData = function (index) {
+            this.Index = index;
+        };
+        
+        var addWidget = function (widgetType, index, col, row) {
+            var widgetArea;
+            var widgetDelete;
+            widgetType == "Local" ? widgetArea = gridster : widgetArea = globalGridster;
+            widgetType == "Local" ? widgetDelete = "widgetDelete" : widgetDelete = "widgetDeleteGlobal";
+            var myRegion = new widgetData(index);
+            
+            uxAdmin.utilities.ajaxPostJson("SystemSettings/WidgetManager/GetWidgetData/", myRegion, function (data) {
+                var widgetDatax = $.parseJSON(data.JsonData);
+                var widgetTitleName = widgetDatax.WidgetTitleName;
+                var sizeX = widgetDatax.selectedColumnSize;
+                var sizeY = widgetDatax.selectedRowSize;
+                 var headline;
+                switch (widgetDatax.WidgetType) {
+                case 'ContentWidget':
+                    //-
+                    console.log("CONTENT WIDGET ---");
+                    var data = widgetDatax;
+                    var content = data.WidgetContent.toString();
+
+                    var html = $("<div></div>").append( $(data.WidgetContent).clone() );
+                    var elem = html.find('#cke-background-fill');  //$(content).find('#cke-background-fill');
+                    var color = typeof elem == 'undefined' || elem == null || elem == undefined ? 'transparent' : $(elem).attr('data-color');
+                    var style = typeof color == 'undefined' ? ' ' : ' style="background-color:' + color + ';" ';
+                    console.log(" size x" + sizeX);
+                    console.log(" size y" + sizeY);
+                    console.log(" po x:" + col);
+                    console.log(" po y" + row);
+                    widgetArea.add_widget('<li class="new"' + style + 'id="' + index + '"> <ul class="list4 widgets4"><li><a class="icon delete ' + widgetDelete + '" title="Remove Widget from This Page" value="' + index + '"></a>' + widgetTitleName.substring(0, sizeX * 15) + "..." + '</li></ul><div style="padding-left:10px; padding-right:10px; height:90%; overflow:auto;">' + widgetDatax.WidgetContent + '</div></li>', sizeX, sizeY, col, row);
+                    break;
+                case 'FeedbackWidget':
+                    var feedbackHtml = '<li style="background-color:' + widgetDatax.WidgetBackground + '" class="new"  id="' + index + '"> <ul class="list4 widgets4"><li><a class="icon delete  ' + widgetDelete + '" title="Remove Widget from This Page" value="' + index + '"></a>' + widgetTitleName.substring(0, sizeX * 15) + "..." + '</li></ul><div style="padding-left:10px; height:305px; overflow:auto;">' + widgetDatax.WidgetHeadline + '<textarea style="width:95%;"></textarea>check here if you want to reply <input type="checkbox"> <br> Name: <input type="text" style="width:95%;"> <br> Email: <input type="text" style="width:95%;"> <br> Phone: <input type="text"   style="width:95%;" ><br>' + widgetDatax.WidgetFeedbackInstrContent + '<br><div style="float:right; padding-right: 10px"><input type="button" value="Submit"> <input type="button" value="Reset" ></div></div></li>';                  
+                    widgetArea.add_widget(feedbackHtml, sizeX, sizeY, col, row);
+                    break;
+                case 'DrawWidget':
+                    widgetArea.add_widget('<li class="new"  id="' + index + '"> <ul class="list4 widgets4"><li><a class="icon delete ' + widgetDelete + '" title="Remove Widget from This Page" value="' + index + '"></a>' + widgetTitleName.substring(0, sizeX * 15) + "..." + '</li></ul><center><img  alt=""  src="' + widgetDatax.widgetDrawImage + '" width="95%" height="95%" /></center></li>', sizeX, sizeY, col, row);
+                    break;
+                case 'ImageWidget':
+                    widgetArea.add_widget('<li class="new"  id="' + index + '"> <ul class="list4 widgets4"><li><a class="icon delete ' + widgetDelete + '" title="Remove Widget from This Page" value="' + index + '"></a>' + widgetTitleName.substring(0, sizeX * 15) + "..." + '</li></ul><center><img  alt=""  src="' + widgetDatax.WidgetImageURL + '" width="' + sizeX * 85 + 'px" height="' + sizeY * 65 + 'px" /></center></li>', sizeX, sizeY, col, row);
+                    break;
+                case 'HoursWidget':
+                      if ((typeof widgetDatax.WidgetHeadline !== "undefined")) {
+                                headline = "<br>" + widgetDatax.WidgetHeadline + "<br>";
+                            }
+                    widgetArea.add_widget('<li class="new"  id="' + index + '"> <ul class="list4 widgets4"><li><a class="icon delete ' + widgetDelete + '" title="Remove Widget from This Page" value="' + index + '"></a>' + widgetTitleName.substring(0, sizeX * 15) + "..." + '</li></ul><div style="padding-left:10px; padding-right:10px; height:85%; overflow:auto;">' +  headline + widgetDatax.WidgetHoursContent + '</div></li>', sizeX, sizeY, col, row);
+                    break;
+                case 'ShowcaseWidget':
+                    showcaseWidgetCounter++; 
+                        var x = '<li class="new"  id="' + index + '"><ul class="list4 widgets4"><li><a class="icon delete ' + widgetDelete + '" title="Remove Widget from This Page" value="' + index + '"></a>' + widgetTitleName.substring(0, sizeX * 15) + "..." + '</li></ul><center>' +
+                                '<div class="list_carousel responsive">' +
+                                '<ul id="showCaseWidget' + index + showcaseWidgetCounter + '"></ul>' +
+                                '</div>' +
+                                '<a id="prev2' + index + showcaseWidgetCounter + '" class="prev" href="#">&lt;</a>' +
+                                '<a id="next2' + index + showcaseWidgetCounter + '" class="next" href="#">&gt;</a>' +
+                                '<div id="pager2' + index + showcaseWidgetCounter + '" class="pager"></div>' +
+                                '</center></li>'.trim();
+
+                            gridster.add_widget(x, sizeX, sizeY, col, row);
+
+                            $('#showCaseWidget' + index + showcaseWidgetCounter).carouFredSel({
+                                circular: false,
+                                infinite: false,
+                                responsive: false,
+                                auto: false,
+                                prev: '#prev2' + index + showcaseWidgetCounter,
+                                next: '#next2' + index + showcaseWidgetCounter,
+                                pagination: '#pager2' + index + showcaseWidgetCounter,
+                                swipe: { onMouse: true, onTouch: true }
+                            });
+                            $.each(widgetDatax.ShowCasePreviewResult, function (i, v) {
+                                $("#showCaseWidget" + index + showcaseWidgetCounter).trigger("insertItem", getShowCaseOptions(v, true));
+                            });
+                            showcaseWidgetCounter++;    
+                    break;
+                case 'TopicSearchWidget':
+                    var topicSearchWidgetList = "<div class='topicPreviewHtml'><h4>" + widgetDatax.WidgetHeadline + "</h4><ul>";
+                        $.each(widgetDatax.requestedProducts, function (i, v) {
+                            topicSearchWidgetList += "<li><span class='icn'></span><a href='#'>" + v.Name + "</a></li>";
+                        });
+                        topicSearchWidgetList += "</ul></div>";
+                  /*var topicSearchWidgetList = "<div class='accordion vertical'><ul><li><input type='radio' id='radio-1' name='radio-accordion' checked='checked' /><label for='radio-1'>" + widgetDatax.WidgetHeadline + "</label><div class='content'><br>";
+                            $.each(widgetDatax.requestedProducts, function (i, v) {
+                                //topicSearchWidgetList += " <p><a href='#' onclick='ShowTopicSearchResult(" + JSON.stringify(ko.toJSON(v.TopicSearchCriteria)) + ")'>" + v.Name + "</a>";
+                                topicSearchWidgetList += " <p><a href='#' >" + v.Name + "</a>";
+                            });
+                            topicSearchWidgetList +="</div></li></ul></div>";*/
+                    widgetArea.add_widget('<li class="new"  id="' + index + '"> <ul class="list4 widgets4"><li><a class="icon delete ' + widgetDelete + '" title="Remove Widget from This Page" value="' + index + '"></a>' + widgetTitleName.substring(0, sizeX * 15) + "..." + '</li></ul>'+topicSearchWidgetList +'</li>', sizeX, sizeY, col, row);                    
+                    break;
+                default:
+                    widgetArea.add_widget('<li class="new"  id="' + index + '"> ' + widgetTitleName + ' - ID: ' + index + '  <a class="icon edit widgetEdit" title="Edit" value="' + index + '"></a><a class="icon delete widgetDelete" title="Delete" value="' + index + '"></a></li>', sizeX, sizeY, col, row);
+                }
+
+            });
+        };
+        var deleteWidget = function (id) {
+            gridster.remove_widget(id);
+        };
+        var deleteGlobalWidget = function (id) {
+            globalGridster.remove_widget(id);
+        };
+        var showHomePageLocal = function(pageId, pageData) {              
+            var localTemplate =  $.parseJSON(pageData.LocalTemplate);
+            widgetVm.showLocal(true);
+            widgetVm.showGlobal(false);
+            widgetVm.ShowLibraryInfo(false);
+            var x = new Object();
+            x.Index = pageId;            
+            var widgetRegion = ko.utils.parseJson(localTemplate.LocalTemplate);            
+            if (localTemplate.LocalTemplate.length > 0) {
+                ko.utils.arrayForEach(widgetRegion, function(item) {
+                    addWidget("Local", item.id, item.col, item.row);
+                });
+            }
+        };
+        var showHomePageLocalGlobal = function(pageId, pageData) {
+            var globalTemplate =  $.parseJSON(pageData.GlobalTemplate);     
+            var localTemplate =  $.parseJSON(pageData.LocalTemplate);
+            widgetVm.showLocal(true);
+            widgetVm.showGlobal(true);
+            widgetVm.ShowLibraryInfo(true);
+            var x = new Object();
+            x.Index = pageId;
+            
+            uxAdmin.utilities.ajaxPostJson("SystemSettings/PageManager/GetLibraryList/", x, function (data) {
+               
+                widgetVm.WidgetLibraryList(data.Libraries);
+                widgetVm.DefaultLibrary(data.DefaultLibrary);
+                  
+                  if (globalTemplate != null) {
+                      if (globalTemplate.SelectedLibrariesToForceUseGlobal !== undefined) {
+                          widgetVm.SelectedLibrary(globalTemplate.SelectedLibrariesToForceUseGlobal.split(','));
+                          widgetVm.SelectedLibrary().push(data.DefaultLibrary);
+                      } else {
+                          widgetVm.SelectedLibrary([data.DefaultLibrary]);
+                      };
+                  } else {
+                          widgetVm.SelectedLibrary([data.DefaultLibrary]);
+                  }
+                
+                $("#LoadingLibraryBar").hide();
+            });
+
+            if (localTemplate != null) {
+                var widgetRegion = ko.utils.parseJson(localTemplate.LocalTemplate);
+
+                if (localTemplate.LocalTemplate.length > 0) {
+                    ko.utils.arrayForEach(widgetRegion, function(item) {
+                        addWidget("Local", item.id, item.col, item.row);
+                    });
+                }
+            }
+            if (globalTemplate != null) {
+                widgetVm.ForceLibraryToUseGlobal(globalTemplate.ForceLibraryToUseGlobal);
+                var widgetRegion2 = ko.utils.parseJson(globalTemplate.GlobalTemplate);
+                if (globalTemplate.GlobalTemplate.length > 0) {
+                    ko.utils.arrayForEach(widgetRegion2, function(item) {
+                        addWidget("Global", item.id, item.col, item.row);
+                    });
+                }
+            }
+        };
+        var showGlobalInfoData = function (pageId, pageData, fillData) {
+            widgetVm.showGlobal(fillData);
+            widgetVm.ShowLibraryInfo(fillData);            
+            var x = new Object();
+            x.Index = pageId;           
+//                uxAdmin.utilities.ajaxPostJson("SystemSettings/PageManager/GetLibraryList/", x, function (data) {
+//                    widgetVm.ForceLibraryToUseGlobal(pageData.ForceLibraryToUseGlobal);
+//                    widgetVm.WidgetLibraryList(data.Libraries);
+//                    if (fillData) {                            
+//                            widgetVm.SelectedLibrary(pageData.SelectedLibrariesToForceUseGlobal.split(','));
+//                    }
+//                    $("#LoadingLibraryBar").hide();
+//                });  
+            
+            uxAdmin.utilities.ajaxPostJson("SystemSettings/PageManager/GetLibraryList/", x, function (data) {
+                widgetVm.ForceLibraryToUseGlobal(pageData.ForceLibraryToUseGlobal);
+                widgetVm.WidgetLibraryList(data.Libraries);
+                widgetVm.DefaultLibrary(data.DefaultLibrary);
+                  
+                if (pageData.ForceLibraryToUseGlobal !== undefined) {
+                    widgetVm.SelectedLibrary(pageData.SelectedLibrariesToForceUseGlobal.split(','));
+                    widgetVm.SelectedLibrary().push(data.DefaultLibrary);
+                } else {
+                    widgetVm.SelectedLibrary([data.DefaultLibrary]);
+                }
+                $("#LoadingLibraryBar").hide();
+            });
+            
+
+            widgetVm.DefaultPageType(pageData.DefaultPage);
+            var widgetGlobalRegion = ko.utils.parseJson(pageData.GlobalTemplate);
+                
+            ko.utils.arrayForEach(widgetGlobalRegion, function(item) {
+                addWidget("Global", item.id, item.col, item.row);
+            });                
+        };
+
+        var showLocalInfoData = function (pageId, pageData, fillData) {
+            widgetVm.showLocal(true);
+        
+            if (fillData) {
+                var widgetRegion = ko.utils.parseJson(pageData.LocalTemplate);
+                ko.utils.arrayForEach(widgetRegion, function (item) {
+                    addWidget("Local", item.id, item.col, item.row);
+                });
+            }
+        };
+        var loadData = function (index, fillData, isGlobal) {
+            console.log('WidgetPage:loadData');
+            console.log(index);
+            console.log(fillData);
+            isGlobal = typeof isGlobal != 'boolean' ? false : isGlobal;
+            console.log(isGlobal);
+            var dsrc = isGlobal ? "SystemSettings/PageManager/GetGlobalPageData" : "SystemSettings/PageManager/GetPageData/";
+            uxAdmin.utilities.ajaxPostJson(dsrc, { index: index.Index, isGlobal: isGlobal }, function (data) {
+                console.log('WidgetPage:loadData:ajaxPostJson');
+                console.log(data);
+                var pageData = $.parseJSON(data.PageCollector.JsonData);    
+                console.log(pageData);
+                widgetVm.PageTypeEnable(pageData.PageTypeId != -1);
+                widgetVm.PageId(index.Index);
+                widgetVm.PageTypeId(pageData.PageTypeId);
+                widgetVm.PageType(pageData.PageType);
+                widgetVm.PageTitleName(pageData.PageTitleName);
+                widgetVm.EnableGuests(pageData.EnableGuests);
+                widgetVm.EnablePatrons(pageData.EnablePatrons);
+                widgetVm.EnableStaff(pageData.EnableStaff);
+                widgetVm.DefaultPageType(pageData.DefaultPage);
+                
+                if (!pageData.IsGlobalPage) {
+                    $("#PageTemplateTabs").tabs({ active: [0] , disabled: [1] });
+                    //$("#PageTemplateTabs").disableTab(0, true);
+                } else {
+                    if (!data.PageCollector.IsActiveLocal) {
+                        $("#PageTemplateTabs").tabs({ selected: 1,  active: 1, disabled: [0] });
+                    } else {
+                         $("#PageTemplateTabs").tabs();
+                    }
+                }
+                   
+                if (pageData.PageTypeId == -1) {
+
+                    if (data.IsCustomerSuperUser) {
+                        widgetVm.IsLocalPage(true);
+                        widgetVm.IsGlobalPage(true);
+                       // widgetVm.enableForceToUserGlobal(data.PageCollector.ForceLibraryToUseGlobal);
+                        showHomePageLocalGlobal(index.Index, data.PageCollector);
+                    } else {
+                        widgetVm.IsLocalPage(true);
+                        widgetVm.IsGlobalPage(false);
+                       // widgetVm.enableForceToUserGlobal(data.PageCollector.ForceLibraryToUseGlobal);
+                        showHomePageLocal(index.Index, data.PageCollector);
+                    }
+
+                } else {                    
+                    widgetVm.IsLocalPage(pageData.IsLocalPage);
+                    widgetVm.IsGlobalPage(pageData.IsGlobalPage);                    
+                    var checkLocalId = index.Index.split('|')[1];
+                    var checkGloballId = index.Index.split('|')[0];
+                    if ((pageData.IsLocalPage) && (checkLocalId > 0)) {                       
+                        showLocalInfoData(index.Index, pageData, fillData);
+                    };
+
+                    if ((pageData.IsGlobalPage) && (checkGloballId>0)) {
+                        showGlobalInfoData(index.Index, pageData, fillData);
+                    };
+                }
+            });
+        };
+
+        return {
+            Init: init,
+            loadData: loadData,
+            collectPageData: collectPageData,
+            showGlobalView: showGlobalView,
+            showLocalView: showLocalView,
+            showDefaultPageView: showDefaultPageView,
+            showLibraryInfoView: showLibraryInfoView,
+            setDefaultTab: setDefaultTab,
+            collectApplyLibraryData: collectApplyLibraryData,
+            showGlobalInfoData: showGlobalInfoData,
+            showLocalInfoData: showLocalInfoData,            
+        };
+
+    })();
+</script>

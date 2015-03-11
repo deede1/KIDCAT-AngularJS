@@ -1,0 +1,537 @@
+﻿@model Verso.Common.UXAdmin.WidgetCollector
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")
+@Html.LocalResourceJavascript("~/~/Public/Javascript/KnockOut/knockout.mapping-latest.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/ckeditor.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/config.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+<div class="content edit-options" id="TopicSearchWidgetFields" >
+   <ul>
+   <li class="fields">
+      <!-- row 1 -->
+      <div class="row"><h4>Topic Search Widget</h4></div>
+      <div class="row">
+         <p class="cell w-12-2"><label>Widget Size:</label></p>
+         <p class="cell w-12-1">Column: <select data-bind="options: widgetSizeStyleOption, optionsText: 'Name' , optionsValue: 'id', value: selectedColumnSize" ></select></p>
+         <p class="cell w-12-1">Row: <select data-bind="options: WidgetSizeList, optionsText: 'Name', optionsValue: 'id', value: selectedRowSize"></select></p>
+      </div>
+      <!-- row 2 -->
+      <div class="row customz">
+         <p class="cell w-12-2"><label style="color: red">* Widget Name:</label></p>
+         <p class="cell w-12-8"><input type="text"  data-bind="value: WidgetTitleName" /></p>
+      </div>
+      <!-- row 3 -->
+      <div class="row customz">
+         <p class="cell w-12-2"><label>Headline:</label></p>
+         <div class="cell w-12-8"><textarea rows="10" cols="10" id="contentWidget_HLte" data-bind="value: WidgetHeadline"></textarea></div>
+      </div>
+      <!-- row 4 -->
+      <div class="row"><hr /></div>
+      <!-- row 5 -->
+      <div class="row">
+         <p class="cell w-12-2">Create New Search Topic</p>
+         <p class="cell w-12-3"><input id="NewTopicTxt" type="text" data-bind="value: CreateNewTopic"/></p>
+         <p class="cell w-12-4"><input type="button" name="create" value="Create New Search Topic" data-bind="click: CreateNewSearchTopic"/></p>
+      </div>
+      <!-- row 6 -->
+      <div class="row">
+           <p class="cell w-12-2">
+               <label>Manage Selected Topics:</label>
+           </p>
+           <p class="cell w-12-10">
+               <table>
+                   <tr><td style="padding-left:0px"><font size="1"> Available List</font></td><td>&nbsp;</td><td ><font size="1">Display List</font></td><td>&nbsp;</td></tr>
+                   <tr>
+                       <td style="vertical-align: top;padding-left:0px;">                            
+                           <select id="ManageSelectedTopic" multiple="multiple" size="10" class="select-multiple" style="width: 200px" data-bind="options:availableProducts, selectedOptions:availableSelected, optionsText:'Name'"></select>
+                       </td>
+                       <td style="vertical-align: top">
+                           <div class="sort-list-controls">
+                               <input type="button" name="add" value=">>" data-bind="click: addRequested, enable:availableSelected().length > 0" style="width: 30px"/>
+                               <input type="button" name="remove" value="<<" data-bind="click: removeRequested, enable:requestedSelected().length > 0" style="width: 30px"/>
+                           </div>
+                       </td>
+                       <td style="vertical-align: top">                          
+                           <select id="ManageSelectedTopicx" multiple="multiple" size="10" class="select-multiple" style="width: 200px" data-bind="options:requestedProducts, optionsText:'Name' , selectedOptions:requestedSelected"></select>
+                       </td>
+                       <td style="vertical-align: top">
+                           <div class="sort-list-controls">
+                               <input type="button" name="remove" value="UP" data-bind="click: upRequested, enable:requestedSelected().length > 0" style="width: 100px"/>
+                               <input type="button" name="remove" value="Down" data-bind="click: downRequested, enable:requestedSelected().length > 0" style="width: 100px"/>
+                               <input type="button" value="Remove" style="width: 100px" data-bind="click: RemoveSelectedTopicRequested"/>
+                               <input type="button" value="Configure" style="width: 100px" data-bind="click: ConfigureRequested"/>
+                           </div>
+                       </td>
+                   </tr>
+               </table>
+           </p>
+       </div>
+      <!-- row 7 -->
+      <div class="row">
+           <div id="dialog" data-bind="dialog: {autoOpen: false, title: 'Configure a Search Topic', width: 700, height: 580  }, dialogVisible: isOpen">
+               <div class="content  edit-options" id="ConfigureASearchTopicField" >
+                   <div class="fields">
+                       <div class="row">
+                           <p class="cell w-12-2"><label>selected Topic:</label></p>
+                           <p class="cell w-12-6"><input type='text' data-bind="value: NewSearchTopicTxt"></p>                  
+                       </div>
+                       <div class='row'>
+                           <p class='cell w-12-2'>Search Parameters:</p>
+                           <p class='cell w-12-2'><select data-bind="options: searchPhraseType, optionsValue: 'value', optionsText: 'name', value: phraseType1"></select></p>
+                           <p class='cell w-12-3'><input type='text' data-bind="value:keyword1"></p>
+                           <p class='cell w-12-1'><select data-bind="options: searchOperators,value:Operator1"></select></p>
+                       </div>
+                       <div class='row'>
+                           <p class='cell w-12-2'> </p>
+                           <p class='cell w-12-2'><select data-bind="options: searchPhraseType, optionsValue: 'value', optionsText: 'name', value: phraseType2"></select></p>
+                           <p class='cell w-12-3'><input type='text' data-bind="value:keyword2"></p>
+                           <p class='cell w-12-1'><select data-bind="options: searchOperators,value:Operator2"></select></p>
+                       </div>
+                       <div class='row'>
+                           <p class='cell w-12-2'> </p>
+                           <p class='cell w-12-2'><select data-bind="options: searchPhraseType, optionsValue: 'value', optionsText: 'name', value: phraseType3"></select></p>
+                           <p class='cell w-12-3'><input type='text' data-bind="value:keyword3"></p>
+                           <p class='cell w-12-1'></p>
+                       </div>
+                       <div class='row'>
+                           <p class='cell w-12-2'>Material Types:</p>
+                       </div>
+                       <div class='row'>
+                           <p class="cell w-12-8">
+                               <div data-bind="foreach: FormatMaterialOption " class="checkboxGrid"  style="width:670px;height:110px;overflow:auto;">
+                                   <span class="optionWrapper">
+                                       <input type="checkbox" data-bind="attr:{value:QualifierKey}, checked: $root.SelectedFormatMaterialOption" /><span data-bind="text:QualifierName "></span>
+                                   </span>
+                               </div>
+                           </p>
+                       </div>
+                       <div class='row'>
+                           <p class='cell w-12-2'>Resource:</p>
+                       </div>
+                       <div class='row'>
+                           <p class="cell w-12-8">
+                               <div data-bind="foreach: ResourceGroupOption " class="checkboxGrid" style="width:670px;height:150px;overflow:auto;">
+                                   <span class="optionWrapper3">
+                                       <b><span data-bind="text:Name"></span></b>
+                                       <ul data-bind="foreach: $data.ResourceNodes" style="padding: 0 0 0 5px;">
+                                           <li style=" list-style:none;"> <input type="checkbox" data-bind="attr:{value:ID},checked: $root.SelectedResourceGroupOption" /><span data-bind="text:Name "></span> </li>
+                                       </ul>
+                                   </span>
+                               </div>
+                           </p>
+                       </div>
+                       <div class="row">
+                           <hr/>
+                       </div>
+                       <div class="row">
+                           <p class='cell' style="float: right"><button data-bind="click: save">Save</button> <button data-bind="click: close">Close</button></p>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+      <!-- row 7 -->
+      <div class="row customz fixFooter"  style="float: right">
+        <div class="title full-width" style="border:none;">
+            <div class="actions">
+                <input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview" />       
+                <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" /> 
+                <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+            </div>
+        </div>
+    </div>
+   </li>
+   <li id="preview">
+            <div class="row"><h4>Topic Search Widget Preview (<span data-bind="text: 'Columns: '+selectedColumnSize() +' X Rows: '+selectedRowSize()"></span>)</h4>            </div>
+           <div class="row customz" style="height: 510px;overflow: auto;">
+                <div data-bind="attr:{ 'style': 'width:' + selectedColumnSize()*90 + 'px;height:' + selectedRowSize()*90 + 'px;border:1px solid #ccc;background:#fff;overflow:hidden;margin: 0 auto;' }">
+                    <div class="TopicPreviewHtml">
+                        <h4 data-bind="html: WidgetHeadline"></h4>
+                        <ul data-bind="foreach: requestedProducts">
+                            <li data-bind="text: Name"></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row customz fixFooter"  style="float: right">
+                <div class="title full-width" style="border:none;">
+                    <div class="actions">
+                        <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />                            
+                        <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" /> 
+                        <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                        <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                    </div>
+                </div>
+            </div>
+        </li>
+   </ul>
+</div>
+<script type="text/javascript">
+    var uxAdmin = {};
+    uxAdmin.WidgetManager = (function () {
+        return {};
+    })();
+    
+    ko.bindingHandlers.dialog = {
+        init: function (element, valueAccessor, allBindingsAccessor) {
+            var options = ko.utils.unwrapObservable(valueAccessor()) || {};
+            setTimeout(function () {
+                options.close = function () {
+                    allBindingsAccessor().dialogVisible(false);
+                };
+                $(element).dialog(options);
+            }, 0);
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                $(element).dialog("destroy");
+            });
+        },
+        update: function (element, valueAccessor, allBindingsAccessor) {
+            var shouldBeOpen = ko.utils.unwrapObservable(allBindingsAccessor().dialogVisible);
+            $(element).dialog(shouldBeOpen ? "open" : "close");
+        }
+    };
+
+    uxAdmin.WidgetManager.TopicSearchWidget = (function () {
+        var _view = $('#TopicSearchWidgetFields');
+        var tpWvm;
+        var _editor, _html = '', _editor2, _html2 = '';
+        var widgetSizeListOption = [{ Name: 1, id: 1 }, { Name: 2, id: 2 }, { Name: 3, id: 3 }, { Name: 4, id: 4 }, { Name: 5, id: 5 }, { Name: 6, id: 6 }, { Name: 7, id: 7 }, { Name: 8, id: 8 }, { Name: 9, id: 9 }, { Name: 10, id: 10 }, { Name: 11, id: 11 }, { Name: 12, id: 12}];
+        var widgetSizeStyleOption = [{ Name: 2, id: 2 }, { Name: 4, id: 4 }, { Name: 6, id: 6 }, { Name: 8, id: 8}];
+
+        var selectedItems = null;
+        var firstSelectedColumn = null;
+        var columnIndex = 0;
+        var nameValuePair = function () {
+            this.name = ko.observable();
+            this.value = ko.observable();
+            this.selected = ko.observable();
+        };
+        //self.WidgetHeadlineContent = ko.observable();
+          var displayList = function(id,name) {
+            var dList = this;
+            dList.Id = id;
+            dList.Name = name;            
+        };
+        
+        var topicSearchWidgetVm = function () {
+            var self = this;
+
+            //SearchTopic Dialog
+            self.FormatMaterialOption = ko.observableArray([]);
+            self.ResourceGroupOption = ko.observableArray([]);
+            self.searchPhraseType = ko.observableArray([]);
+            self.searchPhraseType.push(new nameValuePair().value("ALL").name("ALL of these words"));
+            self.searchPhraseType.push(new nameValuePair().value("ANY").name("ANY of these words"));
+            self.searchPhraseType.push(new nameValuePair().value("EXACT").name("this EXACT PHRASE"));
+            self.searchOperators = ko.observableArray(["AND", "OR", "NOT"]);
+
+            self.Id = ko.observable();
+            self.NewSearchTopicTxt = ko.observable();
+            self.keyword1 = ko.observable();
+            self.keyword2 = ko.observable();
+            self.keyword3 = ko.observable();
+            self.phraseType1 = ko.observable();
+            self.phraseType2 = ko.observable();
+            self.phraseType3 = ko.observable();
+            self.Operator1 = ko.observable();
+            self.Operator2 = ko.observable();
+            self.SelectedFormatMaterialOption = ko.observableArray([]);
+            self.SelectedResourceGroupOption = ko.observableArray([]);
+
+            self.CreateOrConfig = ko.observable("Create");
+            //SearchTopic Dialog
+
+            self.WidgetId = ko.observable();
+            self.WidgetTypeId = ko.observable();
+            self.WidgetType = ko.observable();
+            self.WidgetTitleName = ko.observable();
+            self.WidgetSizeList = widgetSizeListOption;
+            self.widgetSizeStyleOption = widgetSizeStyleOption;
+            self.selectedColumnSize = ko.observable();
+            self.selectedRowSize = ko.observable();
+            self.WidgetHeadline = ko.observable();
+
+            
+            self.CreateNewTopic = ko.observable();
+            self.availableProducts = ko.observableArray([]);
+            self.availableSelected = ko.observableArray([]);
+            self.requestedProducts = ko.observableArray([]);
+            self.requestedSelected = ko.observableArray([]);
+            
+            self.tempList = ko.observableArray();
+            
+            self.saveWidget = function () {
+                reload();               
+                saveWidgetInfo(false);
+            };
+            self.saveCloseWidget = function () {
+                reload();
+                saveWidgetInfo(true);
+            };
+            this.goBack = function(){
+                $('#TopicSearchWidgetFields > ul').stop().animate({left: "0"}, 500);
+            };
+            this.Preview = function() {
+                document.getElementById('contentWidget_HLte').innerHTML = _html = _editor.getData();                 
+                tpWvm.WidgetHeadline(_html);                
+                $('#TopicSearchWidgetFields > ul').stop().animate({left: "-1310"}, 500);              
+            };
+            self.cancelWidget = function () {
+               reload();
+               parent.$.fn.colorbox.close();
+            };
+            function reload(){
+                var iframe = parent.document.getElementById('myIFrame');
+                iframe.src = iframe.src;
+            }
+            // Dialog - Begin            
+            self.isOpen = ko.observable(false);
+            self.save = function () {
+            if (self.CreateOrConfig() == "Create") {
+                    self.requestedProducts.push({ 
+                        Id: self.NewSearchTopicTxt().replace(" ", ""),
+                        Name: self.NewSearchTopicTxt(),
+                        TopicSearchCriteria: { SearchTeam: [{ Index: self.phraseType1(), Phase: self.keyword1(), Condition: self.Operator1() },
+                                { Index: self.phraseType2(), Phase: self.keyword2(), Condition: self.Operator2() },
+                                { Index: self.phraseType3(), Phase: self.keyword3(), Condition: ""}],
+                            MaterialTypes: self.SelectedFormatMaterialOption(),
+                            ResourceTypes: self.SelectedResourceGroupOption()
+                        }
+                    });
+                } else {
+                    selectedItems = self.requestedSelected;
+                    firstSelectedColumn = selectedItems.shift();
+                    columnIndex = $.inArray(firstSelectedColumn, self.requestedProducts());
+                    self.requestedProducts.replace(self.requestedProducts()[columnIndex], {
+                        Id:self.Id(),
+                        Name: self.NewSearchTopicTxt(),                      
+                        TopicSearchCriteria: {
+                            SearchTeam: [{ Index: self.phraseType1(), Phase: self.keyword1(), Condition: self.Operator1() },
+                                { Index: self.phraseType2(), Phase: self.keyword2(), Condition: self.Operator2() },
+                                { Index: self.phraseType3(), Phase: self.keyword3(), Condition: "" }],
+                            MaterialTypes: self.SelectedFormatMaterialOption(),
+                            ResourceTypes: self.SelectedResourceGroupOption()
+                        }                    
+                    });
+                }
+                this.isOpen(false);
+            };
+            self.close = function () {
+                self.Id("");
+                self.NewSearchTopicTxt("");
+                self.keyword1("");
+                self.keyword2("");
+                self.keyword3("");
+                self.phraseType1("");
+                self.phraseType2("");
+                self.phraseType3("");
+                self.Operator1("");
+                self.Operator2("");
+                self.SelectedFormatMaterialOption([]);
+                self.SelectedResourceGroupOption([]);
+                this.isOpen(false);
+            };
+            // Dialog - End
+
+            self.CreateNewSearchTopic = function () {
+                this.CreateNewTopic("");
+                self.Id("");
+                self.NewSearchTopicTxt("");
+                self.keyword1("");
+                self.keyword2("");
+                self.keyword3("");
+                self.phraseType1("");
+                self.phraseType2("");
+                self.phraseType3("");
+                self.Operator1("");
+                self.Operator2("");
+                self.SelectedFormatMaterialOption([]);
+                self.SelectedResourceGroupOption([]);
+                this.NewSearchTopicTxt(this.CreateNewTopic());
+                self.CreateOrConfig("Create");
+                this.isOpen(true);
+            };
+
+            self.addRequested = function () {
+                 $.each(self.availableSelected(), function(i, v) { self.tempList.push(new displayList(v.Id,v.Name)); });                
+                self.requestedProducts(self.tempList());
+                self.availableProducts.removeAll(self.availableSelected());
+                self.availableSelected.splice(0, self.availableSelected().length);
+            };
+
+            self.removeRequested = function () {
+                var available = this.availableProducts;
+                $.each(self.requestedSelected(), function (n, item) {
+                    if (item.SystemPredefine) {
+                        available.push(item);
+                    }
+                });
+                self.requestedProducts.removeAll(this.requestedSelected());
+                self.requestedSelected.splice(0, this.requestedSelected().length);
+            };
+
+            this.upRequested = function () {
+                selectedItems = self.requestedSelected;
+                firstSelectedColumn = selectedItems.shift();
+                columnIndex = $.inArray(firstSelectedColumn, self.requestedProducts());
+                if (columnIndex > 0) {
+
+                    self.requestedProducts.remove(firstSelectedColumn);
+                    self.requestedProducts.splice(columnIndex - 1, 0, firstSelectedColumn);
+                    //this.requestedSelected(firstSelectedColumn.Name);
+                }
+            };
+
+            self.downRequested = function () {
+                selectedItems = self.requestedSelected;
+                firstSelectedColumn = selectedItems.pop();
+                columnIndex = $.inArray(firstSelectedColumn, self.requestedProducts());
+                if (columnIndex != self.requestedProducts().length - 1) {
+                    self.requestedProducts.remove(firstSelectedColumn);
+                    self.requestedProducts.splice(columnIndex + 1, 0, firstSelectedColumn);
+                }
+            };
+
+            self.ConfigureRequested = function () {
+                selectedItems = ko.mapping.toJS(self.requestedSelected);
+                firstSelectedColumn = selectedItems.shift();
+                self.Id(firstSelectedColumn.Id);
+                self.NewSearchTopicTxt(firstSelectedColumn.Name);
+                self.keyword1(firstSelectedColumn.TopicSearchCriteria.SearchTeam[0].Phase);
+                self.keyword2(firstSelectedColumn.TopicSearchCriteria.SearchTeam[1].Phase);
+                self.keyword3(firstSelectedColumn.TopicSearchCriteria.SearchTeam[2].Phase);
+                self.phraseType1(firstSelectedColumn.TopicSearchCriteria.SearchTeam[0].Index);
+                self.phraseType2(firstSelectedColumn.TopicSearchCriteria.SearchTeam[1].Index);
+                self.phraseType3(firstSelectedColumn.TopicSearchCriteria.SearchTeam[2].Index);
+                self.Operator1(firstSelectedColumn.TopicSearchCriteria.SearchTeam[2].Condition);
+                self.Operator2(firstSelectedColumn.TopicSearchCriteria.SearchTeam[2].Condition);
+                //console.log(firstSelectedColumn.TopicSearchCriteria.MaterialTypes);
+                self.SelectedFormatMaterialOption(firstSelectedColumn.TopicSearchCriteria.MaterialTypes);
+                self.SelectedResourceGroupOption(firstSelectedColumn.TopicSearchCriteria.ResourceTypes);
+                self.CreateOrConfig("Config");
+                this.isOpen(true);
+            };
+            self.RemoveSelectedTopicRequested = function () {
+
+                var available = this.availableProducts;
+                $.each(self.requestedSelected(), function (n, item) {
+                    if (item.SystemPredefine) {
+                        available.push(item);
+                    }
+                });
+                self.requestedProducts.removeAll(this.requestedSelected());
+                self.requestedSelected.splice(0, this.requestedSelected().length);
+            };
+
+            self.checkRequested = function () {
+                //console.log(collectWidgetData());
+            };
+        } .bind(this);
+  
+        var collectWidgetData = function () {
+            tpWvm.availableProducts("");
+            tpWvm.requestedSelected("");
+            tpWvm.availableSelected("");
+            tpWvm.WidgetSizeList = "";
+            tpWvm.widgetSizeStyleOption = "";
+            tpWvm.FormatMaterialOption = "";
+            tpWvm.ResourceGroupOption = "";
+            tpWvm.searchPhraseType = "";
+            tpWvm.searchOperators = "";
+
+            tpWvm.Id("");
+            tpWvm.NewSearchTopicTxt("");
+            tpWvm.keyword1("");
+            tpWvm.keyword2("");
+            tpWvm.keyword3("");
+            tpWvm.phraseType1("");
+            tpWvm.phraseType2("");
+            tpWvm.phraseType3("");
+            tpWvm.Operator1("");
+            tpWvm.Operator2("");
+            tpWvm.SelectedFormatMaterialOption([]);
+            tpWvm.SelectedResourceGroupOption([]);
+            tpWvm.CreateOrConfig("");
+            document.getElementById('contentWidget_HLte').innerHTML = _html = _editor.getData();
+            tpWvm.WidgetHeadline(_html);
+            return ko.toJS(tpWvm);
+        };
+          var saveWidgetInfo = function(closePopup) {
+            var data = collectWidgetData();
+            console.log(data);
+            var widgetJsonCollector = function (widgetId, jsonData) {
+                var self = this;
+                self.JsonData = jsonData;
+                self.WidgetId = widgetId;
+            };
+                        
+            var myWidgetDataCollection = new widgetJsonCollector(data.WidgetId, ko.toJSON(data));
+                var widgetUrl = typeof(data.WidgetId) == 'undefined' ? "/mvc/SystemSettings/WidgetManager/InsertWidget" : "/mvc/SystemSettings/WidgetManager/UpdateWidget";
+                $.ajax({ url: widgetUrl,
+                         type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json", contentType: "application/json",
+                         success: function (result) { alert(result); if (closePopup) { parent.$.fn.colorbox.close();}}
+                });                     
+        };
+        var loadData = function (data) {
+                tpWvm.WidgetId(data.WidgetId);
+                tpWvm.WidgetTypeId(data.WidgetTypeId);
+                tpWvm.WidgetType(data.WidgetType);
+                tpWvm.WidgetTitleName(data.WidgetTitleName);
+                tpWvm.selectedColumnSize(data.selectedColumnSize);
+                tpWvm.selectedRowSize(data.selectedRowSize);
+                tpWvm.WidgetHeadline(data.WidgetHeadline);
+                tpWvm.requestedProducts(data.requestedProducts);
+                removeEditor();
+                createEditor();
+        };
+        var createEditor = function () {
+            if (_editor)
+                return;
+            // Create a new editor by replacing textarea with id = contentWidget_te, setting its value to html
+            var config = { language: 'en', toolbar: 'Full', height: '110px' };
+            var config2 = { language: 'en', toolbar: 'Full2' };
+            _editor = CKEDITOR.replace('contentWidget_HLte', config, _html);            
+        };
+        var removeEditor = function () {
+            if (!_editor)
+                return;
+            // Destroy the editor.
+            _editor.destroy();
+            _editor = null;
+        };
+
+        //init
+        var init = function () {
+            var widgetData = $.parseJSON(@Html.Raw(Json.Encode(Model.JsonData)));           
+            tpWvm = new topicSearchWidgetVm();
+            if (widgetData) {
+                loadData(widgetData);
+            } else {            
+                tpWvm.WidgetTypeId(widgetData.widgetTypeId);
+                tpWvm.WidgetType(widgetData.widgetType);            
+                removeEditor();
+                createEditor();
+            }
+            ko.applyBindings(tpWvm, _view.get(0));            
+            $.ajax({ url: "/mvc/SystemSettings/WidgetManager/TopicSearchPredefineData",
+                    type: "POST", data: "", dataType: "json",contentType: "application/json",
+                    success: function (data) {
+                    tpWvm.availableProducts(data.MyBisaSearchInfo);
+                    tpWvm.FormatMaterialOption(data.MyFormatAndResource.FormatsGroupList);
+                    tpWvm.ResourceGroupOption(data.MyFormatAndResource.ResourceGroupList);
+                    }
+            });            
+        };
+        return {
+            Init: init,
+            CollectWidgetData: collectWidgetData
+        };
+    })();
+    uxAdmin.WidgetManager.TopicSearchWidget.Init();
+    $(function() { $('body').css('overflow', 'hidden'); });
+</script>

@@ -1,0 +1,15 @@
+﻿ <div class="container">
+                <a id="home-links" ng-click="goHome()">
+                    <img src="/mvc/public/images/KidsCatalog/logo.gif" id="logo" alt="logo" />
+                    <img src="/mvc/public/images/KidsCatalog/headertitle.gif" id="headertitle" alt="headertitle"  />
+                </a>
+                <a id="exit-button" ng-click="exit()">
+                    <img src="/mvc/public/images/KidsCatalog/exit.gif" alt="exit"/>
+                </a>
+                <a id="aboutme-button" data-bind="click: MyAccount, visible:!ShowLogin()">
+                    <img src="/mvc/public/images/KidsCatalog/aboutme.gif" alt="aboutme" />
+                </a>
+                <a id="login-button" data-bind="click:login, attr: {title: ShowLogin() ? 'login' : 'logout'}" ><img data-bind="attr: {src: ImageBasePath() + (ShowLogin() ? 'Login.png' : 'Logout.png'), alt: ShowLogin() ? 'login' : 'logout'}"/></a>
+             
+               
+</div>

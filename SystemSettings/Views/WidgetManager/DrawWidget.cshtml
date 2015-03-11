@@ -1,0 +1,233 @@
+﻿@model Verso.Common.UXAdmin.WidgetCollector
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/ckeditor.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/config.js")
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/wColorPicker.css")" >
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/wPaint.css")" >
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/wPaint.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/wColorPicker.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/jquery.ui.core.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/jquery.ui.widget.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/jquery.ui.mouse.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/DrawWidget/jquery.ui.draggable.min.js")"></script>
+
+<div class="content edit-options" id="imageWidgetFields">
+<ul>
+    <li class="fields">
+        <!-- row 1 -->
+        <div class="row"><h4>Draw Widget</h4></div>    
+        
+        <!-- row 2 -->      
+        <div class="row customz">
+            <p class="cell w-12-2"><label>Widget Size:</label></p>
+            <p class="cell w-12-1">Column: <select data-bind="options: WidgetSizeList, optionsText: 'Name' , optionsValue: 'id', value: selectedColumnSize" ></select></p>
+            <p class="cell w-12-1">Row: <select data-bind="options: WidgetSizeList, optionsText: 'Name', optionsValue: 'id', value: selectedRowSize"></select></p>
+        </div>     
+        
+        <!-- row 3 -->
+        <div class="row customz"><p class="cell w-12-2"><label style="color: red">* Widget Name:</label></p><p class="cell w-12-8"><input type="text"  data-bind="value: WidgetTitleName" /></p></div>
+        
+        <!-- row 4 -->
+        <div class="row ">
+            <p class="cell w-12-2">Create your drawing</p>
+            <p class="cell w-12-8"><span id="wPaint" style="position:relative; width:1140px; height:400px; background:#CACACA; border:solid black 1px;display:block;"></span><img id="canvasImage" src="" style="display: none"/></p>
+        </div>  
+        
+        <div class="row customz fixFooter"  style="float: right">
+                <div class="title full-width" style="border:none;">
+                    <div class="actions">
+                        @*<input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview" />*@       
+                        <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" /> 
+                        <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                        <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                    </div>
+                </div>
+        </div>
+    </li>
+    @*<li id="preview">
+            
+            <div class="row">
+                <h4>Draw Widget Preview (<span data-bind="text: 'Columns: '+selectedColumnSize() +' X Rows: '+selectedRowSize()"></span>)</h4>            
+            </div>
+           
+            
+            <div class="row customz" style="height: 510px;overflow: auto;">
+                <div data-bind="attr:{ 'style': 'width:' + selectedColumnSize()*90 + 'px;height:' + selectedRowSize()*90 + 'px;border:1px solid #ccc;background:#fff;overflow:hidden;margin: 0 auto;' }">
+                    <span style="display: block;" data-bind="html: drawContentHolder"></span>
+                </div>
+            </div>
+
+            <div class="row customz fixFooter"  style="float: right">
+                    <div class="title full-width" style="border:none;">
+                        <div class="actions">
+                            <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />                            
+                            <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" /> 
+                            <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                            <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                        </div>
+                    </div>
+            </div>
+        </li>*@
+    </ul>       
+</div>
+
+
+
+
+<script type="text/javascript">
+    var fileName = null;
+    var fileToUpload = null;
+
+    var uxAdmin = {};
+    uxAdmin.WidgetManager = (function () {
+        return {};
+    })();
+    
+
+    uxAdmin.WidgetManager.DrawWidget = (function () {
+
+        var view = $('#imageWidgetFields');
+        var dWvm;
+        var widgetSizeListx = [{ Name: 1, id: 1 }, { Name: 2, id: 2 }, { Name: 3, id: 3 }, { Name: 4, id: 4 }, { Name: 5, id: 5 }, { Name: 6, id: 6 }, { Name: 7, id: 7 }, { Name: 8, id: 8 }, { Name: 9, id: 9 }, { Name: 10, id: 10 }, { Name: 11, id: 11 }, { Name: 12, id: 12}];
+        
+        var imageWidgetVm = function () {
+             this.WidgetSizeList = widgetSizeListx;
+            this.WidgetId = ko.observable();
+            this.WidgetTypeId = ko.observable();
+            this.WidgetType = ko.observable();
+            this.WidgetTitleName = ko.observable();            
+            this.selectedColumnSize = ko.observable();
+            this.selectedRowSize = ko.observable();
+            this.widgetDrawImage = ko.observable();
+            //this.drawContentHolder = ko.observable();
+            this.saveWidget = function () {
+                reload();  
+                saveWidgetInfo(false);                           
+            };
+            this.saveCloseWidget = function () {
+               reload();  
+               saveWidgetInfo(true);
+            };
+            this.cancelWidget = function () {
+               reload();
+               parent.$.fn.colorbox.close();
+            };
+            function reload(){
+                var iframe = parent.document.getElementById('myIFrame');
+                iframe.src = iframe.src;
+            }
+//            this.goBack = function(){
+//                $('#imageWidgetFields > ul').stop().animate({left: "0"}, 500);
+//            };
+//            this.Preview = function() {
+//                //document.getElementById('contentWidget_te').innerHTML = _html = _editor.getData(); console.log("DATA:"); console.log(_editor.getData());
+//                //_VM.WidgetContent(_html);
+//                //_VM.WidgetContentBg($($('iframe.cke_reset').contents()[0]).find('html').css('background-color'));
+//                $('#imageWidgetFields > ul').stop().animate({left: "-1310"}, 500);              
+//            };
+        };
+
+        var saveWidgetInfo = function(closePopup) {
+          
+            var data = collectWidgetData();
+            console.log(data);
+            var widgetJsonCollector = function (widgetId, jsonData) {
+                var self = this;
+                self.JsonData = jsonData;
+                self.WidgetId = widgetId;
+            };
+                        
+            var myWidgetDataCollection = new widgetJsonCollector(data.WidgetId, ko.toJSON(data));
+                var widgetUrl = typeof(data.WidgetId) == 'undefined' ? "/mvc/SystemSettings/WidgetManager/InsertWidget" : "/mvc/SystemSettings/WidgetManager/UpdateWidget";
+                $.ajax({
+                url: widgetUrl,
+                type: "POST",
+                data: ko.toJSON(myWidgetDataCollection),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (result) {
+                    alert(result);
+                    if (closePopup) {
+                        parent.$.fn.colorbox.close();        
+                    }
+                            
+                }
+            });   
+
+        };
+        var collectWidgetData = function () {
+            try {
+                var today = new Date();
+                var sToday = (today.getMonth() + 1).toString();
+                sToday += today.getDate().toString();
+                sToday += today.getYear().toString();
+                sToday += today.getHours().toString();
+                sToday += today.getMinutes().toString();
+                sToday += today.getSeconds().toString();
+                sToday += ".jpg";
+                saveImage(sToday);
+
+                dWvm.widgetDrawImage("/download_temp/uxadmin/"+sToday);
+            } catch (e) {
+
+            };
+
+            return ko.toJS(dWvm);
+        };
+        
+        var loadData = function (data) {         
+                dWvm.WidgetId(data.WidgetId);
+                dWvm.WidgetTypeId(data.WidgetTypeId);
+                dWvm.WidgetType(data.WidgetType);
+                dWvm.WidgetTitleName(data.WidgetTitleName);
+                dWvm.selectedColumnSize(data.selectedColumnSize);
+                dWvm.selectedRowSize(data.selectedRowSize);
+                dWvm.widgetDrawImage(data.widgetDrawImage);
+                loadImageBase64(data.widgetDrawImage);
+        };
+        var imageCollector = function (imageFilename, base64) {
+            var self = this;
+            self.ImageFilename = imageFilename;
+            self.Base64 = base64;
+        };
+        var saveImage = function (datatimeFilename) {
+            var imageData = $("#wPaint").wPaint("image");
+            var index = new imageCollector(datatimeFilename, imageData);
+            uxAdmin.utilities.ajaxPostJson("SystemSettings/WidgetManager/SaveDrawImage/", index, function (data) {
+                return data;
+            });
+        };
+        var loadImageBase64 = function (imageData) {
+            //console.log(imageData);
+            $("#wPaint").wPaint("image", imageData);            
+        };
+        var init = function () {
+            var widgetData = $.parseJSON(@Html.Raw(Json.Encode(Model.JsonData)));
+            //console.log(widgetData);
+            dWvm = new imageWidgetVm();
+
+            // init drawing canvas
+            var wp = $("#wPaint").wPaint().data('_wPaint');
+
+             if (widgetData) {
+                loadData(widgetData);
+            } else {
+                //new: set creation properties into View Model
+                dWvm.WidgetTypeId(widgetData.widgetTypeId);
+                dWvm.WidgetType(widgetData.widgetType);           
+            };            
+            ko.applyBindings(dWvm, view.get(0));
+        };
+        return {
+            Init: init,
+            loadData: loadData,
+            CollectWidgetData: collectWidgetData
+        };
+
+    })();
+    uxAdmin.WidgetManager.DrawWidget.Init();
+    $(function() { $('body').css('overflow', 'hidden'); });
+</script>

@@ -1,0 +1,161 @@
+﻿<head>
+<script type="text/javascript">
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+</script>
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")                 
+@Html.LocalResourceJavascripts("~/public/javascript/overrides.js", "~/public/javascript/json2.js")
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery.maxlength.js")" ></script>
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/ckeditor.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/config.js")
+
+    <script type="text/javascript">
+
+        (function (uxAdmin) {
+            uxAdmin.WebLinksOptions = (function () {
+                var view = $('#webLinks_options');
+                var vm;
+                var _editor, _html = '';
+                var createEditor = function (data) {
+                    if (_editor)
+                        return;
+
+                    // Create a new editor by replacing textarea with id = contentWidget_te, setting its value to html
+                    var config = { language: 'en', toolbar: 'Full', height: '75px' };
+                    //var config2 = { language: 'en', toolbar: 'Full2', height: '380px' }; //{ language: 'en', toolbar: 'Basic' };
+
+                    _editor = CKEDITOR.replace('contentWidget_te', config, _html);
+
+                    CKEDITOR.instances['contentWidget_te'].on('instanceReady', function () {
+                        window.parent.__cke.onLoad(_editor, data);
+                        //console.log('You are in ' + (document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks') + ' mode.');
+                    });
+                };
+                var removeEditor = function () {
+                    if (!_editor)
+                        return;
+
+                    // Destroy the editor.
+                    _editor.destroy();
+                    _editor = null;
+                };
+
+
+                var webLinksOptionsVm = function () {
+                    var self = this;
+                    self.DisplayWebLinkSeparateTabGuest = ko.observable();
+                    self.DisplayWebLinkSeparateTabPatron = ko.observable();
+                    self.DisplayWebLinkSeparateTabStaff = ko.observable();
+
+                    self.DisplayWebLinkResourceScreenGuest = ko.observable();
+                    self.DisplayWebLinkResourceScreenPatron = ko.observable();
+                    self.DisplayWebLinkResourceScreenStaff = ko.observable();
+
+                    self.WebLinkTabLabel = ko.observable();
+                    self.WebLinkPageText = ko.observable();
+                    self.SaveWebLinkOptions = function () {
+                        document.getElementById('contentWidget_te').innerHTML = _html = _editor.getData();
+                        vm.WebLinkPageText(_html);
+                        var data = ko.mapping.toJS(vm);
+                        uxAdmin.utilities.ajaxPostJson('SystemSettings/OptionManager/SaveWebLinkOptions/', data, function (datax) {
+                            alert(datax);
+                        });
+                    };
+                };
+                var load = function () {
+                    $("WebLinkTabLabelTxt").maxlength({ maxCharacters: 16, status: true, statusClass: "status", statusText: "character left", notificationClass: "notification", showAlert: true, alertText: "The text you are pasting exceeds the 20 character limit", slider: true });
+                    vm = new webLinksOptionsVm();
+                    uxAdmin.utilities.ajaxPostJson('SystemSettings/OptionManager/GetWebLinkOptions/', null, function (data) {
+                        var jsondata = ko.toJS(data);
+                        vm.DisplayWebLinkSeparateTabGuest(jsondata.DisplayWebLinkSeparateTabGuest);
+                        vm.DisplayWebLinkSeparateTabPatron(jsondata.DisplayWebLinkSeparateTabPatron);
+                        vm.DisplayWebLinkSeparateTabStaff(jsondata.DisplayWebLinkSeparateTabStaff);
+                        vm.DisplayWebLinkResourceScreenGuest(jsondata.DisplayWebLinkResourceScreenGuest);
+                        vm.DisplayWebLinkResourceScreenPatron(jsondata.DisplayWebLinkResourceScreenPatron);
+                        vm.DisplayWebLinkResourceScreenStaff(jsondata.DisplayWebLinkResourceScreenStaff);
+                        vm.WebLinkTabLabel(jsondata.WebLinkTabLabel);
+                        //vm.WebLinkPageText(jsondata.WebLinkPageText);                    
+                        removeEditor();
+                        createEditor(jsondata.WebLinkPageText);
+                        ko.applyBindings(vm, view.get(0));
+                    });
+                };
+                return {
+                    load: load
+                };
+            })();
+
+        })(window.uxAdmin = window.uxAdmin || {});
+
+
+        $(function () {
+            uxAdmin.WebLinksOptions.load();
+            $("#WebLinksOptionsTab").tabs();
+        });
+    </script>
+    <style type="text/css">
+        /*  html {width:780px; min-width:780px; max-width:780px; padding:0px; margin:0px;}
+    body {width:780px; min-width:780px; max-width:780px; padding:0px; margin:0px; position:relative;}*/
+    
+        /* iframe form styles */
+        body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+        body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+        body > form .title .actions {width:auto; float:right;}
+        #WebLinksOptionsTab {
+            border: none;
+            margin: 0 5px;
+        }   
+        .topWebLinksOptionBtnFix {
+            z-index: 1;
+            position: relative;
+            float: right;        
+        }
+        .row {
+            padding: 5px 0 !important;
+        }
+    </style>
+</head>
+<form id="webLinks_options" method="post" action="" style="display:block">
+    <br/>
+    <div class="actions">
+        <input type="button" class="button primary topWebLinksOptionBtnFix" value="Save" data-bind="click: $root.SaveWebLinkOptions"/>            
+    </div>
+    <div id="WebLinksOptionsTab">
+        <ul><li><a href="#WebLinksOption">Web Links</a></li></ul>
+        <div id="WebLinksOption">
+            <div class="content">
+                <div class="fields">         
+                    <div class="row">
+                        <p class="cell w-12-4"><label>Display Web Links on Separate Tab:</label></p>
+                        <p class="cell w-12-5"><input type="checkbox" data-bind="checked: $root.DisplayWebLinkSeparateTabGuest"> Guests 
+                                               <input type="checkbox" data-bind="checked: $root.DisplayWebLinkSeparateTabPatron"> Patrons 
+                                               <input type="checkbox" data-bind="checked: $root.DisplayWebLinkSeparateTabStaff"> Staff</p>            
+                    </div>
+                    <div class="row">
+                        <p class="cell w-12-4"><label>Display Web Links on Choose Resources Screen:</label></p>
+                        <p class="cell w-12-5"><input type="checkbox" data-bind="checked: $root.DisplayWebLinkResourceScreenGuest"> Guests 
+                                               <input type="checkbox" data-bind="checked: $root.DisplayWebLinkResourceScreenPatron"> Patrons 
+                                               <input type="checkbox" data-bind="checked: $root.DisplayWebLinkResourceScreenStaff"> Staff</p>            
+                    </div>         
+                    <div class="row">
+                        <p class="cell w-12-4"><label>Web Link Tab Label:</label></p>
+                        <p class="cell w-12-5"><input id="WebLinkTabLabelTxt" type="text" maxlength="16" data-bind="value: $root.WebLinkTabLabel"/></p>
+                        <p class="cell w-12-3" style="color: red"> 16 characters max</p>
+                    </div>
+                    <div class="row" style="vert-align: top">
+                        <p class="cell w-12-4"><label>Web Links Page Text:</label></p>
+                        <p class="cell w-12-9"><textarea rows="10" cols="10" id="contentWidget_te" data-bind="value: $root.WebLinkPageText"></textarea></p>            
+                    </div>         
+                </div>
+            </div>                        
+        </div>
+    </div>
+
+   
+</form>

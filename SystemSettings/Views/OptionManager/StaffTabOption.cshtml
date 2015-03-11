@@ -1,0 +1,269 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <meta charset="utf-8" />
+    <meta http-equiv="Cache-control" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+    <title>Widget Manager</title>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Styles/style.css")" />    
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Styles/jquery.sortable.style.css")" />
+    <style type="text/css">
+        html {padding: 0; margin: 0;}
+        body {padding: 0; margin: 0; position: relative;}
+    
+        /* iframe form styles */
+        body > form {display:block; width:inherit; margin:0px;}
+        body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+        body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+        body > form .title .actions {width:auto; float:right;}
+        body > form .content > .fields .row > div.cell.w-12-10 {width:100%;}
+        body > form .widgets1.list1 {width: 250px; padding: 0;}
+        body > form .list3.widgets3 {width: 250px; padding: 0;}
+        body > form .tabberlive {width:inherit;}
+        .fields .cell > span.cke, 
+        .cke_browser_ie.cke_browser_quirks {display:block;}
+        .cke_browser_iequirks.cke_browser_ie .cke_top,
+        .cke_browser_iequirks.cke_browser_ie .cke_bottom,
+        .cke_browser_ie.cke_browser_quirks .cke_top,
+        .cke_browser_ie.cke_browser_quirks .cke_bottom {width:auto;}
+    </style>
+@*    <style type="text/css">
+        html {padding: 0; margin: 0;}
+        body {padding: 0; margin: 0; position: relative;}
+    
+        /* iframe form styles */
+        body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+        body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+        body > form .title .actions {width:auto; float:right;}
+    </style>*@
+    @*    <script type="text/javascript">
+        var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+        console.log('Loading Page. You are in ' + (document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks') + ' mode.');
+    </script>*@
+        <script type="text/javascript">
+            var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+    </script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-sortable.js")"></script>
+    
+    
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+    <script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jQuery-ui-tab-utils.js")" ></script>
+
+</head>
+<body>
+
+
+<form id="PageManagerForm" method="post" action="" style="display:block;">
+    <div class="title full-width">
+        <h3>Sort Menu Tabs</h3>
+        @*<div class="actions"><input type="button" class="button primary" value="Save"/></div>*@
+    </div>
+    <div class="content">
+        <div class="fields">    
+            <div class="row">                
+                <div class="cell w-12-10">
+                    <div class="row">
+                        <div id="PageOptionsTabs" style="width: 98.8%; float: left;">
+                            <ul>
+                                <li><a href="#LocalOptions">Local Tab Order</a></li>
+                                <li><a href="#GlobalOptions" data-bind="visible: ShowGlobal()">Global Tab Order</a></li>            
+                            </ul>
+                            <div id="LocalOptions">
+                                <div class="actions"><input type="button" class="button primary" value="Save Local"/><input type="button" class="button primary" value="Use Global Options"/></div>
+                                <div style="display: table-cell;">
+                                    <ul class="list1 widgets1" data-bind="sortable: {data: LocalPageList, afterMove: $root.saveLocalPageOrderData, options: { cancel: '.no-sort'}}">                    
+                                        <li><span class="widget-type" data-bind="text: MenuText"></span></li>
+                                    </ul>
+                                    <div>&nbsp;</div>
+                                </div>
+                                <div style="display: table-cell;">
+                                    <ul class="list5 widgets5" data-bind="foreach: StaffPageList">                    
+                                        <li><span class="widget-type" data-bind="text: MenuText"></span></li>
+                                    </ul>
+                                    <div style="text-align: center;">Current Global Order (read only)<span style="font-weight: bold; color: red;" title="Global order is active." data-bind="visible: !AllowLibraries() || (!LocalIsSet() && AllowLibraries())">&nbsp;*&nbsp;</span></div>
+                                </div>
+                            </div>
+                            <div id="GlobalOptions"  data-bind="visible: ShowGlobal()">
+                                <div>
+                                    @*<div class="actions"><input type="button" class="button primary" value="Save"/></div>*@
+                                    <div class="actions"><input type="button" class="button primary" value="Save"/></div>
+                                    <ul class="list3 widgets3" data-bind="sortable: {data: StaffPageList, afterMove: $root.savePageOrderData, options: { cancel: '.no-sort'}}">                    
+                                        <li><span class="widget-type" data-bind="text: MenuText"></span></li>
+                                    </ul>
+                                    <div><label style="padding-left: 8px; padding-right: 8px;">Allow libraries to set staff tab sequence:</label><input type="checkbox" value="1" data-bind="checked: AllowLibraries"/></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+              <div class="row">
+                <hr />
+            </div>
+        </div>
+    </div>
+    <div id="wgt"></div>
+</form>
+
+<script type="text/javascript">
+
+    ko.bindingHandlers.sortableList = {
+        init: function (element, valueAccessor) {
+            var list = valueAccessor();
+            $(element).sortable({
+                update: function (event, ui) {
+                    //retrieve our actual data item
+                    var item = ui.item.tmplItem().data;
+                    //figure out its new position
+                    var position = ko.utils.arrayIndexOf(ui.item.parent().children(), ui.item[0]);
+                    //remove the item and add it back in the right spot
+                    if (position >= 0) {
+                        list.remove(item);
+                        list.splice(position, 0, item);
+                    }
+                }
+            });
+        }
+    };
+
+
+    uxAdmin.PageManager = (function () {
+
+        // vars
+        var _view = $('#PageManagerForm');
+        var _body = $('#wgt');
+        var _formButtons = {};
+        var _VM;
+        // methods
+
+        var pageManagerPageVm = function () {
+            var self = this;
+            self.StaffPageList = ko.observableArray([]);
+            self.LocalPageList = ko.observableArray([]);
+            self.selectedType = ko.observable();
+            self.AllowLibraries = ko.observable();
+            self.ShowGlobal = ko.observable();
+            self.SelectedSearchHideShowBar = ko.observable();
+            self.IsCustomertSuperUser = ko.observable();
+            self.StaffSortedList = ko.observable();
+            self.StaffLocalSortedList = ko.observable();
+            self.LocalIsSet = ko.observable();
+
+            self.savePageOrderData = function (orderEvt) {
+                //console.log('savePageOrderData');
+                //console.log(ko.toJSON(orderEvt.sourceParent));
+                self.StaffSortedList(ko.toJSON(orderEvt.sourceParent));
+            };
+            self.saveLocalPageOrderData = function (orderEvt) {
+                //console.log('saveLocalPageOrderData');
+                //console.log(ko.toJSON(orderEvt.sourceParent));
+                self.StaffLocalSortedList(ko.toJSON(orderEvt.sourceParent));
+            };
+        };
+        var pageJsonCollector = function (xMenuTabs, xAllowLibraries) {
+            //console.log(xMenuTabs);
+            //console.log(xAllowLibraries);
+            var self = this;
+            self.AllowLibraries = xAllowLibraries;
+            self.MenuTabs = xMenuTabs;
+        };
+
+        var saveGlobalPage = function () {
+            //console.log('saveGlobalPage');
+            var myCollectionData = new pageJsonCollector(_VM.StaffPageList(), _VM.AllowLibraries());
+            uxAdmin.utilities.ajaxPostJson("OptionManager/SaveGlobalStaffMenuOrder", myCollectionData, function (result) {
+                if (result.EncounteredError) {
+                    alert(result.ErrorMessage);
+                } else {
+                    updatePageInfo(result);
+                    alert("Your data has been successfully saved");
+                }
+            });
+        };
+
+        var saveLocalPage = function () {
+            //console.log('saveLocalPage');
+            var myCollectionData = new pageJsonCollector(_VM.LocalPageList(), false);
+            uxAdmin.utilities.ajaxPostJson("OptionManager/SaveLocalStaffMenuOrder", myCollectionData, function (result) {
+                if (result.EncounteredError) {
+                    alert(result.ErrorMessage);
+                } else {
+                    updatePageInfo(result);
+                    alert("Your data has been successfully saved");
+                }
+            });
+        };
+
+        var removeLocalPage = function () {
+            //console.log('removeLocalPage');
+            uxAdmin.utilities.ajaxPostJson("OptionManager/RemoveLibraryMenuOrdinals", {}, function (result) {
+                if (result.EncounteredError) {
+                    alert(result.ErrorMessage);
+                } else {
+                    updatePageInfo(result);
+                    alert("Your data has been successfully saved");
+                }
+            });
+        };
+
+        //var help = function () { alert("help"); console.log(_VM.StaffPageList()); };
+        var getFormButtonsReferences = function () {
+            _formButtons = {
+                Save: _view.find('.actions .button[value="Save"]'),
+                Local: _view.find('.actions .button[value="Save Local"]'),
+                UseGlobal: _view.find('.actions .button[value="Use Global Options"]')
+            };
+        };
+        var initFormButtonsBindings = function () {
+            //console.log(_formButtons);
+            _formButtons.Save.bind('click', saveGlobalPage);
+            _formButtons.Local.bind('click', saveLocalPage);
+            _formButtons.UseGlobal.bind('click', removeLocalPage);
+        };
+        var updatePageInfo = function (staffMenuTabs) {
+            console.log(staffMenuTabs);
+            var jsondata = ko.toJS(staffMenuTabs.GlobalStaffMenu);
+            var localjsondata = ko.toJS(staffMenuTabs.LocalStaffMenu);
+            _VM.AllowLibraries(staffMenuTabs.LocalOrinals.AllowLocal);
+            _VM.LocalIsSet(staffMenuTabs.LocalOrinals.LocalIsSet);
+            _VM.ShowGlobal(staffMenuTabs.ShowGlobal);
+            _VM.StaffPageList(jsondata);
+            _VM.LocalPageList(localjsondata);
+        };
+        var init = function () {
+            //_view.find('.actions .button[value="Save"]').show();
+            //_view.find('.actions .button[value="Cancel"]').hide();
+
+            _VM = new pageManagerPageVm();
+            uxAdmin.utilities.ajaxGetJson('OptionManager/GetStaffMenuTab/', null, updatePageInfo);
+            $("#PageOptionsTabs").tabs({ "selected": 0, "active": 0 });
+            if (!_VM.ShowGlobal()) {
+                //$("#PageOptionsTabs").tabs("option", "disabled", [1]);
+            }
+            //ko.bindingHandlers.sortable.afterMove = _VM.savePageOrderData;
+            ko.applyBindings(_VM);
+            getFormButtonsReferences();
+            initFormButtonsBindings();
+            $(".list.widgets").mousemove(function (e) { $('.drag').offset({ left: e.pageX, top: e.pageY - 25 }); });
+            $(".list.widgets").mouseenter(function () { $('.drag').stop(true, true).fadeIn(); }).mouseleave(function () { $('.drag').stop(true, true).fadeOut(); });
+            $(".list3.widgets3").mousemove(function (e) { $('.drag').offset({ left: e.pageX, top: e.pageY - 25 }); });
+            $(".list3.widgets3").mouseenter(function () { $('.drag').stop(true, true).fadeIn(); }).mouseleave(function () { $('.drag').stop(true, true).fadeOut(); });
+        };
+
+        return {
+            Init: init,
+            PageManagerPageVm: pageManagerPageVm
+        };
+    })();
+
+    uxAdmin.PageManager.Init();
+</script>
+</body>

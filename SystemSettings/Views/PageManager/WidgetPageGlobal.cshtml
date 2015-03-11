@@ -1,0 +1,265 @@
+﻿@{ Layout = null; }
+
+@model VersoMVC.Areas.SystemSettings.Controllers.PageManagerModel
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/Gridster/jquery.gridster.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+<script  type="text/javascript" >
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath'; ;
+    var uxAdmin = {};
+    uxAdmin.PageManager = (function () { return {}; })();
+</script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/Gridster/jquery.gridster.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/SystemSettings/Scripts/GridsterHelper.js")" ></script>
+
+<style>
+        .liquid {
+	background:#313b31  repeat-y scroll 50% 0;
+	border:2px solid #19301C;
+	-moz-border-radius:10px 10px 10px 10px;
+	-webkit-border-radius:10px 10px 10px 10px;
+	border-radius:10px 10px 10px 10px;
+	padding:10px 0;
+}
+.liquid .previous {
+	background-image:url(@Url.Content("~/Public/Images/arr_left.png"));
+    display: block;
+    float: left;
+    height: 34px;   
+    position: relative;
+    top: 45px;
+    width: 32px;
+}
+.liquid .next {
+
+	background-image:url(@Url.Content("~/Public/Images/arr_right.png"));
+	display: block;
+    float: right;
+    height: 34px;       
+    position: relative;
+    top: 45px;
+    width: 35px;
+}
+.liquid ul li {
+	width:126px;
+	padding:0 2px;
+	margin:0;
+}
+.liquid ul li a img {
+	-moz-box-shadow: 5px 5px 3px #222;
+   	-webkit-box-shadow: 5px 5px 3px #222;
+   	box-shadow: 5px 5px 3px #222;
+}
+</style>
+<div class="content" id="WidgetManagerFieldsx">
+    <ul>
+    <li class="fields" >
+        <div class="row"><h4>Global Page Manager - Widget Page</h4></div>         
+        <div class="row">
+            <p class="cell w-12-3"><label>Page Name: </label></p>            
+            <p class="cell w-12-4"><input type="text"  maxlength="16" data-bind="value: $root.PageTitleName" /><span style="color: red">(Maximum characters: 16)</span></p>
+           <p class="cell w-12-3" ></p>
+            <p class="cell w-12-2" style="position:relative; top:5px;" data-bind="visible: $root.PageTypeId() != '-1'" >Page Description/Tooltip:</p>
+            <p Class="cell w-12-6" data-bind="visible: $root.PageTypeId() != '-1'"> <textarea style="width: 63%;float: left;margin-right: 5px;" type="text"  maxlength="160" rows="4" cols="50" data-bind="value: $root.PageDescToolTip, disable: $root.PageTypeId() == '-1'"></textarea> <span style="color: red; position:relative; top: -3px;">(Maximum characters: 160)</span></p>
+
+        </div>
+                
+        <div class="row">
+            <p class="cell w-12-3"><label>Show This Page For:</label></p>
+            <p class="cell w-12-4"><input type="checkbox" data-bind="checked: $root.EnableGuests"/> Guests <input type="checkbox" data-bind="checked: $root.EnablePatrons"/> Patrons <input type="checkbox" data-bind="checked: $root.EnableStaff"/> Staff</p>
+        </div>
+
+        <div class="row">
+            <p class="cell w-12-10"><hr/></p>
+        </div>
+        
+        <div class="row">
+            <p class="cell w-12-3"><label>Force Library to use Global: </label></p>
+            <p class="cell w-12-4"><input type="checkbox" data-bind="checked: $root.ForceLibraryToUseGlobal"/></p>
+        </div>
+        <div class="row">
+            <p class="cell w-12-3" style="float: left;"><label>Apply to Library: </label></p>
+            <p class="cell w-12-0">             
+                <ul style="float: left; width: 300px" id="ApplytoLibrary" data-bind="foreach: WidgetLibraryList">
+                    <li><input type="checkbox" data-bind="attr: { value: AGLibID }, checked: $root.SelectedLibrary, enable: IsEnabled"><span data-bind="text: LibraryName"></span></li>
+                </ul>
+            </p>
+            <div class="cell w-12-2" >
+                <input type="button" class="button primary" style="width: 120px" value="Select All" data-bind="click: $root.SelectAllLibrary" /><br/><br/>
+                <input type="button" class="button primary" style="width: 120px" value="Clear All" data-bind="click: $root.ClearAllLibrary"/><br/><br/>
+                <input type="button" class="button primary" style="width: 120px" value="Show Selected" data-bind="click: $root.ShowSelectedlLibrary"/> <br/>                                                                           
+            </div>   
+        </div>
+        <div class="row">
+            <p class="cell w-12-10"><hr/></p>
+        </div>
+
+        <div class="row">
+            <p class="cell w-12-3"><label>Design Your Page Layout:</label></p>
+            <p class="cell w-12-10" style="width: 750px ;"><label style="float: left; clear: none">Available Global Widgets :  &nbsp;</label> <select data-bind="options: WidgetList, optionsText: 'Name', value : SelectedWidget, optionsCaption: 'Select a Widget' " style="width: 490px;float:left; clear: none"></select> &nbsp; &nbsp;<button  style="float:right; clear: none" data-bind="click: $root.AddWidgetToPage">Add This Widget</button></p>
+        </div>
+         <div class="row" data-bind="attr:{'style': 'overflow: auto;height:367px;'}">             
+            <div class="gridster">
+                 <b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>
+                <ul></ul>
+            </div>
+        </div>
+        <div class="row customz fixFooter"  style="float: right">
+            <div class="title full-width" style="border:none;">
+                <div class="actions">
+                    <input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview" />       
+                    <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                    <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                    <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                </div>
+            </div>
+        </div>
+    </li>
+    <li id="preview">
+        <div class="rowPreview">
+            <ul id="forPreviewPage" data-bind="html: $root.previewTemplate, attr:{'style': 'height:' + $root.pageHeight() + 'px;'}"></ul>
+        </div>
+        <div class="row customz fixFooter"  style="float: right">
+            <div class="title full-width" style="border:none;">
+                <div class="actions">
+                    <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />       
+                    <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                    <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                    <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                </div>
+            </div>
+        </div>
+    </li>
+    </ul>
+</div>
+<script type="text/javascript">
+    uxAdmin.PageManager.GlobalWidgetPage = (function () {
+        var pageManagerView = $('#WidgetManagerFieldsx');
+        var widgetVm;
+        var gridster;
+        var gristerHelper = uxAdmin.PageManager.GridsterHelper;
+        var globalTemplate = function(xPageId,xPageTypeId, xPageTitleName,xPageDescToolTip,xEnableGuests, xEnablePatrons, xEnableStaff,  xForceLibraryToUseGlobal , xApplyToListLibrary, xGlobalTemplate) {            
+            var global = this;
+            global.PageId = xPageId + "|-1";
+            global.PageTypeId = xPageTypeId;
+            global.PageTitleName = xPageTitleName;
+               global.PageDescToolTip = xPageDescToolTip;
+            global.EnableGuests = xEnableGuests;
+            global.EnablePatrons = xEnablePatrons;
+            global.EnableStaff = xEnableStaff;
+            global.GlobalTemplate =  ko.toJSON(xGlobalTemplate);
+            global.ForceLibraryToUseGlobal = xForceLibraryToUseGlobal;            
+            global.TemplateType = "Global";
+            //--------- [missing property] -----            
+            global.PageType = "WidgetPage";
+            global.PageTypeEnable = true;
+            global.IsLocalPage = false;
+            global.IsGlobalPage = true;
+            global.SelectedLibrariesToForceUseGlobal = xApplyToListLibrary.join();
+            global.DefaultPage = "Global";
+            global.LocalTemplate = ko.toJSON([]);
+            global.PageUrl = "";
+        };
+        var widgetPageVm = function () {
+            var self = this;
+            self.pageHeight = ko.observable(0);
+            self.previewTemplate = ko.observable("");
+            self.WidgetList = ko.observableArray();
+            self.PageId = ko.observable();
+            self.PageTypeId = ko.observable();
+            self.PageTitleName = ko.observable();
+            self.PageDescToolTip = ko.observable();
+            self.EnableGuests = ko.observable();
+            self.EnablePatrons = ko.observable();
+            self.EnableStaff = ko.observable();
+            self.SelectedWidget = ko.observable();
+            self.ForceLibraryToUseGlobal = ko.observable();
+            self.ApplyToListLibrary =  ko.observableArray();
+            self.WidgetLibraryList = ko.observableArray();                        
+            self.SelectedLibrary =  ko.observableArray();            
+            self.SelectedLibraryName =  ko.observableArray();  
+            self.AddWidgetToPage = function () { gristerHelper.AddWidgetToPage(self.pageHeight, gridster, self.SelectedWidget().Index);};
+            self.DeleteWidgetOnPage = function(id) {  gristerHelper.DeleteWidgetOnPage(gridster, id);  };
+            self.Preview = function() {
+                self.previewTemplate("");
+                ko.utils.arrayForEach(gridster.serialize(), function(gItem) {
+                    gristerHelper.AddWidgetToPage( self.pageHeight, gridster, gItem.id, gItem.col, gItem.row, self.previewTemplate, true);
+                });
+                 $('#WidgetManagerFieldsx > ul').stop().animate({left: "-1310"}, 500);
+            };
+            self.goBack = function(){ $('#WidgetManagerFieldsx > ul').stop().animate({left: "0"}, 500); };
+            self.saveWidget = function() { updatePage();};
+            self.saveCloseWidget = function() { updatePage(); reload(); parent.$.fn.colorbox.close();};
+            self.cancelWidget = function() {reload(); parent.$.fn.colorbox.close();};
+            function updatePage() { uxAdmin.utilities.ajaxPostJson("PageManager/UpdatePage", collectPageData(), function (result) {alert(result.Message);self.PageId(result.ResultId); }); };
+            function reload(){ var iframe = parent.document.getElementById('myIFrame'); iframe.src = iframe.src;}
+
+            self.SelectAllLibrary = function() {
+                console.log("SelectAllLibrary");
+                var x = [];
+                ko.utils.arrayForEach( self.WidgetLibraryList(), function(item) {
+                    if (item.IsEnabled) {
+                        x.push(item.AGLibID);
+                    }
+                });            
+                self.SelectedLibrary(x);             
+            };
+            self.ClearAllLibrary = function() {
+                console.log("ClearAllLibrary");                  
+                self.SelectedLibrary([]);             
+            };
+            self.ShowSelectedlLibrary = function() {
+                console.log("ShowSelectedlLibrary");
+                var x = [];                
+                $.each(self.SelectedLibrary(), function(i, v) {
+                    ko.utils.arrayForEach( self.WidgetLibraryList(), function(item) {
+                         if (v == item.AGLibID) { x.push(item.LibraryName);}
+                    });
+                });             
+                alert(x.join());                
+            };
+        };
+        var init = function () {
+            widgetVm = new widgetPageVm();
+            ko.applyBindings(widgetVm, pageManagerView.get(0));
+            uxAdmin.utilities.ajaxGetJson('WidgetManager/GetWidgetList/', null, function (data) {
+                widgetVm.WidgetList(ko.toJS(data).WidgetListGlobal);
+            });
+            gridster = gristerHelper.InitGridster();
+            $("body a.icon.delete.widgetDelete").live("click", function () { widgetVm.DeleteWidgetOnPage($(this).parents("li").parents("li")[0]); });
+        };
+        var loadData = function (index, fillData, isGlobal) {            
+                var x = [];
+                var pageCollector = @Html.Raw(Json.Encode(Model.PageCollector));            
+                var pageInfo = $.parseJSON(pageCollector.GlobalTemplate); 
+                var pageDetail = $.parseJSON(pageInfo.GlobalTemplate);                
+                widgetVm.PageId(pageCollector.PageId);
+                widgetVm.PageTypeId(pageCollector.PageTypeId);                
+                widgetVm.PageTitleName(pageInfo.PageTitleName);
+                widgetVm.EnableGuests(pageInfo.EnableGuests);
+                widgetVm.EnablePatrons(pageInfo.EnablePatrons);
+                widgetVm.EnableStaff(pageInfo.EnableStaff);   
+                widgetVm.ForceLibraryToUseGlobal(pageCollector.ForceLibraryToUseGlobal);
+                widgetVm.WidgetLibraryList(pageCollector.GlobalLibraryList);
+                widgetVm.PageDescToolTip(pageInfo.PageDescToolTip);
+                ko.utils.arrayForEach( widgetVm.WidgetLibraryList(), function (item) { if (item.IsChecked) { x.push(item.AGLibID);}});            
+                widgetVm.SelectedLibrary(x);             
+                if (pageDetail.length > 0) { ko.utils.arrayForEach(pageDetail, function (item) {gristerHelper.AddWidgetToPage(widgetVm.pageHeight, gridster, item.id, item.col, item.row);});}             
+        };
+        var collectPageData = function () {
+            return new globalTemplate(widgetVm.PageId(),widgetVm.PageTypeId(), widgetVm.PageTitleName(), widgetVm.PageDescToolTip() , widgetVm.EnableGuests(),widgetVm.EnablePatrons(), widgetVm.EnableStaff(),  widgetVm.ForceLibraryToUseGlobal(),widgetVm.SelectedLibrary(),  gridster.serialize());            
+        };
+        return {
+            Init: init,
+            LoadData: loadData,
+            CollectPageData: collectPageData,
+        };
+    })();
+    uxAdmin.PageManager.GlobalWidgetPage.Init();
+    uxAdmin.PageManager.GlobalWidgetPage.LoadData();
+</script>
+

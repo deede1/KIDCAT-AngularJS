@@ -1,0 +1,47 @@
+﻿<kidsheader></kidsheader>
+<div id="kidcatBody">
+<header></header>
+    <div class="content">
+        <div class="container">
+            <div class="carousel-container">
+                <a class="back-button" data-bind="visible: categoriesStack().length > 1, click: goBack"></a>
+                <h2 ng-bind="carouselTitle">
+                </h2>
+                <div class="carousel-arrow left" ng-click="carouselPrevPage()" >
+                </div>
+                <div class="carousel-arrow right"  ng-click="carouselNextPage()" >
+                </div>
+               <!-- <div data-bind=" visible: Showloading()">
+                    <center>
+                        Loading ...
+                        <br />
+                        <img src="/mvc/Public/Images/loading18.gif" /></center>
+                </div>-->
+                <div class="carousel-scroll-container" >
+                    <ul class="carousel">
+                        <li ng-repeat="category in subcategories">
+                            <a ng-mouseover="setMouseOverImg($event, category)" ng-mousedown="setMouseDownImg($event, category)" ng-mouseleave="setMouseOutImg($event, category)" ng-click="loadSubCategory(category)">
+                                <img ng-src="category.imageUrl" />
+                            </a>
+                            <div ng-bind="category.title" class="category-title">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="tabs-container">
+                <a class="words-tab-btn tab-btn" data-bind="click:switchTab"></a><a class="titles-tab-btn tab-btn"
+                    data-bind="click:switchTab"></a><a class="authors-tab-btn tab-btn" data-bind="click:switchTab">
+                    </a>
+                <div id="words-tab" class="active">
+                </div>
+                <div id="titles-tab" >
+                </div>
+                <div id="authors-tab">
+                </div>
+                <input id="search-box" type="search" data-bind="event:{ keypress: submitSearchOnPressEnter }"/>
+                <a id="submit-button" data-bind="click:submitSearch"></a>
+            </div>
+        </div>
+    </div>
+</div>

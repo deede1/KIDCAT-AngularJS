@@ -1,0 +1,241 @@
+﻿
+<script type="text/javascript">
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+</script>
+
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+@Html.LocalResourceJavascripts("~/public/javascript/overrides.js", "~/public/javascript/json2.js")
+
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+    <style type="text/css">
+    html {padding:0px; margin:0px;}
+    body {padding:0px; margin:0px; position:relative;}
+    
+    /* iframe form styles */
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title .actions {width:auto; float:right;}
+</style>
+
+<script type="text/javascript">
+    (function (uxAdmin) {
+        uxAdmin.FullRecordOptions = (function () {
+            var view = $('#full_record_options');
+            var vm;
+            var fullRecordOptionsVm = function () {
+
+                this.DisplayMARCViewForPatrons = ko.observable();
+                this.DisplayMARCViewForStaff = ko.observable();
+
+                this.DisplaySubjectAccordionForPatrons = ko.observable();
+                this.DisplaySubjectAccordionForStaff = ko.observable();
+
+                this.DisplayAuthorAccordionForPatrons = ko.observable();
+                this.DisplayAuthorAccordionForStaff = ko.observable();
+
+                this.DisplayOnlineContentAccordionForPatrons = ko.observable();
+                this.DisplayOnlineContentAccordionForStaff = ko.observable();
+
+                this.DisplayHoldingsTabForPatrons = ko.observable();
+                this.DisplayHoldingsTabForStaff = ko.observable();
+                this.HoldingsTabLable = ko.observable();
+
+                this.DefaultNumberOfHoldingToDisplay = ko.observable();
+
+                this.savePage = function () {
+                    var data = ko.mapping.toJS(vm);                    
+                    uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveFullRecordOption", data, function (datax) { alert(datax); });
+                };
+            };
+            var init = function () {                
+                vm = new fullRecordOptionsVm();
+                ko.applyBindings(vm, view.get(0));               
+            };
+            var loadData = function () {
+
+                uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/GetFullRecordOption", "", function (data) {
+
+                    vm.DisplayMARCViewForPatrons(data.DisplayMARCViewForPatrons);
+                    vm.DisplayMARCViewForStaff(data.DisplayMARCViewForStaff);
+
+                    vm.DisplaySubjectAccordionForPatrons(data.DisplaySubjectAccordionForPatrons);
+                    vm.DisplaySubjectAccordionForStaff(data.DisplaySubjectAccordionForStaff);
+
+                    vm.DisplayAuthorAccordionForPatrons(data.DisplayAuthorAccordionForPatrons);
+                    vm.DisplayAuthorAccordionForStaff(data.DisplayAuthorAccordionForStaff);
+
+                    vm.DisplayOnlineContentAccordionForPatrons(data.DisplayOnlineContentAccordionForPatrons);
+                    vm.DisplayOnlineContentAccordionForStaff(data.DisplayOnlineContentAccordionForStaff);
+
+                    vm.DisplayHoldingsTabForPatrons(data.DisplayHoldingsTabForPatrons);
+                    vm.DisplayHoldingsTabForStaff(data.DisplayHoldingsTabForStaff);
+                    vm.HoldingsTabLable(data.HoldingsTabLable);
+                    vm.DefaultNumberOfHoldingToDisplay(data.DefaultNumberOfHoldingToDisplay);
+                });
+
+            };
+
+            return {
+                init: init,
+                loadData: loadData
+            };
+        })();
+
+    })(window.uxAdmin = window.uxAdmin || {});
+
+
+    $(function () {
+        uxAdmin.FullRecordOptions.init();
+        uxAdmin.FullRecordOptions.loadData();
+        $("#FullrecordTabs").tabs();
+    });
+</script>
+<style>
+    #FullrecordTabs {
+        border: none;
+        margin: 0 5px;
+    }   
+    .topFullrecordOptionBtnFix {
+        z-index: 1;
+        position: relative;
+        float: right;        
+    }
+    .row {
+        padding: 5px 0 !important;
+    }
+</style>
+<form id="full_record_options" method="post" action="" style="display:block">
+    <br/>
+    <div class="actions">
+            <input type="button" class="button primary topFullrecordOptionBtnFix" value="Save" data-bind="click: $root.savePage"/>            
+    </div>
+    <div id="FullrecordTabs">
+        <ul><li><a href="#FullrecordDisplayOption">Display</a></li></ul>
+        <div id="FullrecordDisplayOption">
+            <div class="content">
+                <div class="fields">
+
+                    <!-- row 1 
+                        <div class="row">
+                            <h4>Display Options:</h4>
+                        </div> -->
+
+                    <!-- row 2 -->
+                    <div class="row">
+                
+                        <p class="cell w-12-4">
+                            <label class="subtitle">Display MARC View for:</label>
+                        </p>
+                        <div class="cell w-12-4">
+                            <ul class="inline-list ">
+                                <li>
+                                    <input name="patrons" type="checkbox" data-bind="checked: DisplayMARCViewForPatrons"/>
+                                    <label for="">Patrons/Guests</label>
+                                </li>
+                                <li>
+                                    <input name="staff" type="checkbox" data-bind="checked: DisplayMARCViewForStaff" />
+                                    <label for="">Staff</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- row 3 -->
+                    <div class="row">
+                
+                        <p class="cell w-12-4">
+                            <label class="subtitle">Display Subject Accordion for:</label>
+                        </p>
+                        <div class="cell w-12-4">
+                            <ul class="inline-list">
+                                <li>
+                                    <input name="patrons" type="checkbox" data-bind="checked: DisplaySubjectAccordionForPatrons"/>
+                                    <label for="">Patrons/Guests</label>
+                                </li>
+                                <li>
+                                    <input name="staff" type="checkbox" data-bind="checked: DisplaySubjectAccordionForStaff" />
+                                    <label for="">Staff</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- row 4 -->
+                    <div class="row">
+                
+                        <p class="cell w-12-4">
+                            <label class="subtitle">Display Author Accordion for:</label>
+                        </p>
+                        <div class="cell w-12-4">
+                            <ul class="inline-list">
+                                <li>
+                                    <input name="patrons" type="checkbox" data-bind="checked: DisplayAuthorAccordionForPatrons"/>
+                                    <label for="">Patrons/Guests</label>
+                                </li>
+                                <li>
+                                    <input name="staff" type="checkbox" data-bind="checked: DisplayAuthorAccordionForStaff" />
+                                    <label for="">Staff</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                
+                        <p class="cell w-12-4">
+                            <label class="subtitle">Display Holdings on Separate Tab:</label>
+                        </p>
+                        <div class="cell w-12-4">
+                            <ul class="inline-list">
+                                <li>
+                                    <input name="patrons" type="checkbox" data-bind="checked: DisplayHoldingsTabForPatrons"/>
+                                    <label for="">Patrons/Guests</label>
+                                </li>
+                                <li>
+                                    <input name="staff" type="checkbox" data-bind="checked: DisplayHoldingsTabForStaff" />
+                                    <label for="">Staff</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                
+                        <p class="cell w-12-4">
+                            <label class="subtitle">Tab Label:</label>
+                        </p>
+                        <div class="cell w-12-2">
+                            <input type="text" data-bind="value:HoldingsTabLable" />
+                  
+                        </div>
+                    </div>
+
+                    <div class="row">
+                
+                        <p class="cell w-12-4">
+                            <label class="subtitle">Default Number of Holdings to Display:</label>
+                        </p>
+                        <div class="cell w-12-4">
+                            <ul class="inline-list">
+                                <li>
+                                    <input name="NumberHolding" type="radio" value="25" data-bind="checked: DefaultNumberOfHoldingToDisplay"/>
+                                    <label for="">First 25 Locations</label>
+                                </li>
+                                <li>
+                                    <input name="NumberHolding" type="radio" value="-1" data-bind="checked: DefaultNumberOfHoldingToDisplay" />
+                                    <label for="">Show All Locations</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

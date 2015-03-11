@@ -1,0 +1,411 @@
+﻿@model Verso.Common.UXAdmin.WidgetCollector
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/ckeditor.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/config.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/colorpicker/colorpicker.js")
+@Html.LocalResourceCss("~/Public/Javascript/libs/colorpicker/colorpicker.css")
+<div class="content edit-options" id="feedbackWidgetFields" >
+   <ul>
+      <li class="fields">
+         <!-- row 1 -->
+         <div class="row">
+            <h4>Feedback Widget</h4>
+         </div>
+         <div class="widgetForm">
+            <!-- row 2 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Widget Size:</label>
+               </p>
+               <p class="cell w-12-1">
+                  Column: <select data-bind="options: WidgetSizeList, optionsText: 'Name' , optionsValue: 'id', value: selectedColumnSize" ></select>
+               </p>
+               <p class="cell w-12-1">
+                  Row: <select data-bind="options: WidgetSizeList, optionsText: 'Name', optionsValue: 'id', value: selectedRowSize"></select>
+               </p>
+            </div>
+            <!-- row 3 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label style="color: red">* Widget Name:</label>
+               </p>
+               <p class="cell w-12-8">
+                  <input type="text" data-bind="value: WidgetTitleName" />
+               </p>
+            </div>
+            <!-- row 4 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Headline:</label>
+               </p>
+               <div class="cell w-12-8">
+                  @*      <input type="text" data-bind="value: WidgetHeadline" />*@
+                  <textarea rows="10" cols="10" id="contentWidget_HLte" data-bind="value: WidgetHeadline"></textarea>
+               </div>
+            </div>
+            <!-- row 6 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Staff Email(s) to Receive Feedback:</label>
+               </p>
+               <p class="cell w-12-8">
+                  <input type="text" data-bind="value: StaffEmailReceiveFeedBack" />
+                  <label class="field-comment">For multiple emails, separate with a comma</label>
+               </p>
+            </div>
+            <!-- row 8 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Reply Option:</label>
+               </p>
+               <p class="cell w-12-8">
+                  <input type="checkbox" data-bind="checked: IncludeReplyOption"  />
+               </p>
+            </div>
+            <!-- row 7 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Email Subject:</label>
+               </p>
+               <p class="cell w-12-8">
+                  <input type="text" data-bind="value: EmailSubject" />
+               </p>
+            </div>
+            <!-- row 9 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Include Option:</label>&nbsp;
+               </p>
+               <p class="cell w-12-8">
+                  <input type="checkbox" data-bind="checked: IncludeReplyOptionName"  />&nbsp;<label>Name</label>&nbsp;
+                  <input type="checkbox" data-bind="checked: IncludeReplyOptionEmail"  />&nbsp;<label>Email</label>&nbsp;
+                  <input type="checkbox" data-bind="checked: IncludeReplyOptionPhone"  />&nbsp;<label>Phone</label>
+               </p>
+            </div>
+            <!-- row 5 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Instructional Text for Feedback Form:</label>
+               </p>
+               <div class="cell w-12-8">
+                  <textarea rows="10" cols="10" id="feedbackWidget_te" data-bind="value: InstructionalFeedback"></textarea>
+               </div>
+            </div>
+            <!-- row 5 -->
+            <div class="row customz">
+               <p class="cell w-12-2">
+                  <label>Apply Background:</label>
+               </p>
+               <div class="cell w-12-8">
+                  <div id="feedbackWidgetPickBg">
+                     <div data-bind="style: { backgroundColor: WidgetBackground }"></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="row customzv fixFooter"  style="float: right">
+            <div class="title full-width" style="border:none;">
+               <div class="actions">
+                  <input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview" />       
+                  <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" /> 
+                  <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                  <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+               </div>
+            </div>      
+         </div>
+      </li>
+      <li id="preview">
+         <div class="row">
+            <h4>Feedback Widget Preview (<span data-bind="text: 'Columns: '+selectedColumnSize() +' X Rows: '+selectedRowSize()"></span>)</h4>
+         </div>
+         <div class="row customz" style="height: 510px;overflow: auto;">
+            <div data-bind="attr:{ 'style': 'width:' + selectedColumnSize()*90 + 'px;height:' + selectedRowSize()*90 + 'px;border:1px solid #ccc;background:' + WidgetBackground() + ';overflow:hidden;margin: 0 auto;' }">
+               <span style="display: block;" data-bind="html: feedbackContentHolder"></span>
+            </div>
+         </div>
+         <div class="row customz fixFooter"  style="float: right">
+            <div class="title full-width" style="border:none;">
+               <div class="actions">
+                  <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />                            
+                  <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                  <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                  <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+               </div>
+            </div>
+         </div>
+      </li>
+   </ul>
+</div>
+
+<script type="text/javascript">
+    var uxAdmin = {};
+    uxAdmin.WidgetManager = (function () {
+        return {};
+    })();
+    
+    uxAdmin.WidgetManager.FeedbackWidget = (function () {
+        var view = $('#feedbackWidgetFields');
+        var fbWvm;
+        var _editor, _html = '', _editor2, _html2 = '';
+        var feedbackWidgetVm = function () {
+            
+            this.WidgetSizeList = [{ Name: 1, id: 1 }, { Name: 2, id: 2 }, { Name: 3, id: 3 }, { Name: 4, id: 4 }, { Name: 5, id: 5 }, { Name: 6, id: 6 }, { Name: 7, id: 7 }, { Name: 8, id: 8 }, { Name: 9, id: 9 }, { Name: 10, id: 10 }, { Name: 11, id: 11 }, { Name: 12, id: 12}];
+            this.WidgetForLocal = ko.observable();
+            this.WidgetForGlobal= ko.observable();
+            
+            this.widgetIdTemp = ko.observable();
+            this.WidgetId = ko.observable();
+            this.WidgetTypeId = ko.observable();
+            this.WidgetType = ko.observable();
+            
+            this.selectedColumnSize = ko.observable();
+            this.selectedRowSize = ko.observable();
+            this.WidgetTitleName = ko.observable();
+            this.WidgetHeadline = ko.observable();
+            this.StaffEmailReceiveFeedBack = ko.observable();
+            this.IncludeReplyOption = ko.observable();
+            this.EmailSubject = ko.observable();
+            this.IncludeReplyOptionName = ko.observable();
+            this.IncludeReplyOptionEmail = ko.observable();
+            this.IncludeReplyOptionPhone = ko.observable();
+            this.InstructionalFeedback = ko.observable();
+            this.WidgetBackground = ko.observable();
+
+            this.feedbackContentHolder = ko.observable();
+            this.saveWidget = function () {
+               reload();
+               saveWidgetInfo(false);
+            };
+            this.saveCloseWidget = function () {
+                reload();
+                saveWidgetInfo(true);
+            };
+            this.cancelWidget = function () {
+               reload();
+               parent.$.fn.colorbox.close();
+            };
+            this.goBack = function(){
+                $('#feedbackWidgetFields > ul').stop().animate({left: "0"}, 500);
+            };
+            function reload(){
+                var iframe = parent.document.getElementById('myIFrame');
+                iframe.src = iframe.src;
+            }
+            this.Preview = function () {
+                var jsonData = new collectWidgetData();
+                //console.log(jsonData);
+                var feedBackcontent = "";
+                var instrctTxt = jsonData.InstructionalFeedback == null ? '' : jsonData.InstructionalFeedback;
+                var requestReply = '', inputName = '', inputEmail = '', inputPhone = '', openStr = '<br /><br />', subjLine = '', toEmail = '';
+
+                if (jsonData.EmailSubject == null || jsonData.EmailSubject == '') {
+                    subjLine = '<input type="hidden" id="fbsj' + jsonData.WidgetId + '" value="Patron Feedback">';
+                } else {
+                    subjLine = '<input type="hidden" id="fbsj' + jsonData.WidgetId + '" value="' + jsonData.EmailSubject + '">';
+                }
+                toEmail = '<input type="hidden" id="fbto' + jsonData.WidgetId + '" value="' + jsonData.StaffEmailReceiveFeedBack + '">';
+
+
+                if (jsonData.IncludeReplyOption != null && jsonData.IncludeReplyOption.toString() == 'true') {
+                    requestReply = openStr + '<input type="checkbox" id="rpcb' + jsonData.WidgetId + '"> Include Reply Email.<br /><br />';
+                    openStr = '';
+                }
+
+                if (jsonData.IncludeReplyOptionName != null && jsonData.IncludeReplyOptionName.toString() == 'true') {
+                    inputName = openStr + ' Name: <input type="text" style="width:97%;" id="innm' + jsonData.WidgetId + '"><br /><br />';
+                    openStr = '';
+                }
+
+                if (jsonData.IncludeReplyOptionEmail != null && jsonData.IncludeReplyOptionEmail.toString() == 'true') {
+                    inputEmail = openStr + ' Email: <input type="text" style="width:97%;" id="inem' + jsonData.WidgetId + '"><br /><br />';
+                    openStr = '';
+                }
+
+                if (jsonData.IncludeReplyOptionPhone != null && jsonData.IncludeReplyOptionPhone.toString() == 'true') {
+                    inputPhone = openStr + ' Phone: <input type="text" style="width:97%;" id="inph' + jsonData.WidgetId + '"><br /><br />';
+                    openStr = '';
+                }
+
+                var feedbackHtml = '<div style="padding-left:10px;color:white">' + jsonData.WidgetHeadline + '<textarea style="width:97%;max-width: 97%; height:150px" id="inta' + jsonData.WidgetId + '"></textarea>' + requestReply + inputName + inputEmail + inputPhone + instrctTxt + toEmail + subjLine + '<br><div style="float:right; padding-right: 10px"><input type="button" value="Send" name="' + jsonData.WidgetId + '" id="btsd' + jsonData.WidgetId + '"> <input type="button" value="Reset" name="' + jsonData.WidgetId + '" id="btrs' + jsonData.WidgetId + '"></div></div>';
+
+                this.feedbackContentHolder(feedbackHtml);
+                $('#feedbackWidgetFields > ul').stop().animate({left: "-1310"}, 500); 
+            };
+        };
+     
+
+        var saveWidgetInfo = function(closePopup) {
+            var data = new collectWidgetData();            
+            if ((typeof data.WidgetTitleName === "undefined") || (data.WidgetTitleName === "")) {
+                        alert("Widget Name is required.");
+                    } else { 
+                     var widgetJsonCollector = function (widgetId,widgetForLocal,widgetForGlobal, jsonData) {
+                var self = this;
+                self.WidgetForLocal = widgetForLocal;
+                self.WidgetForGlobal = widgetForGlobal;
+                self.JsonData = jsonData;
+                self.WidgetId = widgetId;
+            };                        
+            var widgetUrl = "";
+            var myWidgetDataCollection = "";
+            //console.log(data);
+               if (data.widgetIdTemp == 0) {
+                    myWidgetDataCollection = new widgetJsonCollector(data.WidgetId,data.WidgetForLocal,data.WidgetForGlobal, ko.toJSON(data));    
+                    widgetUrl = "/mvc/SystemSettings/WidgetManager/InsertWidget";
+                    $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                                success: function (result) {
+                                                            if (data.WidgetForLocal) { alert(result[0].Message);}
+                                                            if (data.WidgetForGlobal) { alert(result[1].Message);}   
+                                                            fbWvm.widgetIdTemp(result[0].ResultId + "|" + result[1].ResultId);                                                                        
+                                                            if (closePopup) { parent.$.fn.colorbox.close();}                                
+                                                        }
+                        });
+            } else {
+                    
+                var localId;
+                var globalId;
+                var updateWidgetId;
+                widgetUrl ="/mvc/SystemSettings/WidgetManager/UpdateWidget";
+                if (data.widgetIdTemp.toString().indexOf("|") == -1) {
+                    //console.log("1");                
+                    localId = data.widgetIdTemp.toString();
+                    globalId = data.widgetIdTemp.toString();
+                } else {
+                    updateWidgetId = data.widgetIdTemp.split('|');
+                    localId = updateWidgetId[0];
+                    globalId = updateWidgetId[1];
+                }
+                //console.log(data.WidgetForLocal);
+                //console.log(data.WidgetForGlobal);
+                //console.log(data.widgetIdTemp);
+                if (data.WidgetForLocal) {                               
+                        fbWvm.WidgetId(localId);
+                        myWidgetDataCollection = new widgetJsonCollector(localId,true,false, ko.toJSON(data));    
+                        $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                                success: function (result) { alert(result.Message); if (closePopup) { parent.$.fn.colorbox.close();} }
+                        });
+                }
+                if (data.WidgetForGlobal) {                                
+                    fbWvm.WidgetId(globalId);
+                    //myWidgetDataCollection = new widgetJsonCollector(globalId,false,true, ko.toJSON(data));    
+                        $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(new collectWidgetData()), dataType: "json",contentType: "application/json",
+                                success: function (result) { alert(result.Message);if (closePopup) { parent.$.fn.colorbox.close();} }
+                        });
+                }                             
+            }      
+                    }
+        };
+        var collectWidgetData = function () {
+            document.getElementById('feedbackWidget_te').innerHTML = _html = _editor.getData();
+            document.getElementById('contentWidget_HLte').innerHTML = _html2 = _editor2.getData();
+            var fbWidgetData = this;          
+            fbWidgetData.WidgetForLocal = (fbWvm.WidgetForLocal());
+            fbWidgetData.WidgetForGlobal = (fbWvm.WidgetForGlobal());
+            fbWidgetData.widgetIdTemp = (fbWvm.WidgetId());
+            fbWidgetData.WidgetId = (fbWvm.WidgetId());
+            fbWidgetData.WidgetTypeId = (fbWvm.WidgetTypeId());
+            fbWidgetData.WidgetType = (fbWvm.WidgetType());
+            fbWidgetData.selectedColumnSize = (fbWvm.selectedColumnSize());
+            fbWidgetData.selectedRowSize = (fbWvm.selectedRowSize());
+            fbWidgetData.WidgetTitleName = (fbWvm.WidgetTitleName());
+            fbWidgetData.WidgetHeadline = (_html2);    
+            fbWidgetData.StaffEmailReceiveFeedBack = (fbWvm.StaffEmailReceiveFeedBack());
+            fbWidgetData.IncludeReplyOption = (fbWvm.IncludeReplyOption());
+            fbWidgetData.EmailSubject = (fbWvm.EmailSubject());
+            fbWidgetData.IncludeReplyOptionName = (fbWvm.IncludeReplyOptionName());
+            fbWidgetData.IncludeReplyOptionEmail = (fbWvm.IncludeReplyOptionEmail());
+            fbWidgetData.IncludeReplyOptionPhone = (fbWvm.IncludeReplyOptionPhone());
+            fbWidgetData.InstructionalFeedback = (_html);    
+            fbWidgetData.WidgetBackground = (fbWvm.WidgetBackground());        
+        };
+        var createEditor = function () {
+            if (_editor)
+                return;
+
+            // Create a new editor by replacing textarea with id = contentWidget_te, setting its value to html
+            var config = { language: 'en', toolbar: 'FullStraight', height: '60px' };
+            var config2 = { language: 'en', toolbar: 'FullStraight', height: '80px' };
+
+            _editor = CKEDITOR.replace('feedbackWidget_te', config2, _html);
+            _editor2 = CKEDITOR.replace('contentWidget_HLte', config, _html2);
+        };
+        var removeEditor = function () {
+            if (!_editor)
+                return;
+
+            // Destroy the editor.
+            _editor.destroy();
+            _editor = null;
+
+            _editor2.destroy();
+            _editor2 = null;
+
+        };
+       
+        var loadData = function(widgetInfo) {
+            var widgetData =   $.parseJSON(widgetInfo.JsonData);
+            fbWvm.WidgetForLocal(widgetInfo.WidgetForLocal);
+            fbWvm.WidgetForGlobal(widgetInfo.WidgetForGlobal);
+            fbWvm.widgetIdTemp(widgetInfo.WidgetId);
+            fbWvm.WidgetId(widgetInfo.WidgetId);
+            fbWvm.WidgetTypeId(widgetData.WidgetTypeId);
+            fbWvm.WidgetType(widgetData.WidgetType);
+     
+           
+            if (widgetInfo.WidgetId != 0) {
+                fbWvm.selectedColumnSize(widgetData.selectedColumnSize);
+                fbWvm.selectedRowSize(widgetData.selectedRowSize);
+                fbWvm.WidgetTitleName(widgetData.WidgetTitleName);
+                fbWvm.WidgetHeadline(widgetData.WidgetHeadline);
+                fbWvm.StaffEmailReceiveFeedBack(widgetData.StaffEmailReceiveFeedBack);
+                fbWvm.IncludeReplyOption(widgetData.IncludeReplyOption);
+                fbWvm.EmailSubject(widgetData.EmailSubject);
+                fbWvm.IncludeReplyOptionName(widgetData.IncludeReplyOptionName);
+                fbWvm.IncludeReplyOptionEmail(widgetData.IncludeReplyOptionEmail);
+                fbWvm.IncludeReplyOptionPhone(widgetData.IncludeReplyOptionPhone);
+                fbWvm.InstructionalFeedback(widgetData.InstructionalFeedback);
+                fbWvm.WidgetBackground(widgetData.WidgetBackground);            
+            }
+
+            //console.log(fbWvm);
+            removeEditor();
+            createEditor();
+        };
+        var init = function () {
+              $('#feedbackWidgetPickBg').ColorPicker({ color: '#0000ff',
+                onShow: function (colpkr) {
+                    $(colpkr).fadeIn(500);
+                    return false;
+                },
+                onHide: function (colpkr) {
+                    $(colpkr).fadeOut(500);
+                    return false;
+                },
+                onChange: function (hsb, hex, rgb) {
+                    $('#feedbackWidgetPickBg div').css('backgroundColor', '#' + hex);
+                    fbWvm.WidgetBackground('#' + hex);
+                }
+            });
+                    
+            var widgetInfo = @Html.Raw(Json.Encode(Model));
+            fbWvm = new feedbackWidgetVm();
+            loadData(widgetInfo);            
+            ko.applyBindings(fbWvm, view.get(0));
+            
+
+        };
+
+        return {
+            Init: init//,
+            //loadData: loadData,
+            //CollectWidgetData: collectWidgetData,
+            //Preview: preview
+        };
+    })();
+
+    uxAdmin.WidgetManager.FeedbackWidget.Init();
+    $(function() { $('body').css('overflow', 'hidden'); });
+</script>

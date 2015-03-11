@@ -1,0 +1,97 @@
+﻿<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Styles/style.css")" />
+<style type="text/css">
+    * { margin:0; padding:0 }    
+    /* iframe form styles */
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title .actions {width:auto; float:right;}
+    .fields .cell > span.cke, 
+    .cke_browser_ie.cke_browser_quirks {display:block;}
+    .cke_browser_iequirks.cke_browser_ie .cke_top,
+    .cke_browser_iequirks.cke_browser_ie .cke_bottom,
+    .cke_browser_ie.cke_browser_quirks .cke_top,
+    .cke_browser_ie.cke_browser_quirks .cke_bottom {width:auto;} 
+</style>
+<script type="text/javascript">
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+    //console.log('Loading Page. (CW) You are in ' + (document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks') + ' mode.');
+</script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>    
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>    
+
+<form id="WidgetManagerForm" method="post" action="" style="display:block;width: 993px">
+    <div class="title full-width">
+        <h3>Widget Manager</h3>
+        <div class="actions">
+            <a href="javascript:window.history.back(-1);" id="backToWidgetList" style="text-decoration: underline;color: blue">Back to Widget List </a>                
+        </div>
+    </div>
+    <div class="content">
+        <div class="fields">
+            <div class="row">
+                <p class="cell w-12-2"><label>Select Widget Type: </label></p>
+                <p class="cell w-12-4">
+                    <input type="radio" name="widgetGlobalLocal" value="Local" data-bind="checked: WidgetForGlobalLocal" /> Local<br/>
+                    <span data-bind="visible: $root.IsCustomerSuperUser"><input type="radio" name="widgetGlobalLocal" value="Global" data-bind="checked: WidgetForGlobalLocal"/> Global </span>
+                </p>
+            </div>
+            <!-- row 1 -->
+            <div class="row">
+                <p class="cell w-12-2"> <label>Select Widget To Edit:</label> </p>
+                <p class="cell w-12-4">
+                    <select data-bind="options: WidgetTypesList, optionsText: 'Name', value: selectedType, optionsCaption: 'Select...', event:{ change: widgetTypeSelected }"></select>
+                </p>
+            </div>       
+        </div>
+    </div>  
+</form>
+<script type="text/javascript">
+    uxAdmin.WidgetManager = (function () {
+        // vars
+        var view = $('#WidgetManagerForm');
+        var vm;
+        // methods
+        var widgetManagerWidgetVm = function () {
+            var self = this;
+            self.WidgetTypesList = ko.observableArray([]);
+            self.WidgetGlobalTypesList = ko.observableArray([]);
+            self.WidgetLoccalTypesList = ko.observableArray([]);
+            self.selectedType = ko.observable();
+            self.WidgetForLocal = ko.observable(true);
+            self.WidgetForGlobal = ko.observable();
+            self.WidgetForGlobalLocal = ko.observable("Local");
+            self.IsCustomerSuperUser = ko.observable();
+            self.widgetTypeSelected = function () {
+                if (self.selectedType()) {
+                    window.parent.CreateManageIframeUrl("Widget", self.selectedType().Index, self.selectedType().Key, self.WidgetForGlobalLocal() == "Global", self.WidgetForGlobalLocal() == "Local");
+                } else {
+                    alert("Please select widget type.");
+                }
+            };
+            self.WidgetForGlobalLocal.subscribe(function (newValue) { if (newValue == "Local") { self.WidgetTypesList(self.WidgetLoccalTypesList()); } else { self.WidgetTypesList(self.WidgetGlobalTypesList()); } });
+        };
+        var init = function () {
+            vm = new widgetManagerWidgetVm();
+            uxAdmin.utilities.ajaxGetJson('WidgetManager/GetWidgetTypeList/', null, function (data) {
+                var dta = ko.toJS(data);
+                //console.log(dta);
+                vm.WidgetTypesList(dta.WidgetTypesList);
+                vm.WidgetLoccalTypesList(dta.WidgetTypesList);
+                ko.utils.arrayForEach(vm.WidgetTypesList(), function (typ) {
+                    if (typ.Key !== "ShowcaseWidget") {
+                        vm.WidgetGlobalTypesList.push(typ);
+                    }
+                });
+                //console.log(vm);
+                vm.IsCustomerSuperUser(Boolean(dta.IsCusSuperUser));
+            });
+            ko.applyBindings(vm, view.get(0));
+        };
+        return { Init: init };
+    })();
+    uxAdmin.WidgetManager.Init();
+</script>
+

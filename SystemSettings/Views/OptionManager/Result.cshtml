@@ -1,0 +1,460 @@
+﻿<script type="text/javascript">
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+</script>
+
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+
+@Html.LocalResourceJavascripts("~/public/javascript/overrides.js", "~/public/javascript/json2.js")
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-sortable.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Styles/jquery.sortable.style.css")" />
+<style type="text/css">
+    html {padding:0; margin:0;}
+    body {padding:0; margin:0; position:relative;}
+    
+    /* iframe form styles */
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:20px;  margin:4px 0 0; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title h3 a {padding:6px 10px;float: left; background:#f1f1f1; color:#333; cursor:pointer;}
+    body > form .title h3 a:hover {text-decoration:none;}
+    body > form .title h3 a.active{position: relative;bottom: -1px;background: #FFF;}
+    body > form .title .actions {width:auto; float:right;}
+</style>
+
+<script type="text/javascript">
+    ko.bindingHandlers.sortableList = {
+        init: function (element, valueAccessor) {
+            var list = valueAccessor();
+            $(element).sortable({
+                update: function (event, ui) {
+                    //retrieve our actual data item
+                    var item = ui.item.tmplItem().data;
+                    //figure out its new position
+                    var position = ko.utils.arrayIndexOf(ui.item.parent().children(), ui.item[0]);
+                    //remove the item and add it back in the right spot
+                    if (position >= 0) {
+                        list.remove(item);
+                        list.splice(position, 0, item);
+                    }
+
+                }
+            });
+        },
+        update: function (element, valueAccessor) {
+            var list = valueAccessor();
+            $(element).sortable({
+                update: function (event, ui) {
+                    //retrieve our actual data item
+                    var item = ui.item.tmplItem().data;
+                    //figure out its new position
+                    var position = ko.utils.arrayIndexOf(ui.item.parent().children(), ui.item[0]);
+                    //remove the item and add it back in the right spot
+                    if (position >= 0) {
+                        list.remove(item);
+                        list.splice(position, 0, item);
+                    }
+
+                }
+            });
+        }
+    };
+
+    (function (uxAdmin) {
+        uxAdmin.FullRecordOptions = (function () {
+            var view = $('#results_options');
+            var vm;
+            var resultsOptionsVm = function() {
+                var self = this;
+
+                self.ResultViewOptions = ko.observableArray([{ OptionText: "Gallery", OptionValue: "0" }, { OptionText: "List", OptionValue: "1" }, { OptionText: "Grid", OptionValue: "2" }]);
+                self.ResultTypeOptions = [{ OptionText: "None", OptionValue: 0 }, { OptionText: "Clustered(Auth/Title)", OptionValue: 1 }, { OptionText: "Merged(Auth/Title/Pub/Date)", OptionValue: 2 }];
+                self.ClusterSortByOptions = [{ OptionText: "Relevance", OptionValue: "0" }, { OptionText: "Title Ascending", OptionValue: "1" }, { OptionText: "Title Descending", OptionValue: "2" }, { OptionText: "Author Ascending", OptionValue: "3" }, { OptionText: "Author Descending", OptionValue: "4" }];
+                self.SortByOptions = [{ OptionText: "Relevance", OptionValue: "0" }, { OptionText: "Title Ascending", OptionValue: "1" }, { OptionText: "Title Descending", OptionValue: "2" }, { OptionText: "Author Ascending", OptionValue: "3" }, { OptionText: "Author Descending", OptionValue: "4" }, { OptionText: "Date Ascending", OptionValue: "5" }, { OptionText: "Date Descending", OptionValue: "6" }];
+                self.YesNoOptions = [{ OptionText: "Yes", OptionValue: true }, { OptionText: "No", OptionValue: false }];
+                self.NumberPerPageOptions = [{ OptionText: "10", OptionValue: "10" }, { OptionText: "20", OptionValue: "20" }, { OptionText: "30", OptionValue: "30" }, { OptionText: "40", OptionValue: "40" }, { OptionText: "50", OptionValue: "50" }];
+                self.ClusterSquenceOptions = ko.observableArray([]);
+                self.EnableGallery = ko.observable();
+                self.HasCluster = ko.observable();
+
+                self.filterPatronSortOption = function() {
+                    if (self.DefaultResultTypeForPatronsGuests() == "1") {
+                        return self.ClusterSortByOptions;
+                    } else {
+                        return self.SortByOptions;
+                    }
+                };
+                self.filterStaffSortOption = function() {
+                    if (self.DefaultResultTypeForStaff() == "1") {
+                        return self.ClusterSortByOptions;
+                    } else {
+                        return self.SortByOptions;
+                    }
+                };
+                // Result option
+                self.DefaultResultViewForPatronsGuests = ko.observable();
+                self.DefaultResultViewForStaff = ko.observable();
+
+                self.DisplayPrintOptionForPatronsGuests = ko.observable();
+                self.DisplayPrintOptionForStaff = ko.observable();
+
+                self.DisplayJacketArtOnListViewPatronGuests = ko.observable();
+                self.DisplayJacketArtOnListViewStaff = ko.observable();
+                self.DisplayJacketArtOnGridViewPatronGuests = ko.observable();
+                self.DisplayJacketArtOnGridViewStaff = ko.observable();
+
+                self.DisplayGridJacketOptionForPatronsGuests = ko.observable();
+                self.DisplayGridJacketOptionForStaff = ko.observable();
+
+                self.DefaultResultTypeForPatronsGuests = ko.observable();
+                self.DefaultResultTypeForStaff = ko.observable();
+
+                self.DefaultResultSortForPatronsGuests = ko.observable();
+                self.DefaultResultSortForStaff = ko.observable();
+
+                self.DefaultResultTypeClusteredSequence = ko.observable();
+
+                self.DisplayPrintOptionNumItemScreen = ko.observable();
+
+                self.DisplayRssFeedForPatronsGuests = ko.observable();
+                self.DisplayRssFeedForStaff = ko.observable();
+                //Spellchecker
+                self.DisplaySpellcheckerForPatronsGuests = ko.observable();
+                self.DisplaySpellcheckerForStaff = ko.observable();
+                //******end Spellchecker******
+                //self.DefaultClusteredResultSortForPatronsGuests = ko.observable();
+                // self.DefaultClusteredResultSortForStaff = ko.observable();
+
+
+                self.StaffDetails = ko.observableArray();
+                self.GuestPatronDetails = ko.observableArray();
+                self.savePage = function() {
+                    self.sortFacets(vm.StaffDetails());
+                    self.sortFacets(vm.GuestPatronDetails());
+                    var data = ko.mapping.toJS(vm);
+                    console.log(data);
+                    uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveResultOption", data, function(datax) { alert(datax); });
+                };
+                self.sortFacets = function (list) {
+
+                    var idx = 0;
+                    ko.utils.arrayForEach(list, function (item) {
+                        item.Ordinal = idx++;
+                    });
+
+                };
+            };
+            var init = function () {
+                //console.log("Full Record Option Initialized!");
+                vm = new resultsOptionsVm();
+                ko.applyBindings(vm, view.get(0));
+                //initFormButtonsBindings();
+            };
+            var loadData = function () {
+//                uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/GetFacetMapOption", "", function (data) {
+//                    console.log(data);
+//                    vm.StaffDetails(data.StaffDetails);
+//                    vm.GuestPatronDetails(data.GuestPatronDetails);
+//                });
+                uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/GetResultOption", "", function (result) {
+                    vm.StaffDetails(result.facetMap.StaffDetails);
+                    vm.GuestPatronDetails(result.facetMap.GuestPatronDetails);
+                    
+                    vm.EnableGallery(result.optionResult.EnableGallery);                    
+                    vm.HasCluster(result.optionResult.HasCluster);
+                    if (!result.optionResult.EnableGallery) { vm.ResultViewOptions.remove(vm.ResultViewOptions()[0]); }
+                    
+                    // Results Options
+                    vm.DefaultResultViewForPatronsGuests(result.optionResult.DefaultResultViewForPatronsGuests);
+                    vm.DefaultResultViewForStaff(result.optionResult.DefaultResultViewForStaff);
+
+                    vm.DefaultResultSortForPatronsGuests(result.optionResult.DefaultResultSortForPatronsGuests);
+                    vm.DefaultResultSortForStaff(result.optionResult.DefaultResultSortForStaff);
+
+                    vm.DisplayJacketArtOnListViewPatronGuests(result.optionResult.DisplayJacketArtOnListViewPatronGuests);
+                    vm.DisplayJacketArtOnListViewStaff(result.optionResult.DisplayJacketArtOnListViewStaff);
+                    vm.DisplayJacketArtOnGridViewPatronGuests(result.optionResult.DisplayJacketArtOnGridViewPatronGuests);
+                    vm.DisplayJacketArtOnGridViewStaff(result.optionResult.DisplayJacketArtOnGridViewStaff);
+
+                    vm.DisplayPrintOptionForPatronsGuests(result.optionResult.DisplayPrintOptionForPatronsGuests);
+                    vm.DisplayPrintOptionForStaff(result.optionResult.DisplayPrintOptionForStaff);
+                    // OT 3951 Spellchecker On/Off
+                    vm.DisplaySpellcheckerForPatronsGuests(result.optionResult.DisplaySpellcheckerForPatronsGuests);
+                    vm.DisplaySpellcheckerForStaff(result.optionResult.DisplaySpellcheckerForStaff);
+
+                    vm.DisplayGridJacketOptionForPatronsGuests(result.optionResult.DisplayGridJacketOptionForPatronsGuests);
+                    vm.DisplayGridJacketOptionForStaff(result.optionResult.DisplayGridJacketOptionForStaff);
+
+                    vm.DisplayPrintOptionNumItemScreen(result.optionResult.DisplayPrintOptionNumItemScreen);
+
+
+                    // Clustered Option
+                    vm.DefaultResultTypeForPatronsGuests(result.optionResult.DefaultResultTypeForPatronsGuests);
+                    vm.DefaultResultTypeForStaff(result.optionResult.DefaultResultTypeForStaff);
+
+                    //  vm.DefaultClusteredResultSortForPatronsGuests(data.DefaultClusteredResultSortForPatronsGuests);
+                    //  vm.DefaultClusteredResultSortForStaff(data.DefaultClusteredResultSortForStaff);
+
+                    vm.ClusterSquenceOptions(result.optionResult.ClusterSquenceOptions);
+                    vm.DefaultResultTypeClusteredSequence(result.optionResult.DefaultResultTypeClusteredSequence);
+
+                    vm.DisplayRssFeedForPatronsGuests(result.optionResult.DisplayRssFeedForPatronsGuests);
+                    vm.DisplayRssFeedForStaff(result.optionResult.DisplayRssFeedForStaff);
+                });
+
+            };
+
+//            var initFormButtonsBindings = function () {
+//                $("#results_options").find("input[type=button][value='Save']").bind("click", savePage);
+//                $("#results_options").find("input[type=button][value='Help']").bind("click", help);
+//            };
+//            var savePage = function () {
+//                sortFacets(vm.StaffDetails());
+//                sortFacets(vm.GuestPatronDetails());
+//                var data = ko.mapping.toJS(vm);
+//                console.log(data);
+//                uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveResultOption", data, function (datax) { alert(datax); });
+//            };
+//            var help = function () {
+//                alert("Help");
+//            };
+            return {
+                init: init,
+                loadData: loadData
+            };
+        })();
+
+    })(window.uxAdmin = window.uxAdmin || {});
+
+
+    $(function () {
+        uxAdmin.FullRecordOptions.init();
+        uxAdmin.FullRecordOptions.loadData();
+//        $('#contentResults, #contentFacetManagement').hide(); $('#contentResults').show();
+//        $('.title h3').click(function () {
+//            $('.title h3 a').removeClass("active"); $(this).find('a').addClass("active");
+//            $('#contentResults, #contentFacetManagement').hide(); var indexer = $(this).index();
+//            if (indexer == 0) { $('#contentResults').fadeIn(); }
+//            else { $('#contentFacetManagement').fadeIn(); }
+//        });
+        $("#contentFacetManagement > ul").mousemove(function (e) { $('.drag').offset({ left: e.pageX, top: e.pageY - 25 }); });
+        $("#contentFacetManagement > ul").mouseenter(function () { $('.drag').stop(true, true).fadeIn(); }).mouseleave(function () { $('.drag').stop(true, true).fadeOut(); });
+        $("#ResultsTabs").tabs();
+    });
+</script>
+<style>
+    #ResultsTabs {
+        border: none;
+        margin: 0 5px;
+    }   
+    .topResultOptionBtnFix {
+        z-index: 1;
+        position: relative;
+        float: right;        
+    }
+    .row {
+        padding: 5px 0 !important;
+    }
+</style>
+<form id="results_options" method="post" action="" style="display:block">
+    <br/>
+    <div class="actions">
+        <input type="button" class="button primary topResultOptionBtnFix" value="Save" data-bind="click: $root.savePage"/>            
+    </div>
+    <div id="ResultsTabs">
+        <ul>
+            <li><a href="#ResultsOption">Results</a></li>
+            <li><a href="#FacetManagement">Facet Management</a></li>
+        </ul>
+        <div id="ResultsOption">
+            <div class="content" id="contentResults">
+                <div class="fields">
+                    @*
+            <div class="row">
+                <p class="cell w-12-5">
+                    
+                </p>
+                <p class="cell w-12-5" style="text-align: center">
+                    <font size="3"><b>Clustered Options</b></font>
+                </p>
+            </div>*@
+
+                    <!-- row 1 -->
+                    <div class="row">
+                        <p class="cell w-12-3"><span class="subtitle">Default Results View:</span></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"><span class="subtitle">Default Results Grouping:</span></p>
+                        <p class="cell w-12-3 custmW"><span class="warning">Changes to the Results Grouping Option will not take effect until the next time you log in</span></p>
+                    </div>
+            
+                    <!-- row 2 -->
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: ResultViewOptions  , optionsText: 'OptionText', optionsValue: 'OptionValue', value: DefaultResultViewForPatronsGuests"></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: ResultTypeOptions , optionsText: 'OptionText', optionsValue: 'OptionValue', value: DefaultResultTypeForPatronsGuests"></select></p>
+                    </div> 
+
+                    <!-- row 3 -->
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Staff:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: ResultViewOptions  , optionsText: 'OptionText', optionsValue: 'OptionValue', value: DefaultResultViewForStaff"></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"><span>Staff:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: ResultTypeOptions , optionsText: 'OptionText', optionsValue: 'OptionValue', value: DefaultResultTypeForStaff"></select></p>
+                    </div> 
+
+                    <!-- row 4 -->
+                    <div class="row">
+                        <p class="cell w-12-3"><span class="subtitle">Display PRINT Option:</span></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"><span class="subtitle">Default Results Sort:</span></p>
+                        <p class="cell w-12-3"></p>
+                    </div>            
+                    <!-- row 5 --> 
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayPrintOptionForPatronsGuests "></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"> <select data-bind="options: $root.filterPatronSortOption() , optionsText: 'OptionText', optionsValue: 'OptionValue', value: DefaultResultSortForPatronsGuests"></select></p>
+                    </div> 
+                    <!-- row 6 -->
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Staff:</span></p>
+                        <p class="cell w-12-3"> <select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayPrintOptionForStaff "></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"><span>Staff</span></p>
+                        <p class="cell w-12-3">  <select data-bind="options: $root.filterStaffSortOption() , optionsText: 'OptionText', optionsValue: 'OptionValue', value: DefaultResultSortForStaff"></select></p>
+                    </div> 
+             
+             
+                    <div class="row">
+                        <p class="cell w-12-3"><span class="subtitle">Display Jacket Art on List View:</span></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"><span class="subtitle">Format Sequence:</span></p>
+                        <p class="cell w-12-3"></p>
+                    </div>         
+             
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue' , value: DisplayJacketArtOnListViewPatronGuests"></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"></p>
+                        <p class="cell w-12-3"><select data-bind="options: ClusterSquenceOptions, optionsText: 'ClusterSquenceName', optionsValue: 'ClusterSquenceId', value: DefaultResultTypeClusteredSequence"></select></p>
+                    </div> 
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Staff:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayJacketArtOnListViewStaff"></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"></p>
+                        <p class="cell w-12-3"></p>
+                    </div> 
+             
+             
+             
+                    <div class="row">
+                        <p class="cell w-12-3"><span class="subtitle">Display Jacket Art on Grid View:</span></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"><span class="subtitle">Records Per Page:</span></p>
+                        <p class="cell w-12-3"></p>
+                    </div>         
+             
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayJacketArtOnGridViewPatronGuests"></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"></p>
+                        <p class="cell w-12-3"> <select data-bind="options: NumberPerPageOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayPrintOptionNumItemScreen"></select></p>
+                    </div> 
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Staff:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayJacketArtOnGridViewStaff"></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r"></p>
+                        <p class="cell w-12-3"></p>
+                    </div> 
+
+             
+
+                    <!-- row 7 -->
+                    <div class="row">
+                        <p class="cell w-12-4"><span class="subtitle">Allow User to Toggle Grid CoverFlow Off:</span></p>
+                        <p class="cell w-12-2"></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"><span class="subtitle">Display RSS Feed:</span></p>
+                        <p class="cell w-12-3"></p>
+                    </div>
+                    <!-- row 8 -->
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayGridJacketOptionForPatronsGuests "></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r">Patrons/Guests:</p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayRssFeedForPatronsGuests "></select></p>
+                        <p class="cell w-12-3"></p>
+                    </div> 
+                    <!-- row 9 -->
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Staff:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayGridJacketOptionForStaff "></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3 align-r">Staff:</p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplayRssFeedForStaff "></select></p>
+                    </div> 
+
+
+                    <!-- row 10 -->
+                    <div class="row">
+                        <p class="cell w-12-4"><span class="subtitle">Display "Do You Mean" feature:</span></p>
+                        <p class="cell w-12-2"></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-3"></p>
+                    </div>
+                    <!-- row 11 -->
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Patrons/Guests:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplaySpellcheckerForPatronsGuests "></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-3"></p>
+                    </div> 
+                    <!-- row 12 -->
+                    <div class="row">
+                        <p class="cell w-12-3 align-r"><span>Staff:</span></p>
+                        <p class="cell w-12-3"><select data-bind="options: YesNoOptions, optionsText: 'OptionText', optionsValue: 'OptionValue', value: DisplaySpellcheckerForStaff "></select></p>
+                        <p class="cell w-12-1"></p>
+                        <p class="cell w-12-3"></p>
+                        <p class="cell w-12-3"></p>
+                    </div> 
+           
+                </div>
+            </div>
+        </div>
+        <div id="FacetManagement">
+            <div class="content" id="contentFacetManagement">
+                <h3>Patrons/ Guests</h3><h3>Staff:</h3>
+                <ul data-bind="sortable: {data: GuestPatronDetails, connectClass: true }">
+                    <li><input type="checkbox" data-bind="checked: $data.Display" /><span data-bind="text: $data.Descr"></span> : <input maxlength="64" type="text" data-bind="value: $data.MappedDescr" /></li>
+                </ul>
+                <ul data-bind="sortable: {data: StaffDetails, connectClass: true }">
+                    <li><input type="checkbox" data-bind="checked: $data.Display" /><span data-bind="text: $data.Descr"></span> : <input maxlength="64" type="text" data-bind="value: $data.MappedDescr" /></li>
+                </ul>
+                <div class="drag">Drag to rearrange facet panels</div>
+            </div>
+
+        </div>
+    </div>
+</form>

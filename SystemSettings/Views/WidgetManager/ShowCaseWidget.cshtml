@@ -1,0 +1,1328 @@
+﻿@model Verso.Common.UXAdmin.WidgetCollector
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/jquery.liquidcarousel.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/jQuery-ui-tab-utils.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/ckeditor.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/config.js")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+<style type="text/css">
+    * { margin: 0; padding: 0; }
+    .clear:before,.clear:after { content: " "; display: table; }
+    .clear:after { clear: both }
+    .clear { *zoom: 1 }
+
+/*  MAIN
+----------------------------*/
+
+    body { font: normal 12px/1.3 arial, sans-serif; /*    background-color: #eee;*/ }
+    li { list-style: none }
+    a { text-decoration: none }    
+</style>
+<div class="content edit-options" id="TopicSearchWidgetFields">
+   <ul>
+      <li class="fields">
+         <!-- row 1 -->
+         <div class="row">
+            <h4 style="margin:0;">Showcase Widget</h4>
+         </div>
+         <div class="row">
+            <p class="cell w-12-2">
+               <label>Widget Size:</label>
+            </p>
+            <p class="cell w-12-1">Column:
+               <select data-bind="options: widgetSizeStyleOption, optionsText: 'Name' , optionsValue: 'id', value: selectedColumnSize"></select>
+            </p>
+             <p class="cell w-12-1">Row:
+                 <select data-bind="options: WidgetSizeList, optionsText: 'Name', optionsValue: 'id', value: selectedRowSize, enable:false"></select>
+             </p>
+             <p class="cell w-12-2"></p>
+             <p class="cell w-12-6"><br/>
+                <input type="checkbox" data-bind="checked: $root.EnableAutoScroll" /> Scroll every <input type="text" style="width: 100px !important; display: inline;" data-bind="value: $root.ScrollNumbSecond"/> Seconds.
+             </p>
+         </div>
+         <!-- row 2 -->
+         <div class="row customz">
+            <p class="cell w-12-2">
+               <label>Widget Name:</label>
+            </p>
+            <p class="cell w-12-8">
+               <input type="text" id="WidgtNmtxtBx" autofocus="autofocus" data-bind="value: WidgetTitleName,css: {'required': !$root.hasWidgetTitleName()}" />
+            </p>
+         </div>
+         <!-- row 3 -->
+         <div class="row customz">
+            <p class="cell w-12-2">
+               <label>Headline:</label>
+            </p>
+            <div class="cell w-12-8">
+               <textarea rows="10" cols="10" id="contentWidget_HLte" data-bind="value: WidgetHeadline"></textarea>
+            </div>
+         </div>
+         <!-- row 4 -->
+         <div class="row customz" style="padding: 0;height: 23px;">
+            <p class="cell w-12-2">
+               <label>Showcase Type:</label>
+            </p>
+             <div class="cell w-12-4" style="line-height: 24px;">
+                 <select data-bind="options:$root.WidgetShowcaseType, optionsText:'name', optionsValue:'value', value: $root.selectedShowcaseType, event:{ change: $root.ChangeTempShowcaseItems() } "></select>                             
+             </div>
+            
+         </div>
+         <!-- row 5 -->
+         <div class="row customz" style="padding: 0;height: 23px;">
+            <p class="cell w-12-2">
+               <label>Showcase Display Type:</label>
+            </p>
+             <div class="cell w-12-4" style="line-height: 24px;">
+                 <select data-bind="options:$root.WidgetShowcaseDisplayType, optionsText:'name', optionsValue:'value', value: $root.selectedShowcaseDisplayType , event:{ change: $root.UpdateShowCaseDisplayType}"></select>                             
+             </div>            
+         </div>
+         <div class="row customz">
+            <p class="cell w-12-2">
+               <label>Find New Items:</label>
+            </p>
+            <div class="cell w-12-8">
+               <div id="ShowcaseTabs" style="width: 99.95%; float: left;min-height: 298px;">
+                  <ul style="margin: -3px -1px;float: left;width:100px;position: absolute;top:31px;left: -104px;z-index: 0;overflow: hidden;border: none;">
+                     <li><a href="#tabs-1">Search Query</a>
+                     </li>
+                     <li><a href="#tabs-2">Search Result</a>
+                     </li>
+                  </ul>
+                  <div class="mastToHide">
+                     <div id="tabs-1">
+                        <div id="SearchQueryTabs" style="border: none;">
+                           <ul>
+                              <li><a href="#SearchQueryTab-1">Search Terms</a></li>
+                              <li data-bind="visible: $root.MaterialTypes().length >0" ><a href="#SearchQueryTab-4">Material Type</a></li>
+                              <li><a href="#SearchQueryTab-2">Formats</a></li>
+                              <li><a href="#SearchQueryTab-3">Resources</a></li>
+                              
+                           </ul>
+                            <div id="SearchQueryTab-1">
+                                <div>
+                                    <div class="row">
+                                        <div class="cell w-12-10"><h3>Enter your search terms</h3></div>
+                                    </div>                                      
+                                    <div data-bind="foreach: $root.searchTerms">
+                                        <div class="row">
+                                            <div class="cell w-12-8"><input type="text" style="width: 510px !important" placeholder="Enter your search terms" data-bind="css: {'required': $root.searchByDateItemStatus}, value: $data.phrase" /></div>                                    
+                                            <div class="cell w-12-2" style="text-align: center"><select data-bind="options: $root.searchPhraseType, optionsText: 'name', optionsValue:'value', value: $data.option"></select></div>
+                                            <div class="cell w-12-2" style="text-align: center">in</div>
+                                            <div class="cell w-12-2" style="text-align: center"><select data-bind="options: $root.SearchIndexList, optionsText:'Name', optionsValue:'Value',value: $data.index"></select></div>
+                                            <div class="cell w-12-2" style="text-align: right"><select data-bind="visible:$index() < 2, options:$root.searchOperators, value: $data.operator"></select></div>
+                                        </div>                                                
+                                    </div>
+                                
+                                    <div class="row">
+                                        <div class="cell w-12-3"><label>Sort Order: </label></div>                                    
+                                        <div class="cell w-12-4" style="text-align: center"><select data-bind="options: $root.sortOrderOptions, optionsText:'name', optionsValue:'value', value: $root.selectedSortOrder " style="width:217px !important"></select></div>
+                                    
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="cell w-12-3" ><label data-bind="visible: $root.libraryLicenseType() == 1 ">Search by Date Items Added: </label></div>                                    
+                                        <div class="cell w-12-4" style="text-align: center"><select data-bind="visible: $root.libraryLicenseType() == 1 ,options: $root.showcaseSearchDateItemsAdd, optionsText:'name', optionsValue:'value', value: $root.selectedSearchDateItemsAdd"style="width:217px !important"></select></div>
+                                    
+                                    </div>
+                                    <div class="row">
+                                        <div class="cell w-12-3"><label data-bind="visible: $root.libraryLicenseType() == 1 ">Scope By:  </label></div>                                    
+                                        <div class="cell w-12-4" style="text-align: center"><select data-bind="visible: $root.libraryLicenseType() == 1  ,options: $root.showcaseScopeByList, optionsText:'Name', optionsValue:'LocationID', value: $root.selectedScopeBy"style="width:217px !important"></select></div>
+                                        <div class="cell w-12-2" style="text-align: center"></div>
+                                        <div class="cell w-12-2" style="text-align: center"></div>
+                                        <div class="cell w-12-2" style="text-align: center"></div>
+                                        <div class="cell w-12-2" style="text-align: center"></div>
+                                        <div class="cell eighty-percent-width" style="text-align: right"><button class="button primary" data-bind="visible: $root.selectedShowcaseType() == 1, click: $root.ShowcaseResultSet">Search</button></div>
+                                    </div>
+
+                                
+                                </div>                              
+                            </div>
+                           <div id="SearchQueryTab-2">
+                              <div class="cell w-12-12" style="overflow: auto;height:280px">
+                                 <br/>
+                                 <div class="option-body " >
+                                    <div class="item-list-wrapper  " style="width: 1140px">
+                                       <ul class="item-list" data-bind="foreach: $root.FormatsGroupList " >
+                                          <li>
+                                              <h5>
+                                                  <input type="checkbox" data-bind="attr: { value:GroupName }, checked:$root.selectedFormatsGroups, click:$root.onCheckFormatFilterHead" />                                        
+                                                  <label data-bind="text: $data.GroupName"></label>
+                                              </h5>
+                                             <ul class="list" data-bind="foreach: $data.QualifierList">
+                                                 <li style="width: 300px">
+                                                     <input type="checkbox" data-bind="attr:{value:QualifierKey}, checked:$root.selectedFormatCodes, click:$root.onFormatCodeChange" />
+                                                     <span data-bind="text:QualifierName"></span>
+                                                 </li>
+                                             </ul>
+                                          </li>
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                           <div id="SearchQueryTab-3">
+                              <div class="cell w-12-12" style="overflow: auto;height: 280px">
+                                 <br/>
+                                 <div class="option-body " >
+                                    <div class="item-list-wrapper  " style="width: 1140px">
+                                       <ul class="item-list" data-bind="foreach: $root.ResourceGroupList " >
+                                          <li  style="width: 300px">
+                                             <h5>
+                                              @*<input type="checkbox" data-bind="attr: { id: $data.ID }, click: $root.onCheckResourceFilterHead" />*@
+                                                <label data-bind="text: $data.Name"></label>
+                                             </h5>
+                                             <ul class="list" data-bind="foreach: $data.ResourceNodes">
+                                                <li>
+                                                   <input type="checkbox" data-bind="attr:{value:$data.ID}, checked: $root.selectedResourceCodes" />
+                                                   <span data-bind="text:Name"></span>
+                                                </li>
+                                             </ul>
+                                          </li>
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                            <div id="SearchQueryTab-4">
+                                <div class="option-body">
+                                    <div style="width:109px !important; float:left !important;">
+                                        <h1 style="color:#000;">Material Type</h1>
+              
+                                        <div style="cursor: pointer; width:100%; padding:10px 0px; float:left; color:#1102d9;"  data-bind="text: 'Select All', click: $root.onCheckMaterialTypeAllSelect"></div>
+                                        <div style="cursor: pointer; width:100%; padding:10px 0px; float:left; color:#1102d9;"  data-bind="text: 'Clear All', click: $root.onCheckMaterialTypeAllDeSelect"></div>
+                                    </div>
+                                    <div class="item-list-wrapper" style="width:1028px !important; height:250px; overflow:scroll; float:right !important;" >
+                                        <ul class="item-list" data-bind="foreach: $root.MaterialTypes " >
+                                            <li style="margin-bottom: 0px !important;"><input type="checkbox" data-bind="attr: { value: $data.Value},checked: $root.selectedMaterialTypesCodes" /><span data-bind="text: $data.Name"></span></li>
+                                        </ul>
+                       
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                     </div>
+                     <div id="tabs-2">
+                        <div class="container" >
+                            <span data-bind="visible : $root.TempSearchResultItem().TotalMergedRecords == null" class="showcaseLoader">
+                                
+                                <img src="@Url.Content("~/Public/Images/loading18.gif")" alt="" /><br />
+                                Searching...
+                            </span>
+                            <section id="product" style="overflow: hidden ; height: 290px; width: 100%">
+                               <div class='showcaseResultSetHeader'>
+                                   <h3>Showcase Result Set<span data-bind="visible:  $root.TempSearchResultItem().ProgressPercentage > 0, text: ' - ' +  $root.TempSearchResultItem().ProgressPercentage + '% Completed' " style="color: #F00;"></span></h3>
+                                 @*  <div class='showcaseResultPagination'>
+                                       <ul>
+                                           <li><a href="#">1</a></li>
+                                           <li><a href="#">2</a></li>
+                                           <li><a href="#">3</a></li>
+                                           <li><a href="#">4</a></li>
+                                           <li><a href="#">5</a></li>
+                                       </ul>
+                                   </div>*@
+                                   <div class='showcaseResultPagination'data-bind="visible : $root.TempSearchResultItem().TotalMergedRecords > 0">
+                                       <ul>
+                                           <li data-bind="visible : currentPage() > 0"><a href="#" data-bind="click: function() { $root.previousPage() }">« Previous</a></li>
+                                           <!-- ko foreach : allPages -->
+                                           <li><a href="#" class="active" data-bind="attr:{'class': $data.pageNumber === ($root.currentPage() + 1) ? 'active' : 'deActive' }, text: $data.pageNumber, click: function() { $root.moveToPage($data.pageNumber-1); }"></a></li>
+                                           <!-- /ko -->
+                                           <li data-bind="visible : showNextPagi()"><a href="#" data-bind="click: function() { $root.nextPage() }">Next »</a></li>
+                                       </ul>
+                                   </div>
+                               </div>
+                               <ul data-bind="foreach: $root.TempSearchResultItem().Clusters">                                  
+                                   <li data-bind="showcaseDraggable:{revert:true},foreach: $data.Groupings, attr:{'data-id': $index(),'class': $root.showMatchShowCase($data) ? 'matchShowCase showcaseItem': 'noMatchShowCase showcaseItem' }, event: { mouseover: $root.showcasePopInfo }">
+                                        <a href="#">
+                                           <img data-bind="attr:{'src':$root.getJacketArt($data)}" >
+                                           <h3 data-bind="text: $root.getBookTitle($data)"></h3>
+                                           <p data-bind="text: $root.getBookAuthor($data)"></p>
+                                           <input type="hidden" id="fullRecordLink" data-bind="value: $root.getFullRecordLink($data)"/>
+                                           <input type="hidden" id="authorName" data-bind="value: $root.getAuthorName($data)"/>
+                                           <input type="hidden" id="pubYear" data-bind="value: $root.getPubYear($data)"/>
+                                           <input type="hidden" id="formatType" data-bind="value: $root.getFormatType($data)"/>
+                                           <input type="hidden" id="jacketArtNote" data-bind="value: $root.getJacketArtNote($data)"/>
+                                        </a>
+                                   </li>                                    
+                               </ul>
+                              <aside id="sidebar">
+                                 <div class="basket" data-bind="showcaseDroppable:{}">
+                                    <div class="basket_list">
+                                       <div class="head">
+                                          <span class="name">Drag to your Shelf</span>
+                                          <span class="count" data-bind="text:TempShowcaseItems().length"></span>
+                                       </div>
+                                       <ul data-bind="foreach: TempShowcaseItems()">
+                                          <li data-bind="event: { mouseover: $root.showcasePopInfo }"><span class="name" data-bind="text: $data.Title"></span><button class="delete" data-bind="click: $root.deleteTempShowcaseItem">&#10005;</button><input type="hidden" id="itemId" data-bind="value: $data.FullRecordUrl"/></li>
+                                          <!--li>
+                                             <span class="name">Samsung S3 asd asdasdaf dfsdghgfg dgfg</span>
+                                             <input class="count" value="1" type="text">
+                                             <button class="delete">&#10005;</button>
+                                             </li-->
+                                       </ul>
+                                    </div>
+                                 </div>
+                              </aside>
+                           </section>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- row 7 -->
+         <div class="row customz fixFooter" style="float: right">
+            <div class="title full-width" style="border:none;">
+               <div class="actions">
+                  <input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview,disable:$root.selectedShowcaseType() == 1 && TempShowcaseItems().length ==0" />
+                  <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                  <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" />
+                  <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget" />
+               </div>
+            </div>
+         </div>
+      </li>
+      <li id="preview">
+          <div class="row">
+              <h4>Showcase Widget Preview (<span data-bind="text: 'Columns: '+selectedColumnSize() +' X Rows: '+selectedRowSize()"></span>)</h4>
+          </div>        
+          <div class="liquid" data-bind="style: { width: selectedColumnSize()*100, height: selectedRowSize()*100 }">
+          <h3 data-bind="html: $root.WidgetHeadline"></h3>          
+            <span class="previous"></span>
+              <div class="wrapper" data-bind="style: { width: (selectedColumnSize()*100) }">
+                  <ul data-bind="foreach: TempShowcaseItems()">
+                      <li><a href="#">
+                            <img data-bind="attr:{'src':$data.JackArtUrl}" width="88" height="126" alt="image"/>
+                              <h2 class="name" data-bind="text: $data.Title"></h2>
+                              <span class="name" data-bind="text: $data.Author"></span>
+                              <span class="name" data-bind="text: $data.PubYear"></span>
+                              <span class="name" data-bind="text: $data.FormatType"></span>
+                              <p data-bind="text: $data.JacketArtNote"></p>
+                          </a>
+                      </li>                    
+                  </ul>
+              </div>              
+              <span class="next"></span>
+          </div>          
+          
+          <div class="row customz fixFooter" style="float: right">
+            <div class="title full-width" style="border:none;">
+               <div class="actions">
+                  <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />
+                  <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget,disable:!$root.hasWidgetTitleName()" />
+                  <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget,disable:!$root.hasWidgetTitleName()" />
+                  <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget" />
+               </div>
+            </div>
+         </div>
+      </li>
+   </ul>
+</div>
+<script type="text/javascript">
+
+     $("#WidgtNmtxtBx").focus();
+
+     $("#ShowcaseTabs").tabs();
+     $("#SearchQueryTabs").tabs();
+     var uxAdmin = {};
+     uxAdmin.WidgetManager = (function() {
+         return {};
+     })();
+
+
+     ko.bindingHandlers.showcaseJqueryLiquid = {
+         init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+             var options = ko.utils.unwrapObservable(valueAccessor()) || {};
+         },
+         update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+             var options = ko.utils.unwrapObservable(valueAccessor()) || {};
+         }
+     };
+     ko.bindingHandlers.showcaseDroppable = {
+         init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+             $(element).droppable({
+                 accept: ".noMatchShowCase",
+                 activeClass: "active",
+                 hoverClass: "hover",
+                 tolerance: "touch",
+                 drop: function(event, ui) {
+                     viewModel.TempShowcaseItems.push({
+                         'Title': ui.draggable.find("h3").html(),
+                         'Author': ui.draggable.find("#authorName").attr("value"),
+                         'PubYear': ui.draggable.find("#pubYear").attr("value"),
+                         'FormatType': ui.draggable.find("#formatType").attr("value"),
+                         'JackArtUrl': ui.draggable.find("img").attr("src"),
+                         'JacketArtNote': (ui.draggable.find("#jacketArtNote").attr("value") == null ? "-" : ui.draggable.find("#jacketArtNote").attr("value")),
+                         'FullRecordUrl': ui.draggable.find("#fullRecordLink").attr("value")
+                     });
+                     /*
+				    var basket = $(this),
+						move = ui.draggable,
+						itemId = basket.find("ul li[data-id='" + move.attr("data-id") + "']");	
+				    if (itemId.html() != null) {
+					    itemId.find("input").val(parseInt(itemId.find("input").val()) + 1);
+				    }
+				    else {
+					    // Add the dragged item to the basket
+					    addBasket(basket, move);
+		
+					    // Updating the quantity by +1" rather than adding it to the basket
+					    move.find("input").val(parseInt(move.find("input").val()) + 1);
+				    }*/
+                 }
+             });
+
+         },
+         update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+             $(element).droppable({
+                 accept: ".noMatchShowCase",
+                 activeClass: "active",
+                 hoverClass: "hover",
+                 tolerance: "touch",
+                 drop: function(event, ui) {
+                     viewModel.TempShowcaseItems.push({
+                         'Title': ui.draggable.find("h3").html(),
+                         'Author': ui.draggable.find("#authorName").attr("value"),
+                         'PubYear': ui.draggable.find("#pubYear").attr("value"),
+                         'FormatType': ui.draggable.find("#formatType").attr("value"),
+                         'JackArtUrl': ui.draggable.find("img").attr("src"),
+                         'JacketArtNote': (ui.draggable.find("#jacketArtNote").attr("value") == null ? "-" : ui.draggable.find("#jacketArtNote").attr("value")),
+                         'FullRecordUrl': ui.draggable.find("#fullRecordLink").attr("value")
+                     });
+                 }
+             });
+         }
+     };
+     ko.bindingHandlers.showcaseDraggable = {
+         init: function(element, valueAccessor, allBindingsAccessor) {
+             var options = ko.utils.unwrapObservable(valueAccessor()) || {};
+             $(element).draggable(options, {
+                 drag: function() {
+                     $(element).addClass("active");
+                     $(element).closest(element).addClass("active");
+                 },
+                 stop: function() {
+                     $(element).removeClass("active").closest(element).removeClass("active");
+                 }
+             });
+         },
+         update: function(element, valueAccessor, allBindingsAccessor) {
+             var options = ko.utils.unwrapObservable(valueAccessor()) || {};
+             $(element).find("li").draggable("destory").draggable(options, {
+                 drag: function() {
+                     $(element).addClass("active");
+                     $(element).closest(element).addClass("active");
+                 },
+                 stop: function() {
+                     $(element).removeClass("active").closest(element).removeClass("active");
+                 }
+             });
+         }
+     };
+
+     uxAdmin.WidgetManager.TopicSearchWidget = (function() {
+         var xhrPerform;
+         var xhr;
+         var timerShowcase;
+         var all = " All ";
+         var _view = $('#TopicSearchWidgetFields');
+         var tpWvm;
+         var _editor, _html = '';
+         var widgetSizeListOption = [];
+         var widgetSizeStyleOption = [];
+         var widgetSizeStyleOption2 = [];
+         for (var i = 1; i <= 12; i++) {
+             widgetSizeListOption.push({ Name: i, id: i });
+             (i % 2 == 0) ? widgetSizeStyleOption.push({ Name: i, id: i }) : widgetSizeStyleOption2.push({ Name: i, id: i });
+         }
+         
+         //var widgetSizeListOption = [{Name: 1,id: 1}, {Name: 2,id: 2}, {Name: 3,id: 3}, {Name: 4,id: 4}, {Name: 5,id: 5}, {Name: 6,id: 6}, {Name: 7,id: 7}, {Name: 8,id: 8}, {Name: 9,id: 9}, {Name: 10,id: 10}, {Name: 11,id: 11}, {Name: 12,id: 12}];
+         //var widgetSizeStyleOption = [{Name: 2,id: 2}, {Name: 4,id: 4}, {Name: 6,id: 6}, {Name: 8,id: 8}, {Name: 10,id: 10}, {Name: 12,id: 12}];
+         //var widgetSizeStyleOption2 = [{Name: 4,id: 4}, {Name: 6,id: 6}, {Name: 8,id: 8}, {Name: 10,id: 10}, {Name: 12,id: 12}];
+         var searchPhaseOption = [{"name": "ALL of these words","value": "ALL"}, {"name": "ANY of these words","value": "ANY"}, {"name": "This EXACT PHRASE","value": "EXACT"}];
+         var searchSortOrder = [{"name": "Relevancy","value": "0"}, {"name": "Title Ascending","value": "1"}, {"name": "Title Descending","value": "2"}, {"name": "Author Ascending","value": "3"}, {"name": "Author Descending","value": "4"}, {"name": "Date Ascending","value": "5"}, {"name": "Date Descending","value": "6"}];
+         var searchOperators = ["AND", "OR", "NOT"];
+         var showcaseType = [{"name": "List Showcase","value": "1"}, {"name": "RealTime Showcase","value": "0"}];var showcaseDisplayType = [{"name": "Standard Showcase","value": "0"}, {"name": "One-Up Showcase","value": "1"}];
+
+         var showcaseSearchDateItemsAdd = [{"name": "No Date Limit","value": "0"}, {"name": "Last week","value": "7"}, {"name": "Last 2 weeks","value": "14"}, {"name": "Last 3 weeks","value": "21"}, {"name": "Last month","value": "30"}, {"name": "Last 2 months","value": "60"}, {"name": "Last 3 months","value": "90"}, {"name": "Last 6 months","value": "180"}];
+         //self.WidgetHeadlineContent = ko.observable();
+         var searchTermx = function(v) {
+             var self = this;
+             self.phrase = ko.observable(v ? v.phrase : "");
+             self.option = ko.observable(v ? v.option : "");
+             self.index = ko.observable(v ? v.index : "");
+             self.operator = ko.observable(v ? v.operator : "");
+         };
+
+         var showcaseWidgetVm = function() {
+             var self = this;
+             //SearchTopic Dialog
+             self.CreateOrConfig = ko.observable("Create");
+             // Dialog - Begin    
+             self.isOpen = ko.observable(false);
+             self.ScrollNumbSecond = ko.observable(0);
+             self.EnableAutoScroll = ko.observable(false);
+             self.SelectedScrollNumbSecond = ko.observable();
+             self.WidgetForLocal = ko.observable();
+             self.WidgetForGlobal = ko.observable();
+             self.widgetIdTemp = ko.observable();
+             self.WidgetId = ko.observable();
+             self.WidgetTypeId = ko.observable();
+             self.WidgetType = ko.observable();
+             self.WidgetTitleName = ko.observable();
+             self.hasWidgetTitleName = ko.computed(function()
+             {
+                return typeof self.WidgetTitleName() !== 'undefined' && self.WidgetTitleName() !== '';
+             });
+             self.WidgetSizeList = widgetSizeListOption;
+             self.widgetSizeStyleOption = ko.observableArray(widgetSizeStyleOption);
+             self.selectedColumnSize = ko.observable();
+             self.selectedRowSize = ko.observable();
+             self.WidgetHeadline = ko.observable();
+
+
+             self.TempSearchResultItem = ko.observableArray([]);
+             self.TempShowcaseItems = ko.observableArray([]);
+             self.ReservdTempShowcaseItems = ko.observableArray([]);
+             self.WidgetShowcaseType = showcaseType;
+             self.WidgetShowcaseDisplayType = showcaseDisplayType;
+             self.selectedShowcaseType = ko.observable();
+             self.selectedShowcaseDisplayType = ko.observable();
+
+             self.ChangeTempShowcaseItems = function(data, event) {
+                 //ReservdTempShowcaseItems
+                 if (self.selectedShowcaseType() == 1) {
+                     self.TempShowcaseItems(self.ReservdTempShowcaseItems());
+                     $("#ShowcaseTabs").tabs("select", 0);
+                     $("#ShowcaseTabs").enableTab(1);
+                 } else {
+                     $("#ShowcaseTabs").tabs("select", 0);
+                     $("#ShowcaseTabs").disableTab(1, true);
+                 }
+
+             };
+             self.deleteTempShowcaseItem = function(data, event) {
+                 self.TempShowcaseItems.remove(data);
+             };
+             self.showNextPagi = ko.observable(true);
+             self.currentPage = ko.observable(0);
+             self.moveToPage = function(index) {
+                 self.currentPage(index);
+                 pollingSearchResult(self.TempSearchResultItem().SearchTerm, (self.currentPage() * 20), 20, self.TempSearchResultItem().SearchID, self.selectedSortOrder());
+                 //router.navigate("#search/" + viewtype() + "/" + searchResult().SearchTerm + "/" + (currentPage() * selectedPerPage().value) + "/" + selectedPerPage().value + "/" + searchResult().SearchID + "/" + +selectedSortType().value, true);
+             };
+             self.previousPage = function() {
+                 self.showNextPagi(true);
+                 if (self.currentPage() > 0) {
+                     self.currentPage(self.currentPage() - 1);
+                     pollingSearchResult(self.TempSearchResultItem().SearchTerm, (self.currentPage() * 20), 20, self.TempSearchResultItem().SearchID, self.selectedSortOrder());
+                     //router.navigate("#search/" + viewtype() + "/" + searchResult().SearchTerm + "/" + (currentPage() * selectedPerPage().value) + "/" + selectedPerPage().value + "/" + searchResult().SearchID + "/" + +selectedSortType().value, true);
+                 }
+             };
+             self.nextPage = function() {
+                 if ((parseInt(self.TempSearchResultItem().TotalMergedRecords / (20)) + 1) == (self.currentPage() + 1)) {
+                     self.showNextPagi(false);
+                 } else {
+                     self.showNextPagi(true);
+                     self.currentPage(self.currentPage() + 1);
+                     pollingSearchResult(self.TempSearchResultItem().SearchTerm, (self.currentPage() * 20), 20, self.TempSearchResultItem().SearchID, self.selectedSortOrder());
+                     //router.navigate("#search/" + viewtype() + "/" + searchResult().SearchTerm + "/" + (currentPage() * selectedPerPage().value) + "/" + selectedPerPage().value + "/" + searchResult().SearchID + "/" + +selectedSortType().value, true);
+                 }
+             };
+             self.allPages = ko.computed(function() {
+                 var startPagingPage = self.currentPage() <= 2 ? 0 : self.currentPage() - 2;
+                 var tempEndingNumber = self.currentPage() <= 2 ? 5 : self.currentPage() + 3;
+                 var endPagingPage = 1;
+                 if (self.TempSearchResultItem().length != 0) {
+                     endPagingPage = Math.ceil(self.TempSearchResultItem().TotalMergedRecords / 20);
+                     endPagingPage = tempEndingNumber < endPagingPage ? tempEndingNumber : endPagingPage;
+                 }
+                 var pages = [];
+                 for (var i = startPagingPage; i < endPagingPage; i++) {
+                     pages.push({
+                         pageNumber: (i + 1)
+                     });
+                 }
+                 return pages;
+             });
+             self.showMatchShowCase = function(data) {
+                 var found = false;
+                 var arr = [];
+                 $.each(self.TempShowcaseItems(), function(i, v) {
+                     arr.push(v.FullRecordUrl.split('/')[2]);
+                 });
+                 if ($.inArray(data.Groupings[0].Items[0].ItemID, arr) > -1) {
+                     found = true;
+                 }
+                 return found;
+             };
+             self.searchTerms = ko.observableArray([new searchTermx(), new searchTermx(), new searchTermx()]);
+             self.hasSearchTerms = ko.computed(function()
+             {
+                var hasSearchTerms = false;
+                $.each(self.searchTerms(), function(i, value)
+                {
+                    if(value.phrase() !== '') hasSearchTerms = true;
+                });
+
+                return hasSearchTerms;
+             });
+
+             self.SearchIndexList = ko.observableArray([]);
+             self.searchPhraseType = searchPhaseOption;
+             self.searchOperators = searchOperators;
+             self.sortOrderOptions = ko.observableArray(searchSortOrder); //searchSortOrder;            
+             self.selectedSortOrder = ko.observable();
+             self.showcaseSearchDateItemsAdd = showcaseSearchDateItemsAdd;
+             self.selectedSearchDateItemsAdd = ko.observable();
+             self.searchByDateItemStatus = ko.computed(function() {
+                 if(self.selectedSearchDateItemsAdd() == 0 && !self.hasSearchTerms() )
+                     return true;
+                    else
+                    return false;
+             });       
+             self.enablePreview=ko.computed(function(){
+                if(self.selectedShowcaseType() ==1 && self.TempShowcaseItems().length ==0) return true;
+                if(self.selectedShowcaseType() == 0 && self.searchByDateItemStatus()==true) return true;
+                else return false;
+             }); 
+             self.showcaseScopeByList = ko.observableArray([]);
+             self.selectedScopeBy = ko.observable();
+             self.libraryLicenseType = ko.observable();
+             // Material Type
+             self.MaterialTypes = ko.observableArray([]);
+             self.selectedMaterialTypes = ko.observableArray([]);
+             self.selectedMaterialTypesCodes = ko.observableArray([]);
+
+             //Formats Tab
+             self.selectedFormatsGroups = ko.observableArray([]);
+             self.selectedFormatCodes = ko.observableArray();
+             self.FormatsGroupList = ko.observableArray([]);
+             //Resources Tab
+             self.selectedResource = ko.observableArray();
+             self.selectedResourceCodes = ko.observableArray();
+             self.ResourceGroupList = ko.observableArray([]);
+             self.saveWidget = function() {
+                 reload();
+                 saveWidgetInfo(false);
+             };
+             self.saveCloseWidget = function() {
+                 reload();
+                 parent.$.fn.colorbox.close();
+                 saveWidgetInfo(true);
+             };
+             self.goBack = function() {
+                 if (xhrPerform) {
+                     xhrPerform.abort();
+                 }
+                 //console.log(timerShowcase);
+                 if (xhr) {
+                     xhr.abort();
+                 }
+                 if (timerShowcase) {
+                     clearTimeout(timerShowcase)
+                 };
+                 $('#TopicSearchWidgetFields > ul').stop().animate({
+                     left: "0"
+                 }, 500);
+             };
+
+             self.showcaseComputePreview = function(data, event) {
+                 $('.loadWidgetTemplateShowcase, .smallLoaderOneUpShowcase').remove();
+                 $('#contentWidget_HLte').innerHTML = _html = _editor.getData();
+                 tpWvm.WidgetHeadline(_html);
+                 if (data.selectedShowcaseDisplayType() == '0') {
+                     /*---------------Standard Showcase-----------------------*/
+                     $('.liquid').removeClass('OneUp').find('.previous').removeAttr('style');
+                     $('.OneUpShowcaseTempDivWrapper').remove();
+                     var sliderWidth = $('.wrapper > ul > li:first-child').width() + 54;
+                     var clickFlag = true;
+                     var slider = $('.wrapper > ul');
+                     slider.css('left', '0');
+                     var sliderCount = $('li', slider).length;
+                     slider.width(sliderCount * sliderWidth);
+                     $('.inactive').removeClass('inactive');
+                     $('.liquid .previous').addClass('inactive');
+                     $('.previous').unbind('click').click(function() {
+                         var $pCur = $(this);
+                         if (parseInt($pCur.parent().find('ul').css('left')) < -(sliderWidth)) {
+                             $pCur.parent().find('.next').removeClass('inactive')
+                         } else {
+                             $pCur.addClass('inactive');
+                         }
+                         if (clickFlag && parseInt($pCur.parent().find('ul').css('left')) < 0) {
+                             clickFlag = false;
+                             $pCur.parent().find('ul').stop().animate({
+                                 left: '+=' + sliderWidth
+                             }, 500, function() {
+                                 clickFlag = true;
+                             });
+                         }
+                     });
+                     $('.next').unbind('click').click(function() {
+                         var $nCur = $(this);
+                         if (parseInt($nCur.parent().find('ul').css('left')) > -((sliderCount - 1) - self.selectedColumnSize() / 2) * sliderWidth) {
+                             $nCur.parent().find('.previous').removeClass('inactive')
+                         } else {
+                             $nCur.addClass('inactive');
+                         }
+                         if (clickFlag && parseInt(slider.css('left')) > -(sliderCount - self.selectedColumnSize() / 2) * sliderWidth) {
+                             clickFlag = false;
+                             $nCur.parent().find('ul').stop().animate({
+                                 left: '-=' + sliderWidth
+                             }, 500, function() {
+                                 clickFlag = true;
+                             });
+                         }
+                     });
+                     timerShowcase = 1;
+                     if (data.EnableAutoScroll()) {
+                         timerShowcase = setInterval(function() {
+                             $('.next').trigger('click');
+                         }, (data.ScrollNumbSecond() * 1000));
+                     } else {
+                         clearTimeout(timerShowcase)
+                     };
+                 } else {
+                     /*---------------One-Up Showcase-----------------------*/
+                     $('.liquid').addClass('OneUp').find('.previous').css({
+                         'left': 'auto',
+                         'right': (self.selectedColumnSize() * 100) - 380
+                     });
+                     $('.wrapper').width((self.selectedColumnSize() * 100) - 400);
+                     var sliderWidth = $('.wrapper > ul > li:first-child').width() + 33;
+                     var clickFlag = true;
+                     var slider = $('.wrapper > ul');
+                     slider.css('left', '0');
+                     var sliderCount = $('li', slider).length;
+                     slider.width(sliderCount * sliderWidth);
+                     $('.liquid.OneUp').find('.inactive').removeClass('inactive');
+                     $('.liquid').find('.OneUpShowcaseTempDivWrapper').remove().end().prepend('<div class="OneUpShowcaseTempDivWrapper"><div class="OneUpShowcaseTempDiv"></div></div>');
+                     var OneUptempDiv = $(".OneUpShowcaseTempDiv");
+                     slider.find('li').last().children().clone().appendTo(".OneUpShowcaseTempDiv");
+                     $('.next').unbind('click').click(function() {
+                         if (clickFlag) {
+                             var $pCur = $(this);
+                             clickFlag = false;
+                             OneUptempDiv.children().remove();
+                             $pCur.parent().find('li').last().prev().children().clone().appendTo(".OneUpShowcaseTempDiv");
+                             OneUptempDiv.css({
+                                 'right': 'auto',
+                                 'left': '-310px'
+                             }).stop().animate({
+                                 left: '0px'
+                             }, 400);
+                             $pCur.parent().find('ul').css('left', '-100px').find('li').last().prependTo(slider).parent().stop().animate({
+                                 left: '0px'
+                             }, 500, function() {
+                                 clickFlag = true;
+                             });
+                         }
+                     });
+                     $('.previous').unbind('click').click(function() {
+                         if (clickFlag) {
+                             var $nCur = $(this);
+                             clickFlag = false;
+                             OneUptempDiv.children().remove();
+                             $nCur.parent().find('li').first().children().clone().appendTo(".OneUpShowcaseTempDiv");
+                             OneUptempDiv.css({
+                                 'left': 'auto',
+                                 'right': '-310px'
+                             }).stop().animate({
+                                 'right': '0px'
+                             }, 400);
+                             $nCur.parent().find('ul').stop().animate({
+                                 left: '-100px'
+                             }, 500, function() {
+                                 clickFlag = true;
+                                 slider.find('li').first().appendTo(slider).parent().css('left', '0px');
+                             });
+                         }
+                     });
+                     $('.liquid.OneUp .wrapper').find('img').mousemove(function(e) {
+                         $('#preview').find('.imgOneUpPopup, .pop-arrow').remove().end().append('<div class="imgOneUpPopup" /><span class="pop-arrow arr-left" />');
+                         $('#preview > .pop-arrow').css({
+                             'top': (e.clientY - 10) + 'px',
+                             'left': ($(this).offset().left + 82) + 'px'
+                         });
+                         $('.imgOneUpPopup').append($($(this).parent().html()).filter('span')).css({
+                             'top': (e.clientY - 10) + 'px',
+                             'left': ($(this).offset().left + 90) + 'px'
+                         });
+                     });
+                     $('.liquid.OneUp .wrapper').find('img').mouseout(function(e) {
+                         $('.imgOneUpPopup, #preview > .pop-arrow').remove();
+                     });
+                     timerShowcase = 1;
+                     if (data.EnableAutoScroll()) {
+                         timerShowcase = setInterval(function() { /*console.log(data.ScrollNumbSecond());*/
+                             $('.next').trigger('click');
+                         }, (data.ScrollNumbSecond() * 1000));
+                     } else {
+                         clearTimeout(timerShowcase)
+                     };
+                 }
+             };
+             self.Preview = function(data, event) {
+
+                 if (!self.hasSearchTerms() && self.selectedSearchDateItemsAdd() == 0 && self.selectedResourceCodes().length == 0) {
+                     alert("Please fill in search term(s) and select a resource.");
+                     return false;
+                 }
+                 if (!self.hasSearchTerms() && self.selectedSearchDateItemsAdd() == 0) {
+
+                     alert("Please fill in search term(s)");
+                     return false;
+                 }
+                 if (self.selectedResourceCodes().length == 0) {
+                     alert("Please select a resource.");
+                     return false;
+                 }
+
+
+                 $('.wrapper > ul').find('li').remove();
+                 $('.OneUpShowcaseTempDivWrapper').remove();
+                 $('#TopicSearchWidgetFields > ul').stop().animate({
+                     left: "-1310"
+                 }, 500);
+                 //console.log(tpWvm.selectedShowcaseType());
+                 if (tpWvm.selectedShowcaseType() == 1) {
+                     var tempDom = tpWvm.TempShowcaseItems();
+                     tpWvm.TempShowcaseItems([]);
+                     tpWvm.TempShowcaseItems(tempDom);
+                     self.showcaseComputePreview(data, event);
+                 } else {
+                     var dataColletion = function() {
+                         var that = this;
+                         that.searchTerms = ko.toJS(self.searchTerms());
+                         that.sortOrder = self.selectedSortOrder();
+                         that.pageSize = 20;
+                         that.formats = self.selectedFormatCodes();
+                         that.materialTypes = self.selectedMaterialTypesCodes();
+                         that.resources = self.selectedResourceCodes();
+                         that.libraryLocations = self.selectedScopeBy();
+                         that.DaysWithin = self.selectedSearchDateItemsAdd();
+                         that.ShowCaseType = self.selectedShowcaseType();
+                         that.FromWidgetManager = true;
+                     };
+                     $('.loadWidgetTemplateShowcase').remove();
+                     $('<div class="loadWidgetTemplateShowcase"><img src="../../../../Public/Images/AjaxLoader.gif" /></div>').appendTo('.liquid');
+                     if (data.selectedShowcaseDisplayType() == '0') {
+                         $('.loadWidgetTemplateShowcase').css('left', ((self.selectedColumnSize() * 100) / 2) - 16 + 'px');
+                         /*---------------Standard Showcase-----------------------*/
+                         $('.liquid').removeClass('OneUp').find('.previous').removeAttr('style');
+                         $('.OneUpShowcaseTempDivWrapper').remove();
+                         var sliderWidth = $('.wrapper > ul > li:first-child').width() + 54;
+                         var slider = $('.wrapper > ul');
+                         slider.css({
+                             'left': '0',
+                             'width': '10000px'
+                         });
+                     } else {
+                         /*---------------One-Up Showcase-----------------------*/
+                         $('<div class="smallLoaderOneUpShowcase"><img src="../../../../Public/Images/AjaxLoader.gif" /></div>').appendTo('.liquid');
+                         $('.smallLoaderOneUpShowcase').css('left', (((self.selectedColumnSize() * 100) / 2) + 150) + 'px');
+                         $('.liquid').addClass('OneUp').find('.previous').css({
+                             'left': 'auto',
+                             'right': (self.selectedColumnSize() * 100) - 380
+                         });
+                         $('.wrapper').width((self.selectedColumnSize() * 100) - 400);
+                         var slider = $('.wrapper > ul');
+                         slider.css({
+                             'left': '0',
+                             'width': '10000px'
+                         });
+                         $('.liquid.OneUp').find('.inactive').removeClass('inactive');
+                         $('.liquid').find('.OneUpShowcaseTempDivWrapper').remove().end().prepend('<div class="OneUpShowcaseTempDivWrapper"><div class="OneUpShowcaseTempDiv"></div></div>');
+                         var OneUptempDiv = $(".OneUpShowcaseTempDiv");
+                         slider.find('li').last().children().clone().appendTo(".OneUpShowcaseTempDiv");
+                     }
+                     perfromSearchQuery(new dataColletion(), data, event);
+                 }
+             };
+             self.cancelWidget = function() {
+                 reload();
+                 parent.$.fn.colorbox.close();
+             };
+
+             function reload() {
+                 var iframe = parent.document.getElementById('myIFrame');
+                 iframe.src = iframe.src;
+             }
+
+             self.onCheckMaterialTypeAllSelect = function(data, event) {
+                 self.selectedMaterialTypes([]);
+                 self.selectedMaterialTypesCodes([]);
+                 $.each(data.MaterialTypes(), function(i, v) {
+                     self.selectedMaterialTypes.push(String(v.Name));
+                     self.selectedMaterialTypesCodes.push(v.Value);
+                 });
+             };
+             self.onCheckMaterialTypeAllDeSelect = function(data, event) {
+                 self.selectedMaterialTypes([]);
+                 self.selectedMaterialTypesCodes([]);
+             };
+
+             // OT#23013
+             self.onCheckFormatFilterHead = function(data, event) {
+                 if (self.selectedFormatsGroups.indexOf(data.GroupName) < 0) {
+                     // removing
+                     ko.utils.arrayForEach(data.QualifierList, function(qlm) {
+                         if (self.selectedFormatCodes.indexOf(qlm.QualifierKey) >= 0) {
+                             self.selectedFormatCodes.remove(qlm.QualifierKey);
+                         }
+                     });
+                 } else {
+                     // adding
+                     ko.utils.arrayForEach(data.QualifierList, function(qlm) {
+                         if (self.selectedFormatCodes.indexOf(qlm.QualifierKey) < 0) {
+                             self.selectedFormatCodes.push(qlm.QualifierKey);
+                         }
+                     });
+                 }
+                 return true;
+             };
+
+             // OT#23013
+             self.onFormatCodeChange = function(data, event) {
+                 if (self.selectedFormatCodes.indexOf(data.QualifierKey) < 0) {
+                     // removing
+                     if (self.selectedFormatsGroups.indexOf(data.GroupName) >= 0) {
+                         self.selectedFormatsGroups.remove(data.GroupName);
+                     }
+                 } else {
+                     // adding
+                     var grp = ko.utils.arrayFirst(self.FormatsGroupList(), function(group) {
+                         return group.GroupName == data.GroupName;
+                     });
+                     if (grp) {
+                         var full = true;
+                         ko.utils.arrayForEach(grp.QualifierList, function(qlm) {
+                             if (self.selectedFormatCodes.indexOf(qlm.QualifierKey) < 0) {
+                                 full = false;
+                             }
+                         });
+                         if (full) {
+                             self.selectedFormatsGroups.push(data.GroupName);
+                         }
+                     }
+                 }
+                 return true;
+             };
+
+             self.onCheckResourceFilterHead = function(data, event) {
+                 var ffh = $(event.target);
+                 var input = $(ffh.parent().parent().find('ul li input'));
+                 if (ffh.is(':checked')) {
+                     $.each(input, function(i, val) {
+                         var item = $(val);
+                         //console.log(item); 
+                         if (item.is(':checked') == false) {
+                             item.unbind().trigger('click');
+                         }
+                     });
+                     data.Selected = true;
+                 } else {
+                     $.each(input, function(i, val) {
+                         var item = $(val);
+                         if (item.is(':checked') == true) {
+                             item.unbind().trigger('click');
+                         }
+                     });
+                     data.Selected = false;
+                 };
+                 return true;
+             };
+             self.getJacketArt = function(data) {
+                 return data.Items[0].JacketArtUrl;
+             };
+             self.getBookTitle = function(data) {
+                 return data.Items[0].Title;
+             };
+             self.showcasePopInfo = function(data, event) {
+                 $('.resourceNoteDescriptionPopuptip, .resourceNoteDescriptionPopup').remove();
+                 var targetEle = $(event.target).context.nodename == 'LI' ? $(event.target) : $(event.target).closest('li');
+                 var parentOffsetTop = targetEle.is('.showcaseItem') ? targetEle.offset().top + 38 : targetEle.offset().top + 5;
+                 var parentOffsetLeft = targetEle.is('.showcaseItem') ? targetEle.offset().left + 88 : 'auto';
+                 var parentOffsetRight = targetEle.is('.showcaseItem') ? 'auto' : '200px';
+                 var targetTitle = targetEle.is('.showcaseItem') ? data.Groupings[0].Items[0].Title : data.Title;
+                 var targetAuthor = targetEle.is('.showcaseItem') ? data.Groupings[0].Items[0].Author : data.Author;
+                 var descriptionPopup = '<div class="resourceNoteDescriptionPopup" style="top:' + parentOffsetTop + 'px;left:' + parentOffsetLeft + 'px; right: ' + parentOffsetRight + '; max-width:150px;"><span class="resourceNoteDescriptionPopuptip"></span><div class="jacketArtThumb"><p><b>' + targetTitle + '</b><br />By:&nbsp;' + targetAuthor + '</p></div>';
+                 targetEle.closest('#product').append(descriptionPopup);
+                 if (!(targetEle.is('.showcaseItem'))) {
+                     $('.resourceNoteDescriptionPopuptip').addClass('pickBucketLinks');
+                     $('.jacketArtThumb > p').addClass('imgContains').prepend('<img src="' + data.JackArtUrl + '" />')
+                 }
+                 targetEle.mouseleave(function() {
+                     $('.resourceNoteDescriptionPopuptip, .resourceNoteDescriptionPopup').remove();
+                 });
+             };
+             self.getBookAuthor = function(data) {
+                 return "By: " + data.Items[0].Author;
+             };
+             self.getFullRecordLink = function(data) {
+                 return "#fullrecord/sc/" + data.Items[0].ItemID + "/" + data.Items[0].ResourceID;
+             };
+             self.getAuthorName = function(data) {
+                 return data.Items[0].Author;
+             };
+             self.getPubYear = function(data) {
+                 return data.Items[0].PublishedYear;
+             };
+             self.getFormatType = function(data) {
+                 return data.MaterialType;
+             };
+             self.getJacketArtNote = function(data) {
+                 return data.Items[0].JacketArtNote;
+             };
+             self.ShowcaseResultSet = function() {
+             if(self.selectedSearchDateItemsAdd() == 0 && !self.hasSearchTerms() )
+             {
+              alert("Please fill in search term(s)");
+                     return false;
+             }
+
+                 //console.log(self.searchTerms()[0].phrase());
+                 //console.log(self.searchTerms()[0].index());                
+                 var dataColletion = function() {
+                     // console.log(MaterialTypes());
+                     var that = this;
+                     that.searchTerms = ko.toJS(self.searchTerms());
+                     that.sortOrder = self.selectedSortOrder();
+                     that.pageSize = 20;
+                     that.formats = self.selectedFormatCodes();
+                     that.materialTypes = self.selectedMaterialTypesCodes();
+                     that.resources = self.selectedResourceCodes();
+                     that.libraryLocations = self.selectedScopeBy();
+                     that.DaysWithin = self.selectedSearchDateItemsAdd();
+                     that.ShowCaseType = self.selectedShowcaseType();
+                     that.FromWidgetManager = true;
+                     //this.publication = selectedPublicationOption();
+                     //this.pubDate1 = selectedDate1();
+                     //this.pubDate2 = selectedDate2();
+                     //this.pubDateOperator = selectedPublicationOption();
+                     //this.library = displaySelectedLibraryLocation();
+                     //this.libraryLocations = selectedLibraryLocation();
+                     //this.languages = self.selectedLanguageCodes();
+                     // that.materialTypes = self.selectedFormatCodes();
+                 };
+
+                 if (self.selectedResourceCodes().length == 0) {
+                     alert("Please select a library catalog or database to search.");
+                 } else {
+                     perfromSearchQuery(new dataColletion());
+                     $('#tabs-1').css({
+                         'position': 'absolute',
+                         'z-index': '9999'
+                     }).stop().animate({
+                         top: "-285"
+                     }, 500, function() {
+                         $(this).removeAttr('style').addClass('ui-tabs-hide');
+                     });
+                     $('.ui-state-active').removeClass('ui-tabs-selected ui-state-active').next().addClass('ui-tabs-selected ui-state-active');
+                     $('#tabs-2').removeClass('ui-tabs-hide');
+                 }
+                 /*
+                perfromSearchQuery(new dataColletion());
+                $('#tabs-1').css({'position':'absolute','z-index':'9999'}).stop().animate({top: "-285"}, 500 ,function() { $(this).removeAttr('style').addClass('ui-tabs-hide'); }); 
+                $('.ui-state-active').removeClass('ui-tabs-selected ui-state-active').next().addClass('ui-tabs-selected ui-state-active');
+                $('#tabs-2').removeClass('ui-tabs-hide'); 
+                */
+             };
+
+             self.UpdateShowCaseDisplayType = function() {
+                 if (tpWvm.selectedShowcaseDisplayType() == '0') {
+                     tpWvm.widgetSizeStyleOption(widgetSizeStyleOption);
+                     tpWvm.selectedColumnSize(2);
+                 } else {
+                     tpWvm.widgetSizeStyleOption(widgetSizeStyleOption);
+                     tpWvm.selectedColumnSize(6);
+                 }
+
+             };
+         }.bind(this);
+
+         var stopPulling = function() {
+             return false;
+         };
+         var perfromSearchQuery = function(mySearchQuery, data, event) {
+             xhrPerform = $.ajax({
+                 type: "POST",
+                 data: ko.toJSON(mySearchQuery),
+                 dataType: "json",
+                 contentType: "application/json",
+                 url: "/mvc/AdvancedSearch/ShowCasePerform"
+             });
+             xhrPerform.done(function(result) {
+                 pollingSearchResult("pollsearchResult", 0, 20, result.searchID, mySearchQuery.sortOrder, data, event);
+             });
+             //            $.ajax({ type: "POST", data: ko.toJSON(mySearchQuery), dataType: "json", contentType: "application/json",
+             //                url: "/mvc/AdvancedSearch/ShowCasePerform",
+             //                success: function(result) {
+             //                   
+             //                }
+             //            });                                            
+         };
+         var pollingSearchResult = function(xKeyword, xstartRecord, numberPerPage, searchId, sortOrder, data, event) {
+             var searchUrl = "/mvc/Search/PollSearchResults/" + xKeyword + "/" + xstartRecord + "/" + numberPerPage + "/" + searchId + "/?sortOption=" + sortOrder;
+             xhr = $.ajax({
+                 url: searchUrl,
+                 type: "POST",
+                 dataType: "json"
+             });
+             xhr.done(function(datax) {
+                 if (xhr.status != 0) {
+                     if (tpWvm.selectedShowcaseType() == 1) {
+                         tpWvm.TempSearchResultItem(datax);
+                     } else {
+                         tpWvm.TempShowcaseItems([]);
+                         $.each(datax.Clusters, function(i, v) {
+                             tpWvm.TempShowcaseItems.push({
+                                 'Title': v.Groupings[0].Items[0].Title,
+                                 'Author': v.Groupings[0].Items[0].Author,
+                                 'PubYear': v.Groupings[0].Items[0].PublishedYear,
+                                 'FormatType': v.Groupings[0].MaterialType,
+                                 'JackArtUrl': v.Groupings[0].Items[0].JacketArtUrl,
+                                 'JacketArtNote': v.Groupings[0].Items[0].JacketArtNote,
+                                 'FullRecordUrl': ""
+                             });
+                         });
+                     };
+
+                     if ((!stopPulling()) && (datax.IsActive)) {
+                         pollingSearchResult(xKeyword, xstartRecord, numberPerPage, searchId, sortOrder, data, event);
+                     } else {
+                         //console.log(tpWvm.TempSearchResultItem().SearchTerm);
+                         if (tpWvm.selectedShowcaseType() == 0) {
+                             tpWvm.showcaseComputePreview(data, event);
+                         }
+                     }
+                 }
+             });
+             xhr.fail(function(jqXhr, textStatus) {});
+         };
+         var collectWidgetData = function() {
+             var cWidgetData = this;
+             document.getElementById('contentWidget_HLte').innerHTML = _html = _editor.getData();
+             cWidgetData.widgetIdTemp = tpWvm.widgetIdTemp();
+             cWidgetData.WidgetId = tpWvm.WidgetId();
+             cWidgetData.WidgetTypeId = tpWvm.WidgetTypeId();
+             cWidgetData.WidgetType = tpWvm.WidgetType();
+             cWidgetData.WidgetTitleName = tpWvm.WidgetTitleName();
+             cWidgetData.selectedColumnSize = tpWvm.selectedColumnSize();
+             cWidgetData.selectedRowSize = tpWvm.selectedRowSize();
+             cWidgetData.WidgetHeadline = _html;
+             cWidgetData.WidgetForLocal = tpWvm.WidgetForLocal;
+             cWidgetData.WidgetForGlobal = tpWvm.WidgetForGlobal;
+             cWidgetData.searchTerms = ko.toJS(tpWvm.searchTerms());
+             cWidgetData.sortOrder = tpWvm.selectedSortOrder();
+             //cWidgetData.pageSize = 20;                    
+             cWidgetData.formats = tpWvm.selectedFormatCodes();
+             cWidgetData.materialTypes = tpWvm.selectedMaterialTypesCodes();
+             cWidgetData.resources = tpWvm.selectedResourceCodes();
+             cWidgetData.selectedShowcaseType = tpWvm.selectedShowcaseType();
+             cWidgetData.selectedShowcaseDisplayType = tpWvm.selectedShowcaseDisplayType();
+             cWidgetData.TempShowcaseItems = tpWvm.selectedShowcaseType() == 1 ? tpWvm.TempShowcaseItems() : [];
+             cWidgetData.selectedSearchDateItemsAdd = tpWvm.selectedSearchDateItemsAdd();
+             cWidgetData.selectedScopeBy = tpWvm.selectedScopeBy();
+             cWidgetData.ScrollNumbSecond = tpWvm.ScrollNumbSecond();
+             cWidgetData.EnableAutoScroll = tpWvm.EnableAutoScroll();
+             //console.log(tpWvm.EnableAutoScroll());
+
+         };
+
+         var saveWidgetInfo = function(closePopup) {
+             var data = new collectWidgetData();
+              if ((typeof data.WidgetTitleName === "undefined") || (data.WidgetTitleName === "")) {
+                        alert("Widget Name is required.");
+                    } else { 
+                         var widgetJsonCollector = function(widgetId, widgetForLocal, widgetForGlobal, jsonData) {
+                 var self = this;
+                 self.WidgetForLocal = widgetForLocal;
+                 self.WidgetForGlobal = widgetForGlobal;
+                 self.JsonData = jsonData;
+                 self.WidgetId = widgetId;
+             };
+             var widgetUrl = "";
+             var myWidgetDataCollection = "";
+             if (data.widgetIdTemp == 0) {
+                 myWidgetDataCollection = new widgetJsonCollector(data.WidgetId, data.WidgetForLocal, data.WidgetForGlobal, ko.toJSON(data));
+                 //console.log(myWidgetDataCollection);    
+                 widgetUrl = "/mvc/SystemSettings/WidgetManager/InsertWidget";
+                 $.ajax({
+                     url: widgetUrl,
+                     type: "POST",
+                     data: ko.toJSON(myWidgetDataCollection),
+                     dataType: "json",
+                     contentType: "application/json",
+                     success: function(result) {
+                         (data.WidgetForLocal) ? alert(result[0].Message): alert(result[1].Message);
+                         tpWvm.widgetIdTemp(result[0].ResultId + "|" + result[1].ResultId);
+                         if (closePopup) {
+                             parent.$.fn.colorbox.close();
+                         }
+                     }
+                 });
+             } else {
+                 widgetUrl = "/mvc/SystemSettings/WidgetManager/UpdateWidget";
+                 var localId;
+                 var globalId;
+                 var updateWidgetId;
+                 if (data.widgetIdTemp.toString().indexOf("|") == -1) {
+                     localId = data.widgetIdTemp.toString();
+                     globalId = data.widgetIdTemp.toString();
+                 } else {
+                     updateWidgetId = data.widgetIdTemp.split('|');
+                     localId = updateWidgetId[0];
+                     globalId = updateWidgetId[1];
+                 }
+                 //                    if (tpWvm.selectedShowcaseType() == "0") {
+                 ////                    console.log(tpWvm.TempShowcaseItems());                    
+                 //                    tpWvm.TempShowcaseItems = ko.observableArray([]);
+                 ////                    console.log(tpWvm.selectedShowcaseType());
+                 ////                    console.log(tpWvm.TempShowcaseItems());
+                 //                }
+                 if (tpWvm.WidgetForLocal()) {
+                     tpWvm.WidgetId(localId);
+                     myWidgetDataCollection = new widgetJsonCollector(localId, true, false, ko.toJSON(data));
+                     $.ajax({
+                         url: widgetUrl,
+                         type: "POST",
+                         data: ko.toJSON(myWidgetDataCollection),
+                         dataType: "json",
+                         contentType: "application/json",
+                         success: function(result) { /*console.log(result);*/
+                             alert(result.Message);
+                             if (closePopup) {
+                                 parent.$.fn.colorbox.close();
+                             }
+                         }
+                     });
+                 }
+                 if (tpWvm.WidgetForGlobal()) {
+                     tpWvm.WidgetId(globalId);
+                     myWidgetDataCollection = new widgetJsonCollector(globalId, false, true, ko.toJSON(data));
+                     $.ajax({
+                         url: widgetUrl,
+                         type: "POST",
+                         data: ko.toJSON(myWidgetDataCollection),
+                         dataType: "json",
+                         contentType: "application/json",
+                         success: function(result) { /*console.log(result); */
+                             alert(result.Message);
+                             if (closePopup) {
+                                 parent.$.fn.colorbox.close();
+                             }
+                         }
+                     });
+                 }
+             }
+
+                    }
+         };
+         var loadData = function(data, widgetInfo, widgetPredefinData) {
+             //console.log(data);
+             tpWvm.widgetIdTemp(widgetInfo.WidgetId);
+             tpWvm.WidgetId(widgetInfo.WidgetId);
+             tpWvm.WidgetTypeId(data.WidgetTypeId);
+             tpWvm.WidgetType(data.WidgetType);
+             tpWvm.WidgetTitleName(data.WidgetTitleName);
+             tpWvm.selectedColumnSize(data.selectedColumnSize);
+             tpWvm.selectedRowSize(3);
+             tpWvm.WidgetHeadline(data.WidgetHeadline);
+             tpWvm.WidgetForLocal(widgetInfo.WidgetForLocal);
+             tpWvm.WidgetForGlobal(widgetInfo.WidgetForGlobal);
+             tpWvm.SearchIndexList(widgetPredefinData.SearchIndexList);
+             tpWvm.FormatsGroupList(widgetPredefinData.FormatsGroupList);
+             tpWvm.ResourceGroupList(widgetPredefinData.ResourceGroupList)
+             tpWvm.MaterialTypes(widgetPredefinData.MaterialTypes.sort(function(left, right) {
+                 return left.Name == right.Name ? 0 : (left.Name < right.Name ? -1 : 1);
+             }));
+             //OT:22642 
+
+             console.log(tpWvm.ResourceGroupList());
+             ko.utils.arrayForEach(tpWvm.ResourceGroupList(), function(Resource) {
+                 ko.utils.arrayForEach(Resource.ResourceNodes, function(qlm) {
+                     if (qlm.Primary == true) {
+                         tpWvm.selectedResourceCodes.push(String(qlm.ID));
+                     }
+                 });
+             });
+             // end OT:22642
+
+             //tpWvm.ResourceGroupList(widgetPredefinData.ResourceGroupList);
+             tpWvm.showcaseScopeByList(widgetPredefinData.ScopeList);
+             tpWvm.libraryLicenseType(widgetPredefinData.LibraryLicenseType);
+
+             if (widgetInfo.WidgetId != 0) {
+                 tpWvm.TempShowcaseItems(data.TempShowcaseItems);
+                 tpWvm.ReservdTempShowcaseItems(data.TempShowcaseItems);
+                 tpWvm.selectedFormatCodes(data.formats);
+                 // OT#23013
+                 ko.utils.arrayForEach(tpWvm.FormatsGroupList(), function(group) {
+                     var full = true;
+                     ko.utils.arrayForEach(group.QualifierList, function(qlm) {
+                         if (tpWvm.selectedFormatCodes.indexOf(qlm.QualifierKey) < 0) {
+                             full = false;
+                         }
+                     });
+                     if (full) {
+                         tpWvm.selectedFormatsGroups.push(group.GroupName);
+                     }
+                 });
+                 // OT#23013
+                 tpWvm.selectedMaterialTypesCodes(data.materialTypes);
+                 tpWvm.selectedResourceCodes(data.resources);
+                 tpWvm.selectedShowcaseType(data.selectedShowcaseType);
+                 tpWvm.selectedShowcaseDisplayType(data.selectedShowcaseDisplayType);
+                 tpWvm.selectedSearchDateItemsAdd(data.selectedSearchDateItemsAdd);
+                 tpWvm.selectedScopeBy(data.selectedScopeBy);
+                 tpWvm.searchTerms([new searchTermx(data.searchTerms[0]), new searchTermx(data.searchTerms[1]), new searchTermx(data.searchTerms[2])]);
+                 tpWvm.ScrollNumbSecond(data.ScrollNumbSecond);
+                 tpWvm.EnableAutoScroll(data.EnableAutoScroll);
+                 tpWvm.selectedSortOrder(data.sortOrder);
+             }
+             removeEditor();
+             createEditor();
+         };
+         var createEditor = function() {
+             if (_editor)
+                 return;
+             // Create a new editor by replacing textarea with id = contentWidget_te, setting its value to html
+             var config = {
+                 language: 'en',
+                 toolbar: 'Full',
+                 height: '45px'
+             };
+             _editor = CKEDITOR.replace('contentWidget_HLte', config, _html);
+         };
+         var removeEditor = function() {
+             if (!_editor)
+                 return;
+             // Destroy the editor.
+             _editor.destroy();
+             _editor = null;
+         };
+         //init
+         var init = function() {
+             var widgetData = $.parseJSON(@Html.Raw(Json.Encode(Model.JsonData)));
+             var widgetInfo = @Html.Raw(Json.Encode(Model));
+             var widgetPredefinData = $.parseJSON(@Html.Raw(Json.Encode(Model.PreDefineData)));
+             //console.log(widgetData);
+             //console.log(widgetInfo);
+             console.log(widgetPredefinData);
+             tpWvm = new showcaseWidgetVm();
+             loadData(widgetData, widgetInfo, widgetPredefinData);
+             ko.applyBindings(tpWvm, _view.get(0));
+         };
+         return {
+             Init: init,
+             CollectWidgetData: collectWidgetData
+         };
+     })();
+     uxAdmin.WidgetManager.TopicSearchWidget.Init();
+</script>

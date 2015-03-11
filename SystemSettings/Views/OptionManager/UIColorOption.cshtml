@@ -1,0 +1,1103 @@
+﻿
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.LocalResourceCss("~/Public/Javascript/libs/multiselect/jquery-ui-1.8.18.css")
+
+<style type="text/css">
+    body { position:relative;}
+    
+    /* iframe form styles */
+    body > form .title {border-bottom:1px solid #BBBBBB; margin-bottom:10px;}
+    body > form .title h3 {display:inline-block; width:auto; height:14px; padding:6px 10px; margin:0px; border:1px solid #BBBBBB; border-bottom:none; text-align:center; vertical-align:middle; line-height:1; font-size:13px;}
+    body > form .title .actions {width:auto; float:right;}
+    /* UI Color Options overrides */
+    #ui_color_options .search-preloader {margin-top:40px;}
+</style>
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/jpicker-1.1.6/css/jPicker-1.1.6.min.css")" />
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Public/Javascript/jpicker-1.1.6/jPicker.css")" />
+
+<script type="text/javascript">
+    var __contextRoot = '@VersoMVC.Infrastructure.ConfigurationHelper.ContextPath';
+</script>
+
+@Html.LocalResourceJavascripts("~/public/javascript/overrides.js", "~/public/javascript/json2.js")
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-1.7.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/jquery-ui-1.8.11.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout-2.1.0.debug.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/KnockOut/knockout.mapping-latest.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/libs/modernizr-2.5.3.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/jpicker-1.1.6/jpicker-1.1.6.min.js")" ></script>
+<script type="text/javascript" src="@Url.Content("~/Public/Javascript/uxAdmin/uxAdmin.utilities.js")" ></script>
+<style>
+      #SortMenuTabs {
+        border: none;
+        margin: 0 5px;
+    }   
+     .topSortMenuTabsOptionBtnFix {
+        z-index: 1;
+        position: relative;
+        float: right;        
+    }
+    .row {
+        padding: 5px 0 !important;
+    }
+</style>
+
+<form id="ui_color_options">
+    <br/>
+    <div class="actions">
+        <input type="button" class="button primary topSortMenuTabsOptionBtnFix" value="Save"  data-bind="visible: ViewManager.ShowApplyTheme, click: onClickSetAsDefault"/>
+    </div>
+    <div id="SortMenuTabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+            <li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active">
+                <a href="">Theme & Color Settings</a>
+            </li>
+        </ul>
+        <div>
+            <div class="content">
+                <div class="row">
+
+                    <div class="search-preloader" data-bind="visible: ViewManager.IsPreloading">
+                        <div>
+                            <img alt="Loading..." src="/mvc/Public/Images/AjaxLoader.gif" />
+                        </div>
+                    </div>
+
+                    <div class="settings-panel ui-color-settings" style="display:none;" data-bind="visible: !ViewManager.IsPreloading()">
+                        <div id="chooseCustomTheme" class="setting-item on">
+                            <div>
+                                <span class="icon"></span>
+                                <h1>Choose a Custom Theme</h1>
+                                <span class="switch-button">
+                                    <input type="button" class="button" name="on"  value="on"  data-bind="click: onTurnOnWidget" />
+                                    <input type="button" class="button" name="off" value="off" data-bind="click: onTurnOffWidget" />
+                                </span>
+                            </div>
+                            <div>
+                                <div data-bind="visible: ViewManager.ShowWidget"></div>
+                                <div class="overlay" data-bind="visible: ViewManager.ColorPickingState" style="display:none;"></div>
+                                <div class="content" data-bind="">
+                                    <div class="fields">
+
+                                        <div class="row small-height">
+                                            <p class="cell w-12-6">
+                                                <span class="subtitle">Available Themes:</span>
+                                                <input type="hidden" data-bind="" />
+                                            </p>
+                                        </div>
+
+                                        <div class="row">
+                                    
+                                            <div class="cell w-12-6">
+                                                <select data-bind="options: DataModel, optionsText: 'ColorThemeName', value: SelectedTheme, event:{ 'change': onThemeSelected }, optionsCaption: 'None'"> 
+                                                </select>
+                                            </div>
+                                            <div class="cell w-12-3" style="width:auto">
+                                                <div class="index-actions" data-bind="visible: ViewManager.ShowCustomControls" style="display:block;">
+                                                    <a class="delete" title="Delete Theme" data-bind="visible: ViewManager.ShowDelete"></a>
+                                                    <a class="edit" title="Edit Theme" data-bind="click: onClickEdit, visible: ViewManager.ShowEdit"></a>
+                                                </div>
+                                            </div>
+                                            <p class="cell w-12-2">
+                                                <input type="button" class="button primary" value="Save Changes" data-bind="visible: ViewManager.ShowSaveChanges, click: onClickSaveChanges" />
+                                                <input type="button" class="button primary" value="Save Theme" data-bind="visible: ViewManager.ShowSaveTheme, click: onClickSaveTheme" />
+                                                <span class="label" data-bind="visible: ViewManager.SavingState">Saving...</span>
+                                            </p>
+                                        </div>                            
+                            
+                                    </div>
+                                </div>
+                        
+                                <div class="content" data-bind="visible: ViewManager.EditState">
+                                    <div class="fields">
+                                
+                                        <hr />
+
+                                        <div class="row" data-bind="">
+                                            <p class="cell w-12-2">
+                                                <span class="label">Theme Name</span>
+                                            </p>
+                                            <p class="cell w-12-4">
+                                                <input style="width:100%!important;" type="text" placeholder="Enter New Theme Name" data-bind="value: ThemeName" />
+                                            </p>
+                                            <p class="cell w-12-2">&nbsp;</p>
+                                        </div>
+
+                                        <div class="row">
+                                            <p class="cell w-12-2">
+                                                <span class="label">Based on existing theme</span>
+                                            </p>
+                                            <p class="cell w-12-4">
+                                                <select data-bind="options: ThemesTemplatesCollection , optionsText: 'ColorThemeName', optionsValue: 'ColorThemeId', value: SelectedThemeTemplateId, event:{ 'change': onThemeTemplateSelected }, optionsCaption: 'None'"> 
+                                                </select>
+                                            </p>
+                                        </div>
+
+                                        <div class="row">
+                                            <p class="cell w-12-2 align-r">
+                                                <span class="icon help" title="Toolbar, Links, Some Borders, Admin Links Highlight"></span>
+                                                <span class="label">Color A</span>
+                                            </p>
+                                            <p class="cell w-12-2">
+                                                <input type="text" placeholder="Select color" title="Color A" class="color-picker" maxlength="6" data-bind="value: ThemeColorA" />
+                                            </p>
+                                        </div>
+
+                                        <div class="row">
+                                            <p class="cell w-12-2 align-r">
+                                                <span class="icon help" title="Headings, Footer, Panels Headers, Accordion Headers, Navigation Tabs, SearchBar Button"></span>
+                                                <span class="label">Color B</span>
+                                            </p>
+                                            <p class="cell w-12-2">
+                                                <input type="text" placeholder="Select color" title="Color B" class="color-picker" maxlength="6" data-bind="value: ThemeColorB" />
+                                            </p>
+                                        </div>
+                                
+                                        <div class="row">
+                                            <p class="cell w-12-2 align-r">
+                                                <span class="icon help" title="Body, Panels Content, Highlight Rows"></span>
+                                                <span class="label">Color C</span>
+                                            </p>
+                                            <p class="cell w-12-2">
+                                                <input type="text" placeholder="Select color" title="Color C" class="color-picker" maxlength="6" data-bind="value: ThemeColorC" />
+                                            </p>
+                                        </div>
+                                
+                                        <div class="row">
+                                            <p class="cell w-12-2 align-r">
+                                                <span class="icon help" title="Primary Button Colors (Gradient Top and Bottom)"></span>
+                                                <span class="label">Button</span>
+                                            </p>
+                                            <p class="cell w-12-2">
+                                                <input type="text" placeholder="Top color" title="Color D" class="color-picker" maxlength="6" data-bind="value: ThemeColorD" />
+                                            </p>
+                                            <p class="cell w-12-2">
+                                                <input type="text" placeholder="Bottom color" title="Color E" class="color-picker" maxlength="6" data-bind="value: ThemeColorE" />
+                                            </p>
+                                            <p class="cell w-12-2">
+                                                <button title="Click to Preview Theme" class="preview-button-demo" data-bind="click: onClickPreviewTheme">Preview</button>
+                                            </p>
+                                        </div>
+                                    </div>                        
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+                    
+        </div>
+    </div>
+
+   
+</form>
+
+<script type="text/javascript">
+
+    (function (uxAdmin) {
+
+        uxAdmin.uiColorOptions = (function () {
+
+            /* vars */
+            var _view = $('#ui_color_options');
+            var _vm;
+            var _configOptions;
+            var _dropDownLastOption = {
+                ColorThemeId: 0,
+                ColorThemeName: "Customize a New Theme",
+                ColorThemeCSSClass: "custom",
+                ColorThemeColors: ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"],
+                Selected: false,
+                isCustom: true
+            };
+            var themeTemplate = function (iId, sName, sCss, arrColors, bSelected, bIsCustom) {
+                if (iId != undefined) {
+                    this.ColorThemeId = iId;
+                } else {
+                    this.ColorThemeId = 0;
+                };
+                if (sName != undefined) {
+                    this.ColorThemeName = sName;
+                } else {
+                    this.ColorThemeName = null;
+                };
+                if (sCss != undefined) {
+                    this.ColorThemeCSSClass = sCss;
+                } else {
+                    this.ColorThemeCSSClass = "custom";
+                };
+                if (arrColors != undefined) {
+                    this.ColorThemeColors = arrColors;
+                } else {
+                    this.ColorThemeColors = ["FFF", "FFF", "FFF", "FFF", "FFF"];
+                };
+                if (bSelected != undefined) {
+                    this.Selected = bSelected;
+                } else {
+                    this.Selected = false;
+                };
+                if (bIsCustom != undefined) {
+                    this.isCustom = bIsCustom;
+                } else {
+                    this.isCustom = true;
+                };
+            };
+            var uiColorSettingsViewModel = function () {
+                var self = this;
+                self.DataModel = ko.observableArray([]);
+                self.IndexDataModel = ko.observable(null);
+                self.SelectedTheme = ko.observable(_configOptions);
+                self.SelectedThemeId = ko.observable(null);
+                self.SelectedThemeTemplateId = ko.observable(null);
+                self.ThemesTemplatesCollection = ko.observableArray([]);
+
+                self.ThemeId = ko.observable(0);
+                self.ThemeName = ko.observable();
+                self.ThemeCSSClass = ko.observable("custom");
+                self.ThemeColorA = ko.observable("");
+                self.ThemeColorB = ko.observable("");
+                self.ThemeColorC = ko.observable("");
+                self.ThemeColorD = ko.observable("");
+                self.ThemeColorE = ko.observable("");
+                self.isCustom = ko.observable(true);
+                self.ModelManager = {
+                    UpdateIndexModel: function () {
+                        var theme = new themeTemplate();
+
+                        theme.ColorThemeId = self.ThemeId();
+                        theme.ColorThemeName = self.ThemeName;
+                        theme.ColorThemeColors[0] = self.ThemeColorA();
+                        theme.ColorThemeColors[1] = self.ThemeColorB();
+                        theme.ColorThemeColors[2] = self.ThemeColorC();
+                        theme.ColorThemeColors[3] = self.ThemeColorD();
+                        theme.ColorThemeColors[4] = self.ThemeColorE();
+
+                        self.IndexDataModel(theme);
+                    }
+                };
+                self.ViewManager = {
+                    Elements: {
+                        ButtonDemo: $('.preview-button-demo')
+                    },
+                    EditState: ko.observable(false),
+                    SavingState: ko.observable(false),
+                    ColorPickingState: ko.observable(false),
+                    UpdateColorFields: function (arr) {
+                        var arrColors = arr;
+                        self.ThemeColorA(arrColors[0].toString());
+                        self.ThemeColorB(arrColors[1].toString());
+                        self.ThemeColorC(arrColors[2].toString());
+                        self.ThemeColorD(arrColors[3].toString());
+                        self.ThemeColorE(arrColors[4].toString());
+                    },
+                    SettingItemCSSClass: ko.observable("setting-item off"),
+                    IsPreloading: ko.observable(true),
+                    EnableApply: ko.observable(false),
+                    ShowApplyTheme: ko.observable(false),
+                    ShowSaveChanges: ko.observable(false),
+                    ShowSaveTheme: ko.observable(false),
+                    ShowCustomControls: ko.observable(false),
+                    ShowDelete: ko.observable(true),
+                    ShowEdit: ko.observable(true),
+                    ShowWidget: ko.observable(false)
+                };
+                self.onTurnOnWidget = function () {
+                    self.ViewManager.ShowWidget(true);
+                    self.ViewManager.SettingItemCSSClass("setting-item on");
+                    self.ViewManager.IsPreloading(false);
+
+                    if (_configOptions == 0) {
+                        self.SelectedTheme(self.DataModel()[0]);
+                        self.previewTheme();
+                    };
+                };
+                self.onTurnOffWidget = function () {
+                    var oTheme = ko.toJS(self.IndexDataModel());
+                    oTheme.ColorThemeId = null;
+                    uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveLibraryTheme", oTheme, function (data) {
+
+                        //update data
+                        _configOptions = 0;
+                        self.SelectedTheme(self.DataModel()[0]);
+                        self.onThemeSelected();
+
+                        //update view
+                        self.resetTheme();
+                        //self.ViewManager.ShowWidget(false); // widgetized value
+                        self.ViewManager.SettingItemCSSClass("setting-item off");
+                    });
+                };
+                self.onThemeSelected = function () {
+                    var obj = self.SelectedTheme();
+
+                    if (obj) {
+                        self.ViewManager.EnableApply(true);
+                        self.ViewManager.ShowApplyTheme(true);
+                        self.ViewManager.ShowSaveTheme(false);
+                        self.SelectedThemeTemplateId(null);
+
+                        if (obj.isCustom) {
+
+                            //update fields
+                            self.ThemeId(obj.ColorThemeId);
+                            self.ThemeName(obj.ColorThemeName);
+                            self.ThemeCSSClass(obj.ColorThemeCSSClass);
+                            var colors = obj.ColorThemeColors;
+                            self.ViewManager.UpdateColorFields(colors);
+
+                            //update custom index model
+                            self.ModelManager.UpdateIndexModel();
+
+                            //update view
+                            self.ViewManager.ShowCustomControls(true);
+                            self.applyGradient(self.ViewManager.Elements.ButtonDemo, self.ThemeColorD(), self.ThemeColorE());
+                            $.jPicker.List[0].color.active.val('hex', self.ThemeColorA(), this);
+                            $.jPicker.List[1].color.active.val('hex', self.ThemeColorB(), this);
+                            $.jPicker.List[2].color.active.val('hex', self.ThemeColorC(), this);
+                            $.jPicker.List[3].color.active.val('hex', self.ThemeColorD(), this);
+                            $.jPicker.List[4].color.active.val('hex', self.ThemeColorE(), this);
+
+                            //if is a new theme creation
+                            if (obj.ColorThemeId == 0) {
+                                self.ViewManager.EditState(true);
+                                self.ViewManager.ShowEdit(false);
+                                self.ViewManager.ShowDelete(false);
+                                self.ViewManager.ShowSaveTheme(true);
+                                self.ViewManager.EnableApply(false);
+                                self.ViewManager.ShowApplyTheme(false);
+                                self.ViewManager.ShowSaveChanges(false);
+                                if (self.ThemeName() == "Customize a New Theme") self.ThemeName("");
+                                self.applyGradient(self.ViewManager.Elements.ButtonDemo, self.ThemeColorD(), self.ThemeColorE());
+                                //self.previewTheme(true);
+
+                            } else {
+                                self.ViewManager.EditState(false);
+                                self.ViewManager.ShowEdit(true);
+                                self.ViewManager.ShowDelete(true);
+                                self.ViewManager.ShowSaveTheme(false);
+                                self.ViewManager.EnableApply(true);
+                                self.ViewManager.ShowApplyTheme(true);
+                                self.ViewManager.ShowSaveChanges(false);
+
+                                var colors = self.SelectedTheme().ColorThemeColors;
+                                //self.previewTheme(colors);
+
+                                if (_configOptions == 0) { //if (self.ViewManager.ShowWidget() == false && _configOptions == 0) {
+                                    self.resetTheme();
+                                }
+                                else {
+                                    self.previewTheme(colors);
+                                };
+
+                            };
+
+                            var button = $('.index-actions > a.edit');
+                            button.removeClass("active");
+                        }
+                        else {
+
+                            //update view
+                            self.ViewManager.ShowCustomControls(false);
+                            self.ViewManager.ShowSaveChanges(false);
+                            self.ViewManager.EditState(false);
+                            //self.previewTheme();
+
+                            /*if (_configOptions == 0) { //if (self.ViewManager.ShowWidget() == false && _configOptions == 0) {
+                            self.resetTheme();
+                            }
+                            else {
+                            self.previewTheme();
+                            };*/
+
+                            self.previewTheme();
+                        };
+                    } else {
+                        //self.ViewManager.EnableApply(false);
+
+                        //update view
+                        self.ViewManager.EditState(false);
+                        self.ViewManager.ShowEdit(false);
+                        self.ViewManager.ShowDelete(false);
+                        self.ViewManager.ShowSaveTheme(false);
+                        self.ViewManager.EnableApply(true);
+                        self.ViewManager.ShowApplyTheme(true);
+                        self.ViewManager.ShowSaveChanges(false);
+                        self.resetTheme();
+
+                        //self.ViewManager.ShowWidget(false)
+                    };
+                };
+                self.onThemeTemplateSelected = function () {
+                    var obj = self.getSelectedObject(self.SelectedThemeTemplateId());
+
+                    if (obj) {
+                        var colors = obj.ColorThemeColors;
+                        self.ViewManager.UpdateColorFields(colors);
+                        self.ModelManager.UpdateIndexModel();
+                        self.applyGradient(self.ViewManager.Elements.ButtonDemo, self.ThemeColorD(), self.ThemeColorE());
+                    } else {
+
+                        var templateTheme = new themeTemplate();
+                        var colors = templateTheme.ColorThemeColors;
+                        if (self.SelectedTheme() != undefined) { colors = self.SelectedTheme().ColorThemeColors; };
+                        self.ViewManager.UpdateColorFields(colors);
+                        self.ModelManager.UpdateIndexModel();
+                        self.applyGradient(self.ViewManager.Elements.ButtonDemo, self.ThemeColorD(), self.ThemeColorE());
+                    };
+
+                    $.jPicker.List[0].color.active.val('hex', self.ThemeColorA(), this);
+                    $.jPicker.List[1].color.active.val('hex', self.ThemeColorB(), this);
+                    $.jPicker.List[2].color.active.val('hex', self.ThemeColorC(), this);
+                    $.jPicker.List[3].color.active.val('hex', self.ThemeColorD(), this);
+                    $.jPicker.List[4].color.active.val('hex', self.ThemeColorE(), this);
+                };
+                self.onClickPreviewGradient = function () {
+                    self.ViewManager.UpdateColorFields(colors);
+                    self.ModelManager.UpdateIndexModel();
+                    self.applyGradient(self.ViewManager.Elements.ButtonDemo, self.ThemeColorD(), self.ThemeColorE());
+                };
+                self.onClickPreviewTheme = function () {
+                    self.ModelManager.UpdateIndexModel();
+                    var colors = self.IndexDataModel().ColorThemeColors;
+                    self.previewTheme(colors);
+                };
+                self.onClickSetAsDefault = function () {
+                    var theme = self.SelectedTheme();
+                    var message;
+                    var callback = function (data) {
+                        //real callback
+                        if (data.status) {
+                            message = data.message;
+                            alert(message);
+                            self.ViewManager.SavingState(false);
+
+                            if (self.SelectedTheme() && window.parent.__configOptions) {
+                                window.parent.__configOptions.ColorThemeColors = self.SelectedTheme().ColorThemeColors;
+                                window.parent.__configOptions.ColorThemeCSSClass = self.SelectedTheme().ColorThemeCSSClass;
+                            } else {
+                                window.parent.__configOptions = null;
+                            };
+                        } else {
+                            message = "There was a problem on storing the data. Please try again later.";
+                            alert(message);
+                            self.ViewManager.SavingState(false);
+                        };
+                    };
+
+                    // 1. show spinner
+                    self.ViewManager.SavingState(true);
+
+                    // 2. Update data on server
+                    self.setThemeAsDefault(theme, callback); //pass: model/ID, callback
+                };
+                self.onClickSaveChanges = function () {
+                    // vars
+                    var oThemeToUpdate;
+                    var validationResult;
+
+                    // 1. update model of the index from the fields observables
+                    self.ModelManager.UpdateIndexModel();
+
+                    // validate - { Passed: passed, Message: message }
+                    validationResult = self.validateFields();
+                    if (validationResult.Passed) {
+
+                        // if valid index for a new theme
+                        if (self.SelectedTheme().ColorThemeId != 0) {
+                            var message;
+                            var callback = function (data) {
+
+                                //validate status
+                                if (data.status) {
+                                    message = "Theme succesfully updated";
+                                    alert(message);
+
+                                    //update data
+                                    var index = self.DataModel().indexOf(self.SelectedTheme());
+                                    self.DataModel()[index] = data.theme;
+                                    self.SelectedTheme(data.theme);
+                                    self.IndexDataModel(data.theme);
+
+                                    //update view
+                                    self.ViewManager.SavingState(false);
+                                    self.ViewManager.EditState(true); //to make edition hide on click trigger
+
+                                    //tirgger event to close edition mode and preview theme
+                                    self.onClickEdit();
+                                    self.onClickPreviewTheme();
+
+                                } else {
+                                    message = "There was a problem on updating the data. Please try again later.";
+                                    alert(message);
+                                    self.ViewManager.SavingState(false);
+                                };
+
+                            };
+                            // 2. wrap data into an object
+                            oThemeToUpdate = self.IndexDataModel();
+
+                            // 3. show spinner
+                            self.ViewManager.SavingState(true);
+
+                            // 4. data service (update)
+                            self.updateTheme(oThemeToUpdate, callback);
+
+                        } else {
+                            alert("There was an internal problem (index not updatable). Please try refreshing the page.");
+                        };
+                    } else {
+                        alert(validationResult.Message);
+                    };
+                };
+                self.onClickSaveTheme = function () {
+                    // vars
+                    var oThemeToSave;
+                    var validationResult;
+
+                    // 1. update model of the index from the fields observables
+                    self.ModelManager.UpdateIndexModel();
+
+                    // validate - { Passed: passed, Message: message }
+                    validationResult = self.validateFields(true);
+                    if (validationResult.Passed) {
+
+                        // if valid index for a new theme
+                        if (self.SelectedTheme().ColorThemeId == 0) {
+                            var message;
+                            var callback = function (data) {
+
+                                //real callback
+                                if (data.status) {
+                                    message = "Theme succesfully saved";
+                                    alert(message);
+                                    self.ViewManager.SavingState(false);
+                                    self.initDefault(true);
+                                } else {
+                                    message = "There was a problem on storing the data. Please try again later.";
+                                    alert(message);
+                                    self.ViewManager.SavingState(false);
+                                };
+                            };
+                            // 2. wrap data into an object
+                            oThemeToSave = self.IndexDataModel();
+
+                            // 3. show spinner
+                            self.ViewManager.SavingState(true);
+
+                            // 4. data service (save)
+                            self.addNewTheme(oThemeToSave, callback);
+                        } else {
+                            alert("There was an internal problem (index exists). Please try refreshing the page.");
+                        };
+                    }
+                    else {
+                        alert(validationResult.Message);
+                    };
+                };
+                self.onClickEdit = function () {
+                    var state = self.ViewManager.EditState();
+                    var button = $('.index-actions > a.edit');
+
+                    if (state == true) {
+                        self.ViewManager.EditState(false);
+                        button.removeClass("active");
+                        self.ViewManager.ShowSaveTheme(false);
+                        self.ViewManager.ShowApplyTheme(true);
+                        self.ViewManager.ShowSaveChanges(false);
+                        self.ViewManager.ShowSaveTheme(false);
+                    } else {
+                        self.ViewManager.EditState(true);
+                        button.addClass("active");
+                        self.ViewManager.ShowSaveTheme(true);
+                        self.ViewManager.ShowApplyTheme(false);
+                        self.ViewManager.ShowSaveChanges(true);
+                        self.ViewManager.ShowSaveTheme(false);
+                    };
+                };
+                self.onClickDelete = function () { };
+                self.validateFields = function (isNew) {
+
+                    var passed = true;
+                    var message = "success";
+                    var alphhaNumericRegExp = new RegExp("^[a-zA-Z0-9 _]+$");
+                    var themeId = ko.toJS(self.IndexDataModel().ColorThemeId);
+                    var themeName = ko.toJS(self.IndexDataModel().ColorThemeName);
+                    var model = ko.toJS(self.DataModel());
+                    var count = 0;
+
+                    var a = self.ThemeColorA();
+                    var b = self.ThemeColorA();
+                    var c = self.ThemeColorA();
+                    var d = self.ThemeColorA();
+                    var e = self.ThemeColorA();
+                    var colorsInserted = new Array(a, b, c, d, e);
+
+                    // validate color fields
+                    for (var i = 0; i < colorsInserted.length; i++) {
+                        if (colorsInserted[i] == null) {
+                            message = "Fields missing.\n\nPlease select all colors for your theme.";
+                            passed = false;
+                            break;
+                        }
+                        if (colorsInserted[i] != null && colorsInserted[i].indexOf(' ') >= 0) {
+                            message = "White spaces are not allowed.\n\nOne or more fields have white spaces.";
+                            passed = false;
+                            break;
+                        }
+                        if (colorsInserted[i] != null && colorsInserted[i].length < 6) {
+                            message = "Invalid number of characters.\n\nOne or more fields have missing characters. Please pick colors using color picker or select a theme from existing theme drop down.";
+                            passed = false;
+                            break;
+                        }
+                        if (colorsInserted[i] != null && colorsInserted[i].length == 0) {
+                            message = "All fields are required.\n\nPlease pick colors using color picker or select a theme from existing theme drop down.";
+                            passed = false;
+                            break;
+                        }
+                        if (!alphhaNumericRegExp.test(colorsInserted[i])) {
+                            message = "Invalid characters.\n\nOne or more fields have invalid characters.\nPlease use only numbers and letters.";
+                            passed = false;
+                            break;
+                        }
+                    };
+
+                    // validate theme name field
+                    if (!alphhaNumericRegExp.test(themeName)) {
+                        message = "Invalid characters.\n\nTheme name field has invalid characters.\nPlease use only numbers and letters.";
+                        passed = false;
+                    };
+                    if (themeName.length < 2) {
+                        message = "Invalid number of characters.\n\nTheme name must have at least two characters.";
+                        passed = false;
+                    };
+                    if (themeName.length == 0) {
+                        message = "All fields are required.\n\nPlease write a name for the theme.";
+                        passed = false;
+                    };
+                    if (isNew) {
+                        for (var i = 0; i < model.length - 1; i++) {
+                            //var count = 0;
+                            if (model[i].ColorThemeName == themeName) {
+                                count++;
+                                if (count == 1) {
+                                    message = "Invalid theme Name.\n\nTheme name already exists. Please choose a different name.";
+                                    passed = false;
+                                    break;
+                                }
+                            };
+                        };
+                    } else {
+                        for (var i = 0; i < model.length - 1; i++) {
+                            //var count = 0;
+                            if (model[i].ColorThemeName == themeName && model[i].ColorThemeId != themeId) {
+                                count++;
+                                if (count == 1) {
+                                    message = "Invalid theme Name.\n\nTheme name already exists. Please choose a different name.";
+                                    passed = false;
+                                    break;
+                                }
+                            };
+                        };
+                    };
+
+                    return { Passed: passed, Message: message }
+                };
+                self.customizeLabel = function () {
+                    var model = ko.toJS(self.DataModel());
+                    var dataLength = model.length - 1;
+
+                    for (var i = 0; i < dataLength; i++) {
+                        var isCustom = self.DataModel()[i].isCustom;
+                        var newName = self.DataModel()[i].ColorThemeName;
+                        if (isCustom == true) {
+                            self.DataModel()[i].ColorThemeName = "Custom Theme - " + newName;
+                        };
+                    };
+                };
+                self.normalizeLabel = function () {
+                    var model = ko.toJS(self.DataModel());
+                    var dataLength = model.length - 1;
+
+                    for (var i = 0; i < dataLength; i++) {
+                        var name = self.DataModel()[i].ColorThemeName.toString();
+                        var str = "Custom Theme - ";
+                        var index = str.length;
+
+                        if (isCustom == true) {
+                            self.DataModel()[i].ColorThemeName = name.slice(index);
+                        };
+                    };
+                };
+                self.applyGradient = function (elem, a, b) {
+                    var top;
+                    var bottom;
+
+                    a != "transparent" ? top = "#" + a : top = a;
+                    b != "transparent" ? bottom = "#" + b : top = a;
+
+                    var moz = "background: -moz-linear-gradient(top, " + top + " 0%, " + bottom + " 100%);";
+                    var wbk = "background: -webkit-gradient(linear, left top, left bottom, color-stop(0%," + top + "), color-stop(100%," + bottom + "));";
+                    var wbkl = "background: -webkit-linear-gradient(top, " + top + " 0%," + bottom + " 100%);";
+                    var ope = "background: -o-linear-gradient(top, " + top + " 0%," + bottom + " 100%);";
+                    var ms = "background: -ms-linear-gradient(top, " + top + " 0%," + bottom + " 100%);";
+                    var msf = "filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='" + top + "', endColorstr='" + bottom + "',GradientType=0 );";
+                    var allBrowsersCSS = (moz + wbk + wbkl + ope + ms + msf).toString();
+
+                    $(elem).attr("style", allBrowsersCSS);
+                };
+                self.getSelectedObject = function (id) {
+                    var dataAsObject = self.DataModel();
+                    var targetObject;
+                    var idToSearch = id;
+
+                    for (var i = 0; i < dataAsObject.length; i++) {
+                        if (dataAsObject[i].ColorThemeId == idToSearch) {
+                            targetObject = dataAsObject[i];
+                            targetObject.Selected = true;
+                            break;
+                        };
+                    };
+
+                    return targetObject;
+                };
+                self.previewTheme = function (arrColors) {
+
+                    var cssClass = self.SelectedTheme().ColorThemeCSSClass;
+                    var className = cssClass.toString() + "-theme";
+
+                    $("body", top.document).attr('class', '');
+                    $("body", top.document).addClass(className);
+
+                    if (arrColors) {
+                        var tag = $("body > style.custom-styles", top.document);
+                        var style = self.createCSS(arrColors[0], arrColors[1], arrColors[2], arrColors[3], arrColors[4]);
+
+                        if (tag) {
+                            tag.remove();
+                        }
+                        $("body", top.document).append(style);
+                    };
+
+                };
+                self.resetTheme = function () {
+                    $("body", top.document).attr('class', '');
+                    $("body > style.custom-styles", top.document);
+                };
+                self.createCSS = function (a, b, c, d, e) {
+                    var rules;
+                    var cssString;
+                    var demo = "<style class='custom-styles'> body.custom-theme {background-color:#" + c + ";} </style>";
+                    var openTag = "<style class='custom-styles'>";
+                    var closeTag = "</style>";
+                    var colorA = a;
+                    var colorB = b;
+                    var colorC = c;
+                    var colorD = d;
+                    var colorE = e;
+
+                    var rules =
+                    //colorA: #18468C - " + colorA + "
+                    //colorB: #D3E2F8 - " + colorB + "
+                    //colorC: #F6F9FE - " + colorC + "
+                    //colorD: #EDF3FC - " + colorD + "
+                    //colorE: #B7CEF2 - " + colorE + "
+
+
+                    "body.custom-theme {background:#" + colorC + ";}" +
+                    "body.custom-theme #toolbar {background:#" + colorA + "; border-bottom:1px solid #" + colorA + ";}" +
+                    "body.custom-theme #panelCollapseExpand, body.custom-theme #menuCollapseExpand {background:#" + colorA + ";}" +
+                    "body.custom-theme #panelCollapseExpand b{ border-top-color:#" + colorA + "; }" +
+                    "body.custom-theme #menuCollapseExpand b{ border-left-color:#" + colorA + "; }" +
+                    "body.custom-theme p.rateStars span {color:#" + colorA + "}" +
+                    "body.custom-theme #FullRecord_MarcTags span.MarcTagName span.record_data b {color: #" + colorA + ";}" +
+                    "body.custom-theme footer {background:#" + colorB + ";}" +
+
+                    // anchors & links
+                    "body.custom-theme a," +
+                    "body.custom-theme a:link," +
+                    "body.custom-theme a:hover," +
+                    "body.custom-theme a:active," +
+                    "body.custom-theme a:visited, body.custom-theme #toolbar #myAccountPlaceHolder a {color:#" + colorA + ";}" +
+
+                    "body.custom-theme td a," +
+                    "body.custom-theme td a:link," +
+                    "body.custom-theme td a:hover," +
+                    "body.custom-theme td a:active," +
+                    "body.custom-theme td a:visited {color:#" + colorA + ";}" +
+
+                    "body.custom-theme .ui-dynamic-link {color:#" + colorA + "; cursor:pointer;}" +
+                    "body.custom-theme .ui-dynamic-link:hover {color:#" + colorA + "; text-decoration:underline;}" +
+
+                    "body.custom-theme #facetShowMoreMsg {color:#" + colorA + ";}" +
+
+                    // navigation
+                    "body.custom-theme nav > ul li:hover > a {background:#" + colorB + "; color:#000; text-decoration:none;}" +
+                    "body.custom-theme nav > ul li.active a," +
+                    "body.custom-theme nav > ul li:active > a," +
+                    "body.custom-theme nav > ul li:focus > a {background:#" + colorB + "; color:#000; text-decoration:none; outline:none;}" +
+                    "body.custom-theme nav a," +
+                    "body.custom-theme nav a:visited," +
+                    "body.custom-theme nav > ul li:visited a," +
+                    "body.custom-theme nav > ul li a:visited," +
+                    "body.custom-theme nav a:visited {color:#000 !important;}" +
+                    "body.custom-theme nav > ul li:hover > ul {display:block;}" +
+                    "body.custom-theme nav > ul li:hover > ul li:hover > a {background:#" + colorB + "; color:#000; text-decoration:none;}" +
+                    "body.custom-theme nav > ul > li:active > a," +
+                    "body.custom-theme nav > ul > li.active > a {-webkit-box-shadow:0 0 4px -3px #" + colorA + " inset; -moz-box-shadow:0 0 4px -3px #" + colorA + " inset; box-shadow:0 0 4px -3px #" + colorA + " inset; text-shadow:none;}" +
+
+                    "body.custom-theme .menu-list a:active," +
+                    "body.custom-theme .menu-list .child-item .highlight," +
+                    "body.custom-theme .menu-list .collapsible .highlight {background-color:#" + colorA + ";}" +
+                    "body.custom-theme .widget {background:#FFF;}" +
+                    "body.custom-theme .widget > h2 {background:#" + colorB + "; filter:none;}" +
+
+                    "body.custom-theme .ui-accordion .ui-state-default," +
+                    "body.custom-theme .ui-accordion .ui-accordion-header {background:#" + colorC + " none;}" +
+                    "body.custom-theme .ui-accordion .ui-accordion-header.ui-state-hover," +
+                    "body.custom-theme .ui-accordion .ui-accordion-header.ui-state-active {background-color:#" + colorB + ";}" +
+                    "body.custom-theme .ui-accordion .ui-accordion-header a {color:#" + colorA + "; background:transparent none;}" +
+                    "body.custom-theme .ui-accordion .ui-accordion-content {background-color:#FFF;}" +
+                    "body.custom-theme .ui-accordion .ui-accordion-content ul li a," +
+                    "body.custom-theme .ui-accordion .ui-accordion-content ul li span {color:#000;}" +
+
+                    "body.custom-theme .OptionsBox," +
+                    "body.custom-theme .options-box2 {background:#" + colorB + ";}" +
+                    "body.custom-theme #navlist li .active {color:#000;}" +
+                    "body.custom-theme #navlist li .deActive {color:#" + colorA + ";}" +
+
+                    "body.custom-theme .list_search_result_m1 .sct_1_main .top_rw_1 {background:#" + colorB + "; border-color:#BBB;}" +
+                    "body.custom-theme .list_search_result_m1 .sct_1_main {border-color:#BBB;}" +
+                    "body.custom-theme .main_in_grid_prt_left .list_vw_content h5 a," +
+                    "body.custom-theme .list_search_result_m1 .sct_1_main .top_rw_2 .main_in_grid_prt_right p a {color:#" + colorA + ";}" +
+
+                    "body.custom-theme .list_search_wrapper_nw .span_view a {color:#" + colorA + ";}" +
+
+                    "body.custom-theme .search-result.list article .resources > h5 {background:#" + colorB + ";}" +
+                    "body.custom-theme .search-result.list ul li tr {background:#FFF;}" +
+                    "body.custom-theme .search-result.list article .resources > ul li a:hover {background:#" + colorC + ";}" +
+
+                    // record nav
+                    "body.custom-theme .in_cnt_mainfl_scrn {background:#" + colorC + " none;}" +
+                    "body.custom-theme .in_cnt_mainfl_scrn span a {color:#" + colorA + ";}" +
+                    "body.custom-theme .right_f_screen_cnt_main .fl_screen_leftpart h4 {color:#" + colorA + ";}" +
+
+                    // details tabs
+                    "body.custom-theme .ui-state-active," +
+                    "body.custom-theme .ui-widget-content .ui-state-active," +
+                    "body.custom-theme .ui-widget-header .ui-state-active {background:#" + colorC + ";}" +
+
+                    "body.custom-theme .ui-tabs .ui-tabs-nav li.ui-state-default {background:#" + colorC + ";}" +
+                    "body.custom-theme .ui-tabs .ui-tabs-nav li.ui-state-hover," +
+                    "body.custom-theme .ui-tabs .ui-tabs-nav li.ui-state-active  {background:#" + colorB + ";}" +
+
+                    "body.custom-theme .ui-tabs .ui-tabs-nav li.ui-tabs-selected a," +
+                    "body.custom-theme .ui-tabs .ui-tabs-nav li.ui-state-disabled a," +
+                    "body.custom-theme .ui-tabs .ui-tabs-nav li.ui-state-processing a {color:#" + colorA + ";}" +
+
+                    "body.custom-theme .syn_title {background:#" + colorC + ";}" +
+
+                    //staff tab options
+                    "body.custom-theme-iframe .list2.widgets2 > li {background:#" + colorB + ";}" +
+
+                    // buttons
+                    "body.custom-theme button, " +
+                    "body.custom-theme a.button {color:#000;}" +
+
+                    "body.custom-theme button.primary, " +
+                    "body.custom-theme input.primary[type='submit']," +
+                    "body.custom-theme input.primary[type='button']," +
+                    "body.custom-theme input.primary[type='reset']," +
+                    "body.custom-theme .button.primary {" +
+                        "background: #" + colorD + ";" +
+                        "background: -moz-linear-gradient(center top , #" + colorD + " 0%, #" + colorE + " 100%) repeat scroll 0 0 transparent;" +
+                        "background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#" + colorD + "), color-stop(100%,#" + colorE + "));" +
+                        "background: -webkit-linear-gradient(top, #" + colorD + " 0%,#" + colorE + " 100%);" +
+                        "background: -o-linear-gradient(top, #" + colorD + " 0%,#" + colorE + " 100%);" +
+                        "background: -ms-linear-gradient(top, #" + colorD + " 0%,#" + colorE + " 100%);" +
+                        "background: linear-gradient(top, #" + colorD + " 0%,#" + colorE + " 100%);" +
+                        "filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#" + colorD + "', endColorstr='#" + colorE + "',GradientType=0 );" +
+                    "}" +
+
+                    "body.custom-theme button:hover, " +
+                    "body.custom-theme input[type='submit']:hover, " +
+                    "body.custom-theme input[type='button']:hover, " +
+                    "body.custom-theme input[type='reset']:hover, " +
+                    "body.custom-theme .button:hover {border: 1px solid #" + colorA + "; -webkit-box-shadow: 0 0 3px 0 #" + colorA + "; -moz-box-shadow: 0 0 3px 0 #" + colorA + "; box-shadow: 0 0 3px 0 #" + colorA + ";}" +
+
+                    "body.custom-theme button:active, " +
+                    "body.custom-theme input[type='submit']:active, " +
+                    "body.custom-theme input[type='button']:active, " +
+                    "body.custom-theme input[type='reset']:active, " +
+                    "body.custom-theme .button:active {box-shadow: 0 0 3px #A3A3A3 inset;}" +
+
+                    "body.custom-theme .search-bar .search-box.google-style button#search_icon, body.custom-theme #myConnectPageLayout h3 {background-color:#" + colorB + ";}" +
+                    "body.custom-theme .search-bar .search-box.google-style button#search_icon:hover {-webkit-box-shadow: 0 0 3px 0 #" + colorA + "; -moz-box-shadow: 0 0 3px 0 # " + colorA + "; box-shadow: 0 0 3px 0 #" + colorA + ";}" +
+                    "body.custom-theme .search-bar .search-box.google-style button#search_icon:active {-webkit-box-shadow: 0 0 3px #A3A3A3 inset; -moz-box-shadow: 0 0 3px #A3A3A3 inset; box-shadow: 0 0 3px #A3A3A3 inset;}" +
+                    "body.custom-theme .search-bar .search-box.google-style button#search_icon:focus {-webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;}" +
+
+                    // search bar dropdowns
+                    "body.custom-theme .megamenu li .dropcontent {border-color:#" + colorA + "; background:#FFF;}" +
+                    "body.custom-theme .megamenu li .dropcontent ul {color:#000;}" +
+                    "body.custom-theme .megamenu li div a {color:#000;}" +
+                    "body.custom-theme .megamenu li:hover a {text-shadow:none;}" +
+                    "body.custom-theme #index_list li a:hover {color:inherit !important; text-shadow:none;}" +
+                    "body.custom-theme #index_list li a.selected {color:#F00;}" +
+                    "body.custom-theme .megamenu li h4 {color:#000;}" +
+
+                    // grid view table
+                    "body.custom-theme #table-3 {background-color:#" + colorC + ";}" +
+                    "body.custom-theme #table-3 th {background-color:#" + colorB + ";}" +
+                    "body.custom-theme #table-3 tbody > tr:hover {background-color:#" + colorB + ";}";
+
+                    cssString = openTag + rules + closeTag;
+
+                    return cssString;
+                };
+                self.initDefault = function (bRefresh) {
+                    var callback = function (data) {
+                        //var getSelectedTheme = function () {
+                        _configOptions = 0;
+                        for (var i = 0; i < self.DataModel().length; i++) {
+                            if (self.DataModel()[i].Selected == true) {
+                                _configOptions = self.DataModel()[i];
+                                break;
+                            };
+                        };
+                        //};
+                        //getSelectedTheme();
+                        var defaultThemeSelected = _configOptions;
+
+                        //init jPicker to avoid undefined when binding
+                        if ($.jPicker.List.length == 0) {
+
+                            var settings = { images: { clientPath: '/mvc/Public/Images/jPicker/' }, alphaSupport: false, effects: { type: 'fade', speed: 'fast' }, position: { x: "screenCenter", y: 100} };
+                            $('.color-picker').jPicker(
+                                settings,
+                                function (color, context) {
+                                    self.ThemeColorA($.jPicker.List[0].color.active.val().hex);
+                                    self.ThemeColorB($.jPicker.List[1].color.active.val().hex);
+                                    self.ThemeColorC($.jPicker.List[2].color.active.val().hex);
+                                    self.ThemeColorD($.jPicker.List[3].color.active.val().hex);
+                                    self.ThemeColorE($.jPicker.List[4].color.active.val().hex);
+                                    self.applyGradient(self.ViewManager.Elements.ButtonDemo, self.ThemeColorD(), self.ThemeColorE());
+
+                                    self.ViewManager.ColorPickingState(false);
+                                },
+                                function (color, context) {
+                                    try {
+                                        var all = color.val('hex');
+                                        if (!all) {
+                                            alert("Please select a color");
+                                            color.val('hex', 'FFFFFF');
+                                        };
+                                    }
+                                    catch (e) {
+                                        //console.log(e.Message.ToString());
+                                    };
+                                },
+                                function (color, context) {
+                                    self.ViewManager.ColorPickingState(false);
+                                });
+
+                            //trigger overlay behind color pickers to avoid mouse accessing elements and stacking
+                            $('.jPicker .Icon').bind('click', function () {
+                                $('.jPicker.Container').css('top', '100px');
+                                self.ViewManager.ColorPickingState(true);
+                            });
+                            //disable fields so user handles everything from color picker
+                            $('.ui-color-settings .color-picker').prop('disabled', true);
+                        };
+                        //console.log($.jPicker.List);
+
+                        //apply bindings before show
+                        ko.applyBindings(_vm);  // ko.applyBindings(_vm, _view.get(0))
+
+                        // if no theme selected
+                        if (defaultThemeSelected == 0) {
+
+                            //update view
+                            self.ViewManager.IsPreloading(false);
+                            self.resetTheme();
+                        }
+                        else {
+                            //update view
+                            self.ViewManager.ShowWidget(true);
+                            self.ViewManager.SettingItemCSSClass("setting-item on");
+                            self.ViewManager.IsPreloading(false);
+
+                            //update data
+                            self.SelectedTheme(_configOptions);
+                            self.onThemeSelected();
+                        };
+                    };
+
+                    // get themes
+                    if (bRefresh) {
+                        self.getAllThemes();
+                    } else {
+                        self.getAllThemes(callback);
+                    };
+                };
+                self.getAllThemes = function (oCallback) {
+                    if (oCallback) {
+                        uxAdmin.utilities.ajaxGetJson("SystemSettings/OptionManager/GetAvailableThemes", "", function (data) {
+                            self.ThemesTemplatesCollection(ko.toJS(data));
+                            self.DataModel(ko.toJS(data));
+                            self.DataModel.push(_dropDownLastOption);
+                            oCallback(data);
+                        });
+                    } else {
+                        uxAdmin.utilities.ajaxGetJson("SystemSettings/OptionManager/GetAvailableThemes", "", function (data) {
+                            self.ThemesTemplatesCollection(ko.toJS(data));
+                            self.DataModel(ko.toJS(data));
+                            self.DataModel.push(_dropDownLastOption);
+                        });
+                    };
+                };
+                self.setThemeAsDefault = function (oTheme, oCallback) {
+                    uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveLibraryTheme", oTheme, function (data) {
+                        oCallback(data);
+                    });
+                };
+                self.addNewTheme = function (oTheme, oCallback) {
+                    var themeToSave = ko.toJS(oTheme);
+                    themeToSave.ColorThemeId = -1;
+                    uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveUiColorOption", themeToSave, function (data) {
+                        oCallback(data);
+                    });
+                };
+                self.updateTheme = function (oTheme, oCallback) {
+                    uxAdmin.utilities.ajaxPostJson("SystemSettings/OptionManager/SaveUiColorOption", oTheme, function (data) {
+                        oCallback(data);
+                    });
+                };
+                self.deleteTheme = function () { };
+            };
+
+            /* Methods */
+            var init = function () {
+                if (!_vm) {
+                    if (window.parent.__configOptions) {
+                        _configOptions = window.parent.__configOptions;
+                    } else {
+                        _configOptions = 0;
+                    };
+
+                    _vm = new uiColorSettingsViewModel();
+                    _vm.initDefault();
+                };
+            };
+
+            return {
+                Init: init
+            };
+        })();
+
+    })(window.uxAdmin = window.uxAdmin || {});
+
+
+    $(function () {
+        uxAdmin.uiColorOptions.Init();
+    });
+</script>

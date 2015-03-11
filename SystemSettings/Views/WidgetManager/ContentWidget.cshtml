@@ -1,0 +1,447 @@
+﻿<!DOCTYPE html>
+@model Verso.Common.UXAdmin.WidgetCollector
+@Html.LocalResourceCss("~/Public/Styles/style.css")
+@Html.ContentDeliveryNetworkJavascript("knockout/knockout-2.1.0.js")
+@Html.ContentDeliveryNetworkJavascript("jquery/jquery-1.7.1.min.js")    
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/modernizr-2.5.3.min.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/ckeditor.js")
+@Html.LocalResourceJavascript("~/Public/Javascript/libs/ckeditor/config.js")
+
+<div class="content edit-options" id="contentWidgetFields" >
+    <ul>
+        <li class="fields">        
+            <!-- row 1 -->
+            <div class="row">
+                <h4>Content Widget</h4>            
+            </div>               
+            <!-- row 2 -->
+            <div class="row customz">
+                <p class="cell w-12-2"><label>Widget Size:</label></p>
+                <p class="cell w-12-1">Column: <select data-bind="options: WidgetSizeList, optionsText: 'Name' , optionsValue: 'id', value: selectedColumnSize" ></select></p>
+                <p class="cell w-12-1">Row: <select data-bind="options: WidgetSizeList, optionsText: 'Name', optionsValue: 'id', value: selectedRowSize"></select></p>
+            </div>
+
+            <!-- row 3 -->
+            <div class="row customz">
+                <p class="cell w-12-2"><label style="color: red">* Widget Name:</label></p>
+                <p class="cell w-12-8"><input id="widgetTitleName" type="text" data-bind="value: WidgetTitleName" /></p>
+            </div>    
+
+            <div class="row customz" style="display:block; margin:0 auto;">
+                @*<p class="cell w-12-2">
+                    <label>Content Text:</label>
+                </p>*@
+                <div class="cell w-12-8" style="width: 1249px;margin: 7px auto 0;display: block;">                
+                    <textarea rows="10" cols="10" id="contentWidget_te" data-bind="value: WidgetContent"></textarea>
+                </div>
+            </div>
+        
+            <div class="row customz fixFooter"  style="float: right">
+                    <div class="title full-width" style="border:none;">
+                        <div class="actions">
+                            <input type="button" class="button primary" value="Preview" data-bind="click: $root.Preview" />       
+                            <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                            <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                            <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                        </div>
+                    </div>
+            </div>
+        </li>
+
+        <li id="preview">
+            
+            <div class="row">
+                <h4>Content Widget Preview (<span data-bind="text: 'Columns: '+selectedColumnSize() +' X Rows: '+selectedRowSize()"></span>)</h4>            
+            </div>
+           
+            
+            <div class="row customz" style="height: 510px;overflow: auto;">
+                <div data-bind="attr:{ 'style': 'width:' + ((selectedColumnSize()*99.1667)+40) + 'px;height:' + ((selectedRowSize()*99.1667)+40) + 'px;border:1px solid #ccc;background:' + WidgetContentBg() + ';overflow:hidden;margin: 0 auto;' }">
+                    <span style="margin: 20px;display: block;" data-bind="html: WidgetContent"></span>
+                </div>
+            </div>
+
+            <div class="row customz fixFooter"  style="float: right">
+                    <div class="title full-width" style="border:none;">
+                        <div class="actions">
+                            <input type="button" class="button primary" value="Go Back" data-bind="click: $root.goBack" />                            
+                            <input type="button" class="button primary" value="Save" data-bind="click: $root.saveWidget" />
+                            <input type="button" class="button primary" value="Save & Close" data-bind="click: $root.saveCloseWidget" /> 
+                            <input type="button" class="button" value="Cancel" data-bind="click: $root.cancelWidget"/>                 
+                        </div>
+                    </div>
+            </div>
+        </li>  
+</ul>
+</div>
+
+<script type="text/javascript">
+    var uxAdmin = {};
+    uxAdmin.WidgetManager = (function () {
+        return {};
+    })();
+    uxAdmin.WidgetManager.ContentWidget = (function () {
+        //vars
+        var _view = $('#contentWidgetFields');
+        var _VM;
+        var _editor, _html = '', _editor2, _html2 = '';
+        var _WidgetSizeList = [{ Name: 1, id: 1 }, { Name: 2, id: 2 }, { Name: 3, id: 3 }, { Name: 4, id: 4 }, { Name: 5, id: 5 }, { Name: 6, id: 6 }, { Name: 7, id: 7 }, { Name: 8, id: 8 }, { Name: 9, id: 9 }, { Name: 10, id: 10 }, { Name: 11, id: 11 }, { Name: 12, id: 12}];
+        var _ckeIframe;
+       
+        
+        // methods
+        var contentWidgetViewModel = function () {
+            this.widgetIdTemp = ko.observable();
+            this.WidgetId = ko.observable();
+            this.WidgetTypeId = ko.observable();
+            this.WidgetType = ko.observable();
+            this.WidgetTitleName = ko.observable();
+            this.WidgetSizeList = _WidgetSizeList;
+            this.selectedColumnSize = ko.observable();
+            this.selectedRowSize = ko.observable();
+            this.WidgetContent = ko.observable();
+            this.WidgetContentBg = ko.observable();
+            
+            this.WidgetForLocal = ko.observable();
+            this.WidgetForGlobal= ko.observable();
+            
+            this.saveWidget = function() {
+               reload();
+               saveWidgetInfo(false);
+               //$("#widgetTitleName").click().focus();
+               
+            };
+            this.saveCloseWidget = function() {
+                reload();
+                saveWidgetInfo(true);                                
+            };
+            this.cancelWidget = function() {
+                reload();
+                parent.$.fn.colorbox.close();
+            };
+            this.goBack = function(){
+                $('#contentWidgetFields > ul').stop().animate({left: "0"}, 500);
+            };
+            this.Preview = function() {
+                $("#widgetTitleName").focus();
+                document.getElementById('contentWidget_te').innerHTML = _html = _editor.getData(); //console.log("DATA:"); console.log(_editor.getData());
+                _VM.WidgetContent(_html);
+                _VM.WidgetContentBg($($('iframe.cke_reset').contents()[0]).find('html').css('background-color'));
+                $('#contentWidgetFields > ul').stop().animate({left: "-1310"}, 500);              
+            };
+            function reload() {
+                $("#widgetTitleName").focus();
+                var iframe = parent.document.getElementById('myIFrame');
+                iframe.src = iframe.src;
+            }
+        };
+        
+          var saveWidgetInfo = function (closePopup) {                 
+              var data = collectWidgetData();         
+              //console.log("--------saveWidgetInfo ----");
+              //console.log(data);
+                    if ((typeof data.WidgetTitleName === "undefined") || (data.WidgetTitleName === "")) {
+                        alert("Widget Name is required.");
+                    } else {                          
+                        //insert fill color tag
+                        
+                        if (data.WidgetType == "ContentWidget") {                       
+                            var editor = CKEDITOR.instances['contentWidget_te'];                      
+                            var initialColor = window.parent.__cke.getInitial();
+                            var editorColor;
+                            var existing = editor.document.getById('cke-background-fill');
+                            
+                            //no tag, no valid initial color onload, current applied color/no current applied color
+                            var applied = window.parent.__cke.getBackground();
+                            var val = applied == "undefined" || applied == "transparent" ? "transparent" : applied;
+                            //console.log("applied color: " + val);                                      
+                            var content = CKEDITOR.instances['contentWidget_te'].getData();
+                            var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                            var html = content + elem;
+                            CKEDITOR.instances['contentWidget_te'].setData(html);
+                            editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+                            data = collectWidgetData();     
+                            
+                            /* - remove this 
+                            if (existing == null || existing == undefined || existing === "undefined") {
+                                console.log("true");
+                                console.log(initialColor);
+                            } else {
+                                console.log("false");
+                            }
+                            */
+                            /*
+                            if (existing == null || existing == undefined || existing === "undefined") {
+                                //insert new tag based on validation result over _cke 'background' value
+                                //initialColor = window.parent.__cke.getInitial(); //.getBackground();
+                                editorColor = "undefined";
+                                console.log("editor color: " + editorColor);
+
+                                switch (initialColor) {
+                                    case "undefined":
+                                        console.log("---------------------------- (no tag,1)");
+                                        console.log("switch case: " + initialColor);
+
+                                        //no tag, no valid initial color onload, current applied color/no current applied color
+                                        var applied = window.parent.__cke.getBackground();
+                                        var val = applied == "undefined" || applied == "transparent" ? "transparent" : applied;
+                                        console.log("applied color: " + val);                                      
+                                        var content = CKEDITOR.instances['contentWidget_te'].getData();
+                                        var elem = '<p id="cke-background-fill" style="display:none;" data-color="' + val + '"></p>';
+                                        var html = content + elem;
+                                        CKEDITOR.instances['contentWidget_te'].setData(html);
+                                        editor.document.appendStyleText('html { background-color:' + val + '; } body { background-color: transparent; }');
+
+                                        console.log("content: " + content);
+                                        console.log("elem: " + elem);
+                                        console.log("html: " + html);
+                                        console.log(html);
+                                        console.log("----------------------------");
+                                        break;
+
+                                    case "transparent":
+                                    default:
+                                        console.log("---------------------------- (no tag,1)");
+                                        console.log("switch case: " + initialColor);
+
+                                        //no tag, valid initial color onload, current applied color
+                                        var applied = window.parent.__cke.getBackground();
+                                        var val = applied == initialColor ? initialColor : applied;
+                                        console.log("applied color: " + val);
+
+                                        var elem = new CKEDITOR.dom.element('input');
+                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                                        editor.insertElement(elem); console.log("element inserted into editor");
+                                        console.log("----------------------------");
+                                        break;
+
+                                };
+                            } else {
+                                editorColor = existing.getAttribute('data-color');
+                                console.log("editor color: ");
+                                console.log(editorColor);
+
+                                //tempColor = window.parent.__cke.getBackground();
+                                console.log("temp color: ");
+                                console.log(initialColor);
+                                
+                                switch (initialColor) {
+                                    case "undefined":
+                                        console.log("---------------------------- (tag,0)");
+                                        console.log("switch case: " + initialColor);
+
+                                        //tag with value, no initial color, current applied color 
+                                        var applied = window.parent.__cke.getBackground();
+                                        var val = applied == "undefined" || applied == "transparent" ? "transparent" : applied;
+                                        console.log("applied color: " + val);
+
+                                        var tag = editor.document.getById('cke-background-fill');
+                                        console.log("tag: " + tag);
+                                        if (tag) tag.remove();
+
+                                        console.log("tag: " + tag);
+
+
+                                        var elem = new CKEDITOR.dom.element('input');
+                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                                        editor.insertElement(elem); console.log("element inserted into editor");
+                                        console.log("----------------------------");
+                                        break;
+
+                                    case "transparent":
+                                    default:
+                                        console.log("---------------------------- (tag,1)");
+                                        console.log("switch case: " + initialColor);
+
+                                        //tag with value, valid initial color onload, current applied color
+                                        var applied = window.parent.__cke.getBackground();
+                                        var val = applied == initialColor ? initialColor : applied;
+                                        console.log("applied color: " + val);
+
+                                        var tag = editor.document.getById('cke-background-fill');
+                                        console.log("tag: " + tag);
+                                        if (tag) tag.remove();
+
+                                        console.log("tag: " + tag);
+
+                                        var elem = new CKEDITOR.dom.element('p');
+                                        elem.setAttribute('style', 'display:none;'); console.log("setting attr 'style'");
+                                        elem.setAttribute('id', 'cke-background-fill'); console.log("setting attr 'id'");
+                                        elem.setAttribute('data-color', val); console.log("setting attr 'data-color'"); //initialColor
+                                        editor.insertElement(elem); console.log("element inserted into editor");
+                                        console.log("----------------------------");
+                                        break;
+                                };
+                                      
+                            };
+                            
+                            data = collectWidgetData();
+                            console.log("data to store:");
+                            console.log(data);
+                            */
+                        };
+                         
+                         var widgetJsonCollector = function (widgetId,widgetForLocal,widgetForGlobal, jsonData) {
+                            var self = this;
+                            self.WidgetForLocal = widgetForLocal;
+                            self.WidgetForGlobal = widgetForGlobal;
+                            self.JsonData = jsonData;
+                            self.WidgetId = widgetId;
+                        };
+                       
+                        var widgetUrl = "";
+                        var myWidgetDataCollection = "";                        
+                        if (typeof(data.widgetIdTemp) == 'undefined') {
+                            myWidgetDataCollection = new widgetJsonCollector(data.WidgetId,data.WidgetForLocal,data.WidgetForGlobal, ko.toJSON(data));    
+                            widgetUrl = "/mvc/SystemSettings/WidgetManager/InsertWidget";
+                               $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                                         success: function (result) {
+                                                                        if (data.WidgetForLocal) { alert(result[0].Message);}
+                                                                        if (data.WidgetForGlobal) { alert(result[1].Message);}                                                                        
+                                                                        _VM.widgetIdTemp(result[0].ResultId + "|" + result[1].ResultId);                                                                        
+                                                                        if (closePopup) { 
+                                                                            parent.$.fn.colorbox.close();
+                                                                            $("#widgetTitleName").focus();
+                                                                            var iframe = parent.document.getElementById('myIFrame');
+                                                                            iframe.src = iframe.src;
+                                                                        }                                
+                                                                    }
+                                   });
+                        } else { 
+                            
+                            widgetUrl ="/mvc/SystemSettings/WidgetManager/UpdateWidget";
+                            var localId;
+                            var globalId;
+                            var updateWidgetId;
+                            if (data.widgetIdTemp.toString().indexOf("|") == -1) {
+                                localId = data.widgetIdTemp.toString();
+                                globalId = data.widgetIdTemp.toString();
+                            } else {
+                                updateWidgetId = data.widgetIdTemp.split('|');
+                                localId = updateWidgetId[0];
+                                globalId = updateWidgetId[1];
+                            }
+                  
+                            if (data.WidgetForLocal) {                               
+                                    _VM.WidgetId(localId);
+                                    myWidgetDataCollection = new widgetJsonCollector(localId,true,false, ko.toJSON(data));    
+                                    $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                                         success: function(result) {alert(result.Message); if (closePopup) { parent.$.fn.colorbox.close();$("#widgetTitleName").focus();var iframe = parent.document.getElementById('myIFrame');iframe.src = iframe.src;}}
+                                   });
+                            }
+                            if (data.WidgetForGlobal) {                                
+                               _VM.WidgetId(globalId);
+                               myWidgetDataCollection = new widgetJsonCollector(globalId,false,true, ko.toJSON(data));    
+                                    $.ajax({ url: widgetUrl,type: "POST", data: ko.toJSON(myWidgetDataCollection), dataType: "json",contentType: "application/json",
+                                         success: function (result) {alert(result.Message);if (closePopup) { parent.$.fn.colorbox.close();$("#widgetTitleName").focus();var iframe = parent.document.getElementById('myIFrame');iframe.src = iframe.src;} }
+                                   });
+                            }     
+                             
+                        }
+                   
+                    };
+                };
+        
+        
+        var createEditor = function (data) {
+            if (_editor)
+                return;
+
+            // Create a new editor by replacing textarea with id = contentWidget_te, setting its value to html
+            // var config = { language: 'en', toolbar: 'Full', height:'75px' };
+            var config2 = { language: 'en', toolbar: 'Full2', height: '380px' }; //{ language: 'en', toolbar: 'Basic' };
+
+            _editor = CKEDITOR.replace('contentWidget_te', config2, _html);
+            
+            CKEDITOR.instances['contentWidget_te'].on('instanceReady', function () {
+                window.parent.__cke.onLoad(_editor, data);
+                //console.log('You are in ' + (document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks') + ' mode.');
+            });
+        };
+        var removeEditor = function () {
+            if (!_editor)
+                return;
+
+            // Destroy the editor.
+            _editor.destroy();
+            _editor = null;
+        };
+        var collectWidgetData = function () {
+            document.getElementById('contentWidget_te').innerHTML = _html = _editor.getData(); 
+            //console.log("DATA:"); 
+            //console.log(_editor.getData());
+            //document.getElementById('contentWidget_HLte').innerHTML = _html2 = _editor2.getData();
+            _VM.WidgetContent(_html);
+            //_VM.widgetIdTemp("");
+            //_VM.WidgetHeadline(_html2);
+            //_VM.WidgetSizeList = "";
+            return ko.toJS(_VM);
+        };
+//        var preview = function (data, event) {
+//            var jsonData = collectWidgetData();
+//            //var preBg = $($('iframe.cke_reset').contents()[0].all[0]).html();
+//            var preBg = $($('iframe.cke_reset').contents()[0]).find('html').css('background-color');
+//            //var preBg = $('iframe.cke_reset').css('background');
+//            //var preBg = $('#cke_1_contents').find('html').css('background');
+//            console.log(preBg);
+//            var rowSize = eval(jsonData.selectedRowSize) * 90;
+//            var colSize = eval(jsonData.selectedColumnSize) * 90;
+//            var popx = screen.width / 2 - 1200 / 2;
+//            var popy = screen.height / 2 - 500 / 2;
+//            //myWindow = window.open('', '','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width='+colSize+',height='+rowSize+',top='+popy+',left='+popx);
+//            var myWindow = window.open('', '', 'width=1200,height=500,top=' + popy + ',left=' + popx);
+//            myWindow.document.write('<div style="margin: 0 auto;padding-left:10px;font-family: Arial, Helvetica, sans-serif;font-size: 13px;font-weight: normal; line-height:1;background:' + preBg + ';width:' + colSize + ';height:' + rowSize + '; overflow:hidden;border:1px solid #ccc;">' + jsonData.WidgetContent + '</div>');
+//            myWindow.focus();
+//        };
+        var loadData = function (widgetId,data, widgetInfo) {            
+            _VM.widgetIdTemp(widgetId);
+            _VM.WidgetId(widgetId);
+            _VM.WidgetTypeId(data.WidgetTypeId);
+            _VM.WidgetType(data.WidgetType);
+            _VM.WidgetTitleName(data.WidgetTitleName);            
+            _VM.selectedColumnSize(data.selectedColumnSize);
+            _VM.selectedRowSize(data.selectedRowSize);
+            _VM.WidgetContent(data.WidgetContent);                                   
+            _VM.WidgetForLocal(widgetInfo.WidgetForLocal);
+            _VM.WidgetForGlobal(widgetInfo.WidgetForGlobal);
+            
+            removeEditor();
+            createEditor(data.WidgetContent);
+           
+        };
+        var init = function () {
+            var widgetData = $.parseJSON(@Html.Raw(Json.Encode(Model.JsonData)));
+            var widgetInfo = @Html.Raw(Json.Encode(Model));            
+            _VM = new contentWidgetViewModel();
+            
+            if (widgetInfo.WidgetId > 0) {                
+                loadData(@Model.WidgetId,widgetData, widgetInfo);
+            } else {
+                //new: set creation properties into View Model
+                console.log(widgetData);
+                _VM.widgetIdTemp(widgetData.WidgetId);
+                _VM.WidgetId(widgetData.WidgetId);
+                _VM.WidgetTypeId(widgetData.WidgetTypeId);
+                _VM.WidgetType(widgetData.WidgetType);
+                                
+                _VM.WidgetForLocal(widgetInfo.WidgetForLocal);
+                _VM.WidgetForGlobal(widgetInfo.WidgetForGlobal);
+                
+                //create editor
+                removeEditor();
+                createEditor();
+            };
+            ko.applyBindings(_VM, _view.get(0));
+        };
+        
+        return {
+            Init: init
+        };
+    })();
+    uxAdmin.WidgetManager.ContentWidget.Init();
+    $(function() { $('body').css('overflow', 'hidden'); });
+</script>

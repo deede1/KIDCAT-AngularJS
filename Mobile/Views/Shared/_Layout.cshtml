@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="@Url.Content("~/Areas/Mobile/Public/css/style.css")">
+    <link rel="stylesheet" id="kidsStylesheet" href="@Url.Content("~/Areas/Mobile/Public/css/kidsCatalog.css")">
+    <link rel="stylesheet" href="@Url.Content("~/Areas/Mobile/Public/lib/boostrap/css/bootstrap.min.css")" >            
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Quattrocento+Sans' type='text/css'>
+    @Html.LocalResourceCss("~/Public/Styles/myAccountPagination.css")
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <style type="text/css">
+/*         .login-dialog .modal-dialog { width: 300px; }*/
+        </style>                   
+</head>
+    <body>
+        <div>
+            @RenderBody()
+        </div>    
+    </body>
+</html>

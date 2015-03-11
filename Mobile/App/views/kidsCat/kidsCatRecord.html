@@ -1,0 +1,149 @@
+﻿<kidsheader></kidsheader>
+<div id="kidcatBody">
+<header></header>
+    <div id="full-record-container">
+        <div id="record-content">
+            <div id="full-record-header">
+                <a class="back-button" ng-show="!Isac" ng-click="goBack()"></a>
+                <a class="home-button" ng-show="Isac"  ng-click="goBack()"></a>
+                <h1 ng-bind="RecordTitle">
+                </h1>
+                <a id="print-btn" href="#" ng-click="PrintRecord()" ng-show="(fullRecord.FullRecord.LabelFields.length>0)">
+                </a>
+            </div>
+            <div id="line-divider">
+            </div>
+           <!-- <div class="loader" data-bind="visible: showSmallLoader()">
+                Loading ...
+                <br />
+                <img src="../../mvc/Public/Images/loading18.gif" />
+            </div>-->
+            <div class="content-left">
+                <img ng-src="{{fullRecord.FullRecord.JacketArtUrl}}" />
+                <a ng-show="(fullRecord.FullRecord.LabelFields.length>0)" ng-click="IlsPlaceHold()" id="iwantit-btn">
+                </a>
+            </div>
+            <div class="content-right">
+                <ul>
+                    <li ng-repeat="LabelField in fullRecord.FullRecord.LabelFields">
+                        <label ng-bind="LabelField.Title + ' : '">
+                        </label>
+                        <!-- if: IsHotLink -->
+                        <a ng-show="(LabelField.IsHotLink)" target="_blank" ng-bind-html="LabelField.Value" ng-click="HotLink()" style="cursor: pointer">
+                        </a>
+                        <!--  -->
+                        <!-- ko ifnot:IsHotLink -->
+                        <div ng-show="!(LabelField.IsHotLink)" ng-bind-html="LabelField.Value">
+                        </div>
+                    </li>
+                </ul>
+                <table id="locations" ng-show="(fullRecord.FullRecord.TotalLocations>0)">
+                    <thead>
+                        <tr ng-repeat="holding in fullRecord.FullRecord.ItemAvailabilities.Holdings">
+                            <!-- ko if : $index() == 0 -->
+                            <!-- ko foreach: $data.Holdings[0].GridColumns -->
+                            <!-- ko if: $index()< ($parent.Holdings[0].GridColumns.length-1)-->
+                            <th ng-repeat="col in holding.GridColumns" ng-show="!$last">
+                                <span >{{col}}</span>
+                            </th>
+                            <!-- /ko -->
+                            <!-- ko if:$index() == ($parent.Holdings[0].GridColumns.length-1) -->
+                            <th ng-show="$last">
+                                 <span ng-bind="col"></span>
+                            </th>
+                            <!-- /ko -->
+                            <!-- ko ifnot: $parent.MapURI == "" -->
+                            <!-- ko if : $index() == ($parent.Holdings[0].GridColumns.length - 1) -->
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ko foreach:Holdings() -->
+                        <tr ng-repeat="holding  in fullRecord.FullRecord.ItemAvailabilities.Holdings">
+                            <!-- ko foreach: $data.GridData -->
+                            <!-- ko ifnot: $data == null -->
+                            <!-- ko ifnot: $index() == 3 -->
+                            <td ng-show="($index !=3)" ng-repeat="data in holding.GridData" >
+                            </td>
+                            <!-- /ko -->
+                            <!-- ko if: $index() == 3 -->
+                            <td ng-show="($index ==3)" ng-repeat="data in holding.GridData" ng-bind-html="'<b style=background:'+ data +'></b>' ">
+                            </td>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- ko if: $data == null -->
+                            <td />
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </tr>
+                        <!-- /ko -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+     <!--   <div id="print-preview">
+            <div class="content-left">
+                <img data-bind="attr:{src:JacketArtUrl}" />
+                <a data-bind="visible:LabelFields().length>0"></a>
+            </div>
+            <div class="content-right" style="overflow: visible">
+                <ul data-bind="foreach:LabelFields">
+                    <li>
+                        <label data-bind="text:Title">
+                        </label>
+                        <div data-bind="text:Value">
+                        </div>
+                    </li>
+                </ul>
+                <table data-bind="if:TotalLocations()>0">
+                    <thead>
+                        <tr data-bind="foreach:ItemAvailabilities">
+                            <!-- ko if : $index() == 0 -->
+                            <!-- ko foreach: $data.Holdings[0].GridColumns -->
+                            <!-- ko if: $index()< ($parent.Holdings[0].GridColumns.length-1)-->
+                            <th>
+                                <span data-bind="text: $data"></span>
+                            </th>
+                            <!-- /ko -->
+                            <!-- ko if:$index() == ($parent.Holdings[0].GridColumns.length-1) -->
+                            <th>
+                            </th>
+                            <!-- /ko -->
+                            <!-- ko ifnot: $parent.MapURI == "" -->
+                            <!-- ko if : $index() == ($parent.Holdings[0].GridColumns.length - 1) -->
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ko foreach:Holdings() -->
+                        <tr>
+                            <!-- ko foreach: $data.GridData -->
+                            <!-- ko ifnot: $data == null -->
+                            <!-- ko ifnot: $index() == 3 -->
+                            <td data-bind="text: $data ">
+                            </td>
+                            <!-- /ko -->
+                            <!-- ko if: $index() == 3 -->
+                            <td data-bind="html: '<b style=background:'+ $data +'></b>' ">
+                            </td>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- ko if: $data == null -->
+                            <td />
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </tr>
+                        <!-- /ko -->
+                    </tbody>
+                </table>
+            </div>
+        </div>-->
+    </div>
+</div>
+

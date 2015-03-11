@@ -1,0 +1,119 @@
+﻿<nav-menux class="masthead" ></nav-menux>
+<div class="clearfix"></div>
+<div class="container">
+    <style>
+        .nivo-caption {
+    background: none repeat scroll 0 0 #3d3d3d;
+    bottom: 0;
+    box-sizing: border-box;
+    color: #888888;
+    display: none;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 13px;
+    left: 0;
+    opacity: 0.9;
+    overflow: hidden;
+    padding: 20px;
+    position: absolute;
+    width: 40%;
+    z-index: 8;
+}
+
+    </style>
+    <div class="container-fluid">
+        <hr/>
+        <carousel interval="myInterval">
+            <slide ng-repeat="slide in slides" active="slide.active">
+                <img ng-src="{{slide.image}}" style="margin:auto; width: 100%">
+                <div class="carousel-caption">
+                   <!-- <h4>Slide {{$index}}</h4>-->
+                    <div class="nivo-caption">
+                        {{slide.text}}
+                    </div>
+                    
+                </div>
+            </slide>
+        </carousel>
+        <div class="slider_bg">
+            <div class="row show-grid">
+                <div class="col-xs-6 center">
+                    <a data-target="#myModal" data-toggle="modal">
+                        <div class="glyphicon glyphicon-user icon-bg blue-icon icon-position glyphicon-cursor-pointer" ng-click="MyAccount()"></div>
+                        <div class="glyphicon-cursor-pointer" ng-click="MyAccount()">My Account</div>
+                    </a>
+                </div>
+                <div class="col-xs-6 center">
+                    <div class="glyphicon glyphicon-list-alt icon-bg red-icon icon-position  glyphicon-cursor-pointer" ng-click="Events()"></div>
+                    <div class="glyphicon-cursor-pointer" ng-click="Events()">Events</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main_bg" >            
+            <div style="margin: 10px">
+                <div class="wrap">
+                    <div class="main">
+                        <div class="content">
+                            <h2>our customer says</h2>
+                            <h3>Providing the tools and technology to power the library of the future</h3>
+                            <p><a href="details.html"><img src="/mvc/Areas/Mobile/Public/images/pic1.jpg"></a> 
+                            The library of the future is web-enabled, participatory and made of people. It is more than just book repositories; it is an information and community center. Auto-Graphics believes that the more libraries fully engage and make available their tools and information, the more central they become in the lives of their constituencies. Our products are designed to help libraries manage, share and search their resources.
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main_btm">
+                    <div class="wrap">
+                        <div class="main">
+                            <div class="gallery">
+                                <h3>Our latest projects</h3>
+                                <ul>
+                                    <li><a href="images/gallery1.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery1.jpg" alt=""></a><a href="#"></a></li>
+                                    <li><a href="images/gallery2.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery2.jpg" alt=""></a><a href="#"></a></li>
+                                    <li><a href="images/gallery3.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery3.jpg" alt=""></a><a href="#"></a></li>
+                                    <li><a href="images/gallery4.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery4.jpg" alt=""></a><a href="#"></a></li>
+                                    <li><a href="images/gallery4.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery4.jpg" alt=""></a><a href="#"></a></li>
+                                    <li><a href="images/gallery3.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery3.jpg" alt=""></a><a href="#"></a></li>
+                                    <li><a href="images/gallery5.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery5.jpg" alt=""></a><a href="#"></a></li>
+                                    <li><a href="images/gallery6.jpg"><img src="/mvc/Areas/Mobile/Public/images/gallery6.jpg" alt=""></a><a href="#"></a></li>
+                                </ul>
+                            </div>
+            
+                            <div class="terminals">
+                                <h3>Testimonials</h3>
+                                <p>"We anticipate that the efficiencies that will be gained with this new technology and the staff time savings that will be achieved by implementing CILL will allow our libraries to focus on what they do best – help the people in their neighborhoods. With this new ILS system patrons will have increased access to library collections, and we can share our resources through ILL much more readily."
+                                    <br/><br/> Chuck Sherrill State Librarian & Archivist at Tennessee State Library and Archives
+                                </p>                            
+                            </div>
+                            <div class="clear"> </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+        <div id="footer">
+            <div class="ftr-bg">
+                <div class="wrap">
+                    <div class="footer">
+                        <div class="copy">
+                            <p class="w3-link">
+                                Copyright © 2014.
+                                <a href="http://www4.auto-graphics.com/index.asp">Auto-Graphics</a>
+                                , Inc.
+                            </p>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+  

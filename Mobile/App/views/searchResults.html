@@ -1,0 +1,33 @@
+﻿<nav-menux class="masthead" ></nav-menux>
+<div class="container">
+   <div class="container-fluid vertical-room">
+      <div class="row">
+          <div class="col-md-12" role="main">
+              <pager total-items="totalItems" ng-model="currentPage"  ng-change="pageChanged()"></pager>      
+              <pre><span ng-bind="totalHits"></span> Results Found...</pre>
+              <div class="row">
+                  <div class="col-sm-12 col-md-4"  ng-repeat="searchResult in SearchResults.MobileSearchQueryResult.MobileSearchResult">                  
+                      <div class="thumbnail"  >
+                          <div class="col-xs-1 placeholder">
+                              <br/>
+                              <img alt="300x200" onerr ng-src="{{searchResult.JacketArtUrl}} " ng-click="recordDetail(searchResult.AgControlId)" style="cursor: pointer; width: 60px;height: 100px; margin: -5px">                          
+                          </div>
+
+                          <div class="caption" style="margin: 0 80px !important; width: 150px">
+                              <div class="link_truncated"><span ng-click="recordDetail(searchResult.AgControlId)" style="cursor: pointer">{{searchResult.Title}}</span></div>
+                              <div class="link_truncated"><span class="searchResultLabel">{{searchResult.Author}}</span></div>
+                              <div class="link_truncated"><span class="searchResultLabel">Call Number: </span>{{searchResult.CallNumber}}</div>
+                              <div class="link_truncated"><span class="searchResultLabel">Publisher: </span>{{searchResult.Publisher}}</div>
+                              <div class="link_truncated"><span class="searchResultLabel">ISBN: </span>{{searchResult.Isbn}}</div>                              
+                              <placehold-button record="searchResult"></placehold-button>                        
+                          </div>
+                      </div>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+   </div>
+</div>
+
